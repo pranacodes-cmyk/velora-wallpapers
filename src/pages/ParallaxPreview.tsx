@@ -33,7 +33,7 @@ export default function ParallaxPreview() {
   const fgRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef<HTMLDivElement>(null);
 
-  const { current, needsPermission, granted, requestPerm, skipPermission } = useParallaxTilt();
+  const { current } = useParallaxTilt();
 
   const [applying, setApplying] = useState(false);
   const [appliedOk, setAppliedOk] = useState(false);
@@ -414,25 +414,6 @@ export default function ParallaxPreview() {
         )}
       </div>
 
-
-      {/* iOS motion permission overlay */}
-      {needsPermission && !granted && (
-        <div className="absolute inset-0 z-[60] bg-black/75 backdrop-blur-xl flex items-center justify-center p-6">
-          <div className="bg-card border border-border rounded-3xl p-6 max-w-sm text-center">
-            <Smartphone className="w-8 h-8 text-primary mx-auto mb-3" />
-            <h2 className="text-lg font-bold text-foreground mb-2">{t("px.enableMotionTitle")}</h2>
-            <p className="text-sm text-muted-foreground mb-5">
-              {t("px.enableMotionBody")}
-            </p>
-            <button onClick={requestPerm} className="w-full py-3 rounded-2xl bg-primary text-primary-foreground font-bold">
-              {t("px.enableMotionCta")}
-            </button>
-            <button onClick={skipPermission} className="w-full mt-2 py-2 text-xs text-muted-foreground">
-              {t("px.skipMotion")}
-            </button>
-          </div>
-        </div>
-      )}
 
       <PersonalizeCrossSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
       <PremiumSheet

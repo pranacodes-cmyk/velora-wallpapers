@@ -1,25 +1,18 @@
-import { useEffect, useRef, useState } from "react";
-import { isAndroidPerfMode } from "@/lib/androidPerf";
+import { useEffect, useRef } from "react";
 
 /**
  * Shared tilt engine for parallax previews.
- * - iOS: requires DeviceOrientationEvent.requestPermission().
- * - Android/desktop: DeviceOrientation auto-attaches; falls back to mouse.
- * Returns a `bind` ref for the container (used only for mouse fallback bounds)
- * and a `current` position vector { x, y } in the -1..1 range that the
+ * - DeviceOrientation auto-attaches where available (Android/desktop).
+ * - Falls back to mouse movement on desktop.
+ * Returns a `current` position vector { x, y } in the -1..1 range that the
  * consumer reads inside its own requestAnimationFrame loop.
  */
 export function useParallaxTilt(opts?: { enableMouse?: boolean; container?: React.RefObject<HTMLElement> }) {
   const enableMouse = opts?.enableMouse ?? true;
-  // Parallax tilt is a star conversion feature — never freeze on Android.
-  const freezeForAndroid = false;
   const target = useRef({ x: 0, y: 0 });
   const current = useRef({ x: 0, y: 0 });
-  const [needsPermission, setNeedsPermission] = useState(false);
-  const [granted, setGranted] = useState(false);
 
   useEffect(() => {
-    if (freezeForAndroid) return;
     let raf = 0;
     const loop = () => {
       current.current.x += (target.current.x - current.current.x) * 0.1;
@@ -28,10 +21,9 @@ export function useParallaxTilt(opts?: { enableMouse?: boolean; container?: Reac
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [freezeForAndroid]);
+  }, []);
 
   useEffect(() => {
-    if (!granted || freezeForAndroid) return;
     const handler = (e: DeviceOrientationEvent) => {
       const gamma = e.gamma ?? 0;
       const beta = (e.beta ?? 45) - 45;
@@ -40,10 +32,10 @@ export function useParallaxTilt(opts?: { enableMouse?: boolean; container?: Reac
     };
     window.addEventListener("deviceorientation", handler);
     return () => window.removeEventListener("deviceorientation", handler);
-  }, [freezeForAndroid, granted]);
+  }, []);
 
   useEffect(() => {
-    if (!enableMouse || freezeForAndroid) return;
+    if (!enableMouse) return;
     const el = opts?.container?.current;
     const handler = (e: MouseEvent) => {
       if (el) {
@@ -58,36 +50,7 @@ export function useParallaxTilt(opts?: { enableMouse?: boolean; container?: Reac
     const t = el ?? window;
     t.addEventListener("mousemove", handler as EventListener);
     return () => t.removeEventListener("mousemove", handler as EventListener);
-  }, [enableMouse, freezeForAndroid, opts?.container]);
+  }, [enableMouse, opts?.container]);
 
-  useEffect(() => {
-    if (freezeForAndroid) return;
-    const AnyEvt = DeviceOrientationEvent as unknown as {
-      requestPermission?: () => Promise<"granted" | "denied">;
-    };
-    if (typeof AnyEvt.requestPermission === "function") setNeedsPermission(true);
-    else setGranted(true);
-  }, [freezeForAndroid]);
-
-  const requestPerm = async () => {
-    const AnyEvt = DeviceOrientationEvent as unknown as {
-      requestPermission?: () => Promise<"granted" | "denied">;
-    };
-    try {
-      const res = await AnyEvt.requestPermission?.();
-      if (res === "granted") {
-        setGranted(true);
-        setNeedsPermission(false);
-      }
-    } catch {
-      /* noop */
-    }
-  };
-
-  const skipPermission = () => {
-    setGranted(true);
-    setNeedsPermission(false);
-  };
-
-  return { current, needsPermission, granted, requestPerm, skipPermission };
+  return { current };
 }

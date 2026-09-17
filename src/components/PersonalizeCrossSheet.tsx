@@ -306,9 +306,10 @@ export function EngravedOverlay({
           style={{
             fontFamily: "'Georgia', 'Times New Roman', serif",
             fontWeight: 500,
-            color: "hsl(38 50% 97%)",
+            color: "hsl(38 60% 99%)",
             fontSize: verseSize,
-            textShadow: "0 2px 6px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.7)",
+            textShadow: "0 2px 6px rgba(0,0,0,0.95), 0 0 12px rgba(0,0,0,0.8)",
+            opacity: isPlaceholder ? 0.7 : 1,
           }}
         >
           "{verse.text}"
@@ -325,7 +326,7 @@ export function EngravedOverlay({
             color: "hsl(42 96% 70%)",
             textShadow:
               "0 1px 3px rgba(0,0,0,0.95), 0 0 10px hsl(42 90% 45% / 0.55)",
-            opacity: isPlaceholder ? 0.45 : 0.98,
+            opacity: isPlaceholder ? 0.75 : 1,
           }}
         >
           {t("px.jesusLoves")}
@@ -340,7 +341,7 @@ export function EngravedOverlay({
             color: "hsl(38 55% 97%)",
             textShadow:
               "0 2px 5px rgba(0,0,0,0.95), 0 0 16px hsl(42 90% 45% / 0.55), 0 0 26px rgba(0,0,0,0.7)",
-            opacity: isPlaceholder ? 0.4 : 1,
+            opacity: isPlaceholder ? 0.7 : 1,
           }}
         >
           {displayName}

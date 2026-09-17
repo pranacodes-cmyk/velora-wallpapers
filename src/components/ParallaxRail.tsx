@@ -509,42 +509,7 @@ export function ParallaxRail() {
     return () => window.removeEventListener(PERSONAL_CROSS_EVENT, sync);
   }, [version]);
 
-  // Beautiful one-shot swipe cue: shows the first time the rail scrolls into
-  // view, disappears the moment the user swipes (and stays gone after they've
-  // learned the gesture once).
-  const [showCue, setShowCue] = useState(false);
-  const cueDoneRef = useRef(false);
   const stageRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (scenes.length < 2) return;
-    let learned = false;
-    try { learned = localStorage.getItem("prayly_parallax_swipe_cue_v1") === "1"; } catch { /* noop */ }
-    if (learned) return;
-    const el = stageRef.current;
-    if (!el || !("IntersectionObserver" in window)) return;
-    let timer: number | undefined;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0]?.isIntersecting || cueDoneRef.current) return;
-        cueDoneRef.current = true;
-        io.disconnect();
-        setShowCue(true);
-        timer = window.setTimeout(() => setShowCue(false), 5200);
-      },
-      { threshold: 0.4 }
-    );
-    io.observe(el);
-    return () => { io.disconnect(); if (timer) window.clearTimeout(timer); };
-  }, [scenes.length]);
-
-  const dismissCue = () => {
-    setShowCue(false);
-    cueDoneRef.current = true;
-    try { localStorage.setItem("prayly_parallax_swipe_cue_v1", "1"); } catch { /* noop */ }
-  };
-  const dismissCueRef = useRef(dismissCue);
-  dismissCueRef.current = dismissCue;
 
 
   // Track which card is snapped into view so the CTA + dots reflect it.
@@ -553,7 +518,6 @@ export function ParallaxRail() {
     if (!el) return;
     let raf = 0;
     const onScroll = () => {
-      if (el.scrollLeft > 6) dismissCueRef.current();
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
@@ -663,45 +627,6 @@ export function ParallaxRail() {
           </button>
         )}
 
-        {/* First-visit swipe cue — glass pill with a gliding finger + gold trail */}
-        {showCue && (
-          <button
-            type="button"
-            onClick={() => {
-              const el = scrollerRef.current;
-              if (el) el.scrollTo({ left: (activeIdx + 1) * el.clientWidth, behavior: "smooth" });
-              dismissCue();
-            }}
-            className="absolute left-1/2 -translate-x-1/2 bottom-[13%] z-30 flex items-center gap-2.5 pl-3 pr-3.5 h-10 rounded-full prayly-cue-in"
-            style={{
-              color: "hsl(0 0% 100% / 0.95)",
-              background: "hsl(0 0% 0% / 0.5)",
-              backdropFilter: "blur(16px) saturate(160%)",
-              WebkitBackdropFilter: "blur(16px) saturate(160%)",
-              boxShadow:
-                "0 14px 30px -12px hsl(0 0% 0% / 0.8), inset 0 0 0 1px hsl(42 75% 65% / 0.38)",
-            }}
-            aria-label={t("px.swipeCueAria")}
-          >
-            <span aria-hidden className="relative w-9 h-4 overflow-hidden">
-              <span
-                className="absolute top-1/2 -translate-y-1/2 h-[2px] w-5 rounded-full prayly-cue-trail"
-                style={{ background: "linear-gradient(90deg, transparent, hsl(42 85% 65% / 0.85))" }}
-              />
-              <span
-                className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full prayly-cue-dot"
-                style={{
-                  background: "hsl(42 90% 70%)",
-                  boxShadow: "0 0 10px hsl(42 90% 62% / 0.85)",
-                }}
-              />
-            </span>
-            <span className="text-[11px] font-bold tracking-[0.1em] uppercase whitespace-nowrap">
-              {t("px.swipeForMore")}
-            </span>
-            <span className="text-[15px] leading-none text-white/70">›</span>
-          </button>
-        )}
       </div>
 
 
@@ -756,26 +681,8 @@ export function ParallaxRail() {
           50% { transform: translate(-4px, -50%); }
         }
         .prayly-rail-next-cue { animation: prayly-rail-next-cue 1800ms ease-in-out infinite; }
-        @keyframes prayly-cue-in {
-          from { opacity: 0; transform: translate(-50%, 8px); }
-          to { opacity: 1; transform: translate(-50%, 0); }
-        }
-        .prayly-cue-in { animation: prayly-cue-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-        @keyframes prayly-cue-dot {
-          0% { transform: translate(20px, -50%); opacity: 0; }
-          18% { opacity: 1; }
-          72% { opacity: 1; }
-          100% { transform: translate(0px, -50%); opacity: 0; }
-        }
-        .prayly-cue-dot { animation: prayly-cue-dot 1500ms cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-        @keyframes prayly-cue-trail {
-          0% { transform: translate(24px, -50%) scaleX(0.2); opacity: 0; }
-          35% { opacity: 0.9; }
-          100% { transform: translate(2px, -50%) scaleX(1); opacity: 0; }
-        }
-        .prayly-cue-trail { transform-origin: right center; animation: prayly-cue-trail 1500ms cubic-bezier(0.4, 0, 0.2, 1) infinite; }
         @media (prefers-reduced-motion: reduce) {
-          .prayly-cue-dot, .prayly-cue-trail, .prayly-rail-next-cue { animation: none; }
+          .prayly-rail-next-cue { animation: none; }
         }
 
       `}</style>

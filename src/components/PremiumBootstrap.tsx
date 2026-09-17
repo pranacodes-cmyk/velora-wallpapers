@@ -12,6 +12,11 @@ export function PremiumBootstrap({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
     let cancelled = false;
+    // Never hold the first frame hostage to a slow Play/RevenueCat handshake.
+    // After this cap the app renders and reconciliation finishes in background
+    // (usePremium re-reads the snapshot, and an open paywall auto-closes).
+    const cap = window.setTimeout(() => { if (!cancelled) setReady(true); }, 900);
+
 
     const hydrate = async () => {
       try {
@@ -38,10 +43,11 @@ export function PremiumBootstrap({ children }: { children: React.ReactNode }) {
     };
 
     void hydrate();
-    return () => { cancelled = true; };
+    return () => { cancelled = true; window.clearTimeout(cap); };
   }, []);
 
   if (!ready) {
+    // Plain dark screen while Play ownership reconciles (max ~900ms).
     return <div className="fixed inset-0 bg-background" aria-label="Opening Prayly" />;
   }
   return children;
