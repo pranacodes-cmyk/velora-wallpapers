@@ -1,0 +1,1 @@
+update public.ota_bundles set native_version = null where version = '1.0.5';

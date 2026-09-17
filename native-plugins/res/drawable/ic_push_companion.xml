@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chat bubble glyph — for the Bible Companion push. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:strokeColor="#F0D9A0"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M4,5.5C4,4.7 4.7,4 5.5,4L18.5,4C19.3,4 20,4.7 20,5.5L20,15C20,15.8 19.3,16.5 18.5,16.5L9.5,16.5L6,20L6,16.5L5.5,16.5C4.7,16.5 4,15.8 4,15Z" />
+    <path
+        android:strokeColor="#F0D9A0"
+        android:strokeWidth="2.4"
+        android:strokeLineCap="round"
+        android:pathData="M8.5,10L8.51,10 M12,10L12.01,10 M15.5,10L15.51,10" />
+</vector>

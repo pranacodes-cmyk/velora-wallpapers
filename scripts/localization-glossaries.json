@@ -1,0 +1,49 @@
+{
+  "hi": {
+    "register": "Warm, clear, conversational Hindi. Use respectful आप in devotional guidance; preserve तुम/तू only inside established Scripture wording or direct prayer when intentional.",
+    "terms": {
+      "God": "परमेश्वर",
+      "Lord": "प्रभु",
+      "Jesus": "यीशु",
+      "Holy Spirit": "पवित्र आत्मा",
+      "Scripture/Word": "वचन",
+      "verse": "वचन",
+      "faith": "विश्वास",
+      "grace": "अनुग्रह",
+      "salvation": "उद्धार",
+      "Matthew": "मत्ती",
+      "Mark": "मरकुस",
+      "Luke": "लूका",
+      "John": "यूहन्ना",
+      "James": "याकूब",
+      "Peter": "पतरस",
+      "Paul": "पौलुस",
+      "David": "दाऊद",
+      "Eve": "हव्वा",
+      "Job": "अय्यूब",
+      "Revelation": "प्रकाशितवाक्य"
+    },
+    "forbidden": [
+      "पूर्व संध्या",
+      "नौकरी",
+      "न्यायमूर्ति",
+      "मैथ्यू",
+      "मार्क ",
+      "ल्यूक",
+      "जॉन",
+      "पीटर",
+      "पॉल",
+      "जेम्स"
+    ]
+  },
+  "fr": {
+    "register": "Devotional prose uses warm singular tu; Scripture quotations retain the wording of the chosen Bible translation, including vous where present."
+  },
+  "id": {
+    "register": "Use warm kamu in devotional prose. Use Allah in Scripture and direct references to God; Tuhan where idiomatic in narrative and prayer."
+  },
+  "es": { "register": "Warm singular tú; natural Christian devotional Spanish." },
+  "pt": { "register": "Warm Brazilian Portuguese with você; natural Christian devotional wording." },
+  "fil": { "register": "Natural conversational Filipino Christian language; avoid stiff word-for-word English syntax." },
+  "de": { "register": "Warm singular du; established German Bible names and Christian terminology." }
+}

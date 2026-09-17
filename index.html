@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#0a0f1a" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="icon" type="image/png" href="/app-logo.png">
+    <title>Prayly: Bible Prayer &amp; Verse</title>
+    <meta name="description" content="Prayly: Bible Prayer & Verse — Daily prayers, Bible verses, and faith-inspired wallpapers to start and end each day with God's Word.">
+    <meta name="author" content="Prayly: Bible Prayer & Verse" />
+
+    <meta property="og:type" content="website" />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    
+    
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+  
+  
+  
+  <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8131fe89-ca72-414d-8f9e-e828bf5e80d5/id-preview-a20f64e6--0cc114ba-dc6e-4e91-8e17-90d5e121f671.lovable.app-1776435107432.png">
+  <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8131fe89-ca72-414d-8f9e-e828bf5e80d5/id-preview-a20f64e6--0cc114ba-dc6e-4e91-8e17-90d5e121f671.lovable.app-1776435107432.png">
+  <meta property="og:title" content="Prayly: Bible Prayer &amp; Verse">
+  <meta name="twitter:title" content="Prayly: Bible Prayer &amp; Verse">
+  <meta property="og:description" content="Prayly: Bible Prayer &amp; Verse — Daily prayers, Bible verses, and faith-inspired wallpapers to start and end each day with God's Word.">
+  <meta name="twitter:description" content="Prayly: Bible Prayer &amp; Verse — Daily prayers, Bible verses, and faith-inspired wallpapers to start and end each day with God's Word.">
+    <style>
+      html,body{background:#0a0f1a;margin:0}
+    </style>
+    <script>
+      // Set perf-throttling classes BEFORE any CSS/JS renders. Doing this in
+      // main.tsx means Android devices burn one full paint pass with
+      // backdrop-filter / mix-blend-mode / infinite animations enabled — that
+      // paint pass is exactly what the nSyncAndDrawFrame ANR traces show.
+      (function () {
+        try {
+          var de = document.documentElement;
+          var n = navigator || {};
+          var ua = n.userAgent || "";
+          if (/Android/i.test(ua)) de.classList.add("android-device");
+          var mem = typeof n.deviceMemory === "number" ? n.deviceMemory : null;
+          var cores = typeof n.hardwareConcurrency === "number" ? n.hardwareConcurrency : null;
+          if ((mem !== null && mem <= 4) || (cores !== null && cores <= 6) || /Android/i.test(ua)) {
+            de.classList.add("low-end-device");
+          }
+          de.classList.add("startup-safe-mode");
+          setTimeout(function () { de.classList.remove("startup-safe-mode"); }, 10000);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

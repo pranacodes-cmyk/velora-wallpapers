@@ -1,0 +1,814 @@
+[
+ {
+  "key": "j.healing.d4.explanation",
+  "value": "Jérémie ne supplie pas — il déclare. Si Dieu guérit, la guérison est durable. Aucun humain, aucune thérapie, aucun temps ne peut faire ce que Lui fait. Demandez-Lui directement.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "j.marriage-love.d7.opening",
+  "value": "Deux personnes qui essaient de maintenir un mariage par la seule volonté finiront par s'épuiser. Ajoutez un troisième brin — Lui — et la corde supportera un poids que deux personnes seules n'auraient jamais pu porter. Priez ensemble, même si c'est gênant. Surtout si c'est gênant.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.anxiety-peace::1.meditation",
+  "value": "Remarquez ce que ce verset ne fait pas. Il ne vous fait pas honte de ressentir de l'anxiété. Il ne prétend pas que le problème est insignifiant. Il offre simplement une nouvelle destination à votre peur. L'anxiété grandit quand elle n'a nulle part où aller, alors elle tourne en rond dans votre poitrine et se fait passer pour de la préparation. La prière brise ce cercle. Quand vous dites à Dieu la vraie chose – pas la chose polie, la vraie chose – vous n'êtes plus seul avec elle. Vous devrez peut-être toujours faire face à la situation, mais vous n'avez plus à la porter seul. C'est là que la paix commence : non pas quand la vie devient contrôlable, mais quand votre cœur se souvient de qui le tient.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.anxiety-peace::3.practice",
+  "value": "Ouvrez votre main pendant trois secondes. Que ce petit mouvement devienne votre rappel : J'ai remis cela à Dieu.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.building-faith::1.meditation",
+  "value": "La foi ne se construit pas en faisant semblant que les questions n'existent pas. Elle grandit quand on continue de se tourner vers Dieu avec les questions encore entre les mains. Laissez le verset d'aujourd'hui devenir plus qu'une information. Laissez-le devenir un lieu où vous pouvez vous tenir. Vous ne ressentirez peut-être pas une certitude spectaculaire, et c'est bien. La foi commence souvent par un petit oui répété honnêtement : oui, j'écoute ; oui, je cherche ; oui, je suis prêt à Te faire confiance avec ce que je ne peux pas encore voir.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.building-faith::4.practice",
+  "value": "Répétez le verset d'aujourd'hui une fois lentement avant de dormir, comme on plante une graine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.building-faith::6.practice",
+  "value": "Répétez le verset d'aujourd'hui une fois lentement avant de dormir, comme on plante une graine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.forgiveness-letting-go::10.practice",
+  "value": "Répétez le verset du jour une fois lentement avant de dormir, comme on plante une graine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.forgiveness-letting-go::3.practice",
+  "value": "Répétez le verset du jour une fois lentement avant de dormir, comme on plante une graine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.forgiveness-letting-go::5.meditation",
+  "value": "La foi ne se construit pas en faisant semblant que les questions n'existent pas. Elle grandit quand vous continuez à vous tourner vers Dieu, les questions toujours entre vos mains. Que le verset d'aujourd'hui devienne plus qu'une information. Qu'il devienne un endroit où vous pouvez vous tenir. Vous ne ressentirez peut-être pas une certitude dramatique, et c'est bien. La foi commence souvent par un petit oui répété honnêtement : oui, j'écoute ; oui, je cherche ; oui, je suis prêt à Te faire confiance pour ce que je ne vois pas encore.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.forgiveness-letting-go::6.reflection",
+  "value": "Que « Soixante-dix fois sept » devienne personnel un instant. Où cela touche-t-il votre vie réelle aujourd'hui — non en théorie, mais maintenant?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.forgiveness-letting-go::8.practice",
+  "value": "Répétez le verset du jour une fois lentement avant de dormir, comme on plante une graine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.gratitude-joy::1.practice",
+  "value": "Nommez trois dons spécifiques aujourd'hui — pas grands, juste réels.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.gratitude-joy::6.meditation",
+  "value": "La gratitude ne nie pas la douleur. Elle apprend à vos yeux à discerner la grâce sans prétendre que tout est facile. La joie commence souvent par l'attention : un souffle, un don, une gentillesse, une miséricorde ordinaire que vous avez failli manquer. Que le verset d'aujourd'hui interrompe l'habitude de ne voir que ce qui ne va pas. Il y a encore de la bonté ici. Non pas parce que la vie est parfaite, mais parce que Dieu est présent et qu'Il continue d'offrir de petites lumières au cœur des jours ordinaires.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.grief-loss::1.meditation",
+  "value": "Le deuil ne suit pas une ligne droite, et il n'y a rien d'un échec là-dedans. Certaines heures, vous fonctionnez, puis une chanson, une chaise ou une odeur vous enlève de nouveau le sol sous les pieds. Dieu ne vous demande pas de vous dépêcher. Il s'est approché des cœurs brisés, a pleuré devant une tombe qu'Il était sur le point d'ouvrir, et garde un registre des larmes. Laissez le verset du jour vous accompagner comme un ami s'assoit en silence — sans réparer, sans expliquer, juste en restant jusqu'à ce que la vague passe.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.grief-loss::2.practice",
+  "value": "Dites leur nom à voix haute aujourd'hui, et dites à Dieu une chose pour laquelle vous leur êtes reconnaissant.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.grief-loss::4.meditation",
+  "value": "Le deuil ne suit pas une ligne droite, et cela n'est en aucun cas un échec. Parfois vous fonctionnez, puis une chanson, une chaise ou une odeur vous enlève le sol sous les pieds. Dieu ne vous demande pas de vous dépêcher. Il s'est approché des cœurs brisés, a pleuré devant une tombe qu'Il allait ouvrir, et garde une trace de chaque larme. Laissez le verset du jour vous accompagner comme un ami s'assied en silence — sans réparer, sans expliquer, juste en restant là jusqu'à ce que la vague passe.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.grief-loss::5.reflection",
+  "value": "Laissez « Les larmes sont comptées » devenir personnel un instant. Où cela touche-t-il votre vie réelle aujourd'hui — non en théorie, mais là, maintenant ?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.grief-loss::7.practice",
+  "value": "Dites leur nom à voix haute aujourd'hui, et dites à Dieu une chose pour laquelle vous êtes reconnaissant à leur sujet.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.grief-loss::9.meditation",
+  "value": "Le deuil ne suit pas une ligne droite, et il n'y a rien là d'un échec. Certaines heures, vous fonctionnez, puis une chanson, une chaise ou une odeur vous fait de nouveau perdre pied. Dieu ne vous demande pas de vous presser. Il s'est approché des cœurs brisés, a pleuré devant une tombe qu'Il était sur le point d'ouvrir, et garde une trace de chaque larme. Laissez le verset d'aujourd'hui vous accompagner comme un ami s'assied en silence — sans réparer, sans expliquer, juste en restant jusqu'à ce que la vague passe.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.healing::6.reflection",
+  "value": "Laissez « Commencez par vous asseoir » devenir personnel un instant. Où cela touche-t-il votre vraie vie aujourd'hui — non pas en théorie, mais en ce moment même ?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.loneliness::4.reflection",
+  "value": "Laissez « Il remarque, par son nom » devenir personnel un instant. Où cela touche-t-il votre vie réelle aujourd'hui – non en théorie, mais maintenant ?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.loneliness::7.meditation",
+  "value": "La solitude peut mentir d'une voix très convaincante. Elle vous dit que personne ne vous voit, que personne ne le remarquerait, que personne n'est assez proche pour comprendre. Le verset d'aujourd'hui répond à ce mensonge par la présence. Dieu ne vous observe pas de loin. Il est proche dans le silence, proche dans la pièce, proche dans la douleur que vous ne pouvez décrire. Que ce moment soit plus qu'une lecture. Qu'il devienne une compagnie. Vous n'êtes pas une personne oubliée essayant d'atteindre un Dieu distant. Vous êtes vu, connu et tenu, ici et maintenant.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.marriage-love::3.practice",
+  "value": "Répétez le verset d'aujourd'hui une fois lentement avant de dormir, comme on plante une graine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.marriage-love::5.meditation",
+  "value": "La foi ne se construit pas en faisant semblant que les questions n'existent pas. Elle grandit quand vous continuez à vous tourner vers Dieu, les questions toujours entre vos mains. Que le verset d'aujourd'hui devienne plus qu'une information. Qu'il devienne un lieu où se tenir. Vous ne ressentirez peut-être pas une certitude éclatante, et c'est bien ainsi. La foi commence souvent par un petit oui répété avec honnêteté : oui, j'écoute ; oui, je cherche ; oui, je suis prêt à Te faire confiance pour ce que je ne vois pas encore.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.marriage-love::6.reflection",
+  "value": "Laissez « Pardonner — comme Lui » devenir personnel un instant. Où cela touche-t-il votre vie réelle aujourd’hui — non pas en théorie, mais maintenant?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.marriage-love::8.practice",
+  "value": "Répétez le verset d'aujourd'hui une fois lentement avant de dormir, comme on plante une graine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.money-provision::3.practice",
+  "value": "Nommez une manière spécifique dont Dieu a déjà pourvu ce mois-ci, et remerciez-le à voix haute.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.money-provision::5.meditation",
+  "value": "La peur de l'argent parle le langage de la survie, c'est pourquoi elle devient si forte la nuit. Mais le chiffre que vous ne cessez de recompter n'est pas votre sécurité, et ne l'a jamais été. Dieu a un historique avec vous — des repas qui sont arrivés, des mois qui se sont arrangés d'une manière ou d'une autre, une aide venue d'une direction à laquelle vous ne vous attendiez pas. Laissez le verset d'aujourd'hui déplacer votre confiance du solde bancaire vers Celui qui a pourvu au pain quotidien chaque jour jusqu'à présent.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.money-provision::6.reflection",
+  "value": "Laissez « Donner même quand c'est difficile » devenir personnel un instant. Où cela touche-t-il votre vraie vie aujourd'hui — pas en théorie, mais maintenant ?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.money-provision::8.practice",
+  "value": "Nommez une façon spécifique dont Dieu a déjà pourvu ce mois-ci, et remerciez-Le à voix haute.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.overcoming-temptation::1.reflection",
+  "value": "Laissez \"Tu n'es pas ta pire nuit\" devenir personnel un instant. Où cela touche-t-il votre vie réelle aujourd'hui — pas en théorie, mais maintenant ?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.overcoming-temptation::2.practice",
+  "value": "Répétez le verset du jour une fois lentement avant de dormir, comme on plante une graine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.overcoming-temptation::4.meditation",
+  "value": "La foi ne se construit pas en prétendant que les questions n'existent pas. Elle grandit lorsque vous continuez à vous tourner vers Dieu avec les questions toujours entre vos mains. Que le verset d'aujourd'hui devienne plus qu'une information. Qu'il devienne un endroit où se tenir. Vous ne ressentirez peut-être pas une certitude spectaculaire, et c'est bien. La foi commence souvent par un petit oui répété honnêtement : oui, j'écoute ; oui, je cherche ; oui, je suis prêt à te faire confiance pour ce que je ne vois pas encore.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.overcoming-temptation::5.reflection",
+  "value": "Laissez « Mettre en lumière » devenir personnel un instant. Où cela touche-t-il votre vie aujourd'hui — pas en théorie, mais là, maintenant ?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.overcoming-temptation::7.practice",
+  "value": "Répétez le verset du jour lentement une fois avant de dormir, comme on plante une graine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.overcoming-temptation::9.meditation",
+  "value": "La foi ne se construit pas en faisant semblant que les questions n'existent pas. Elle grandit quand vous continuez à vous tourner vers Dieu avec les questions encore entre vos mains. Laissez le verset du jour devenir plus qu'une information. Laissez-le devenir un endroit où se tenir. Vous ne ressentirez peut-être pas une certitude spectaculaire, et c'est bien ainsi. La foi commence souvent par un petit oui répété honnêtement : oui, j'écoute ; oui, je cherche ; oui, je suis prêt à Te faire confiance avec ce que je ne peux pas encore voir.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.purpose-calling::2.practice",
+  "value": "Répétez le verset du jour une fois, lentement, avant de dormir, comme on plante une graine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.purpose-calling::4.reflection",
+  "value": "Que « Ce qui brise votre cœur est un indice » devienne personnel un instant. Où cela touche-t-il votre vie aujourd'hui — pas en théorie, mais en ce moment même ?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.purpose-calling::7.practice",
+  "value": "Répétez le verset du jour une fois lentement avant de dormir, comme on plante une graine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.purpose-calling::9.reflection",
+  "value": "Que « La joie d'abord » devienne personnel un instant. Où cela touche-t-il votre vie aujourd'hui — pas en théorie, mais là, tout de suite ?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.rest-sleep::2.reflection",
+  "value": "Laissez « Ce n'est pas vous qui soutenez tout » devenir personnel un instant. Où cela touche-t-il votre vie aujourd'hui — pas en théorie, mais maintenant, concrètement ?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.rest-sleep::4.practice",
+  "value": "Rangez votre téléphone plus tôt ce soir et que le verset d'aujourd'hui soit la dernière chose que vous lisez.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.rest-sleep::9.meditation",
+  "value": "Un esprit fatigué confond la vigilance avec la responsabilité. Il rejoue la journée et répète le lendemain comme si rester éveillé était une forme de contrôle. Ce n'en est pas une. Il ne sommeille jamais, ce qui signifie que la garde que vous montez dans votre tête n'est pas requise. Laissez le verset du jour être la dernière chose que votre esprit retient ce soir, et laissez le sommeil devenir un petit acte de confiance plutôt qu'une autre chose où vous échouez.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.strength-hard-times::1.reflection",
+  "value": "Laissez le \"Vous êtes toujours là\" devenir personnel un instant. Où cela touche-t-il votre vie réelle aujourd'hui — pas en théorie, mais maintenant ?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jg.strength-hard-times::6.practice",
+  "value": "Choisissez un petit pas suivant aujourd'hui. Pas toute la montagne – juste le prochain pas de foi.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.anxiety-peace::1.s0.p1",
+  "value": "Si votre poitrine se serre, ce n'est pas par faiblesse. C'est que vous portiez tranquillement demain avant même qu'il n'arrive.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.anxiety-peace::2.s0.p2",
+  "value": "Aujourd'hui, il ne s'agit pas de faire taire votre esprit. Les esprits ne se calment pas sur commande.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.anxiety-peace::2.s2.p2",
+  "value": "Paul dit que la paix surpasse toute intelligence — ce qui signifie que vous n'avez pas à tout comprendre pour la recevoir.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.anxiety-peace::2.s3.a2",
+  "value": "Choisissez une pensée que vous ruminez et priez la prière de respiration dessus.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.anxiety-peace::3.s2.p3",
+  "value": "Car le Dieu qui tient les galaxies a la capacité de s'occuper de votre mardi à 23h. Ce n'est pas de la théologie. C'est ce que l'attention signifie réellement.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.anxiety-peace::4.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.anxiety-peace::5.s0.p1",
+  "value": "La plupart de cette tension ne vient pas d'aujourd'hui. Elle vient d'un mardi dans trois semaines que vous vivez déjà dans votre tête.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.anxiety-peace::6.s0.p0",
+  "value": "Un week-end d'évasion. Un verre de vin. Faire défiler jusqu'à en avoir mal aux yeux. Un agenda qui promet, si vous vous organisez bien, que l'angoisse s'envolera.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.anxiety-peace::7.s1.p2",
+  "value": "La paix suit là où votre esprit s'appuie. Appuyez-le sur Lui — même pour trente secondes à la fois — et la paix vous rattrape.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.anxiety-peace::7.s2.p3",
+  "value": "Vous aurez des jours d'anxiété après ce cheminement. Vous reprendrez des soucis que vous aviez promis de laisser. Vous voyagerez encore dans la semaine prochaine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::1.s1.p2",
+  "value": "La foi ne signifie pas l'absence de questions. Elle signifie que vous avez choisi votre fondement pendant que vous les posez.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::2.s2.continueLabel",
+  "value": "Priez avec moi",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::3.s0.p0",
+  "value": "Chaque angle. Chaque issue. Chaque « et si ». Enchaînant les scénarios dans votre tête jusqu'à l'endormissement.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::4.s0.p0",
+  "value": "Parce qu'elle ne vous semble pas forte. Parce que vous avez des doutes. Parce que certains jours, vous oubliez complètement Dieu jusqu'à ce que vous vous en souveniez et vous sentiez coupable.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::4.s2.p1",
+  "value": "Dieu fait de même avec vous. Il ne s'attend pas à de grandes prouesses spirituelles. Il observe si vous revenez toujours à Lui, même après les jours où vous l'avez oublié.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::4.s3.a2",
+  "value": "Faites une prière d'une ligne au milieu de votre journée. N'importe où.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::5.s1.p2",
+  "value": "La montagne n'est pas déplacée par l'ampleur de votre foi. Elle est déplacée par l'ampleur de Celui en qui votre foi est placée.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::5.s3.a1",
+  "value": "Cessez de vous excuser auprès de Dieu pour votre petite foi. Apportez-la telle quelle.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::6.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::6.s3.a2",
+  "value": "Lisez tout le récit dans Marc 9. C'est plus court que vous ne le pensez.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::7.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::7.s2.p4",
+  "value": "Vivre par la foi, c'est la décision tranquille et constante de faire confiance à ce qu'Il a dit plutôt qu'à ce que vous voyez. Aujourd'hui. Demain. La semaine prochaine. Le reste de votre vie.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::7.s3.p0",
+  "value": "Sept jours. Vous avez été là. Votre foi est plus réelle maintenant qu'il y a une semaine, même si vous n'en avez pas l'impression.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::1.s2.p3",
+  "value": "Les deux sont vrais. La facture est réelle. Tout comme l'ami qui vous a envoyé un message aujourd'hui. Le diagnostic est réel. Tout comme le lit dans lequel vous dormirez ce soir.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::2.s2.continueLabel",
+  "value": "Priez avec moi",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::3.s0.p0",
+  "value": "Votre souffle, qui continue sans que vous ayez à y penser. Vos yeux, qui lisent ces mots. La lumière. Le lit dans lequel vous dormirez ce soir.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::3.s1.p1",
+  "value": "Les grandes choses pour lesquelles vous vous attendez à ce que Dieu soit honoré – et les petites auxquelles personne ne pense. Le café qui était juste parfait. L'ami qui a envoyé un message. La chanson qui a commencé au bon moment.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::3.s2.p2",
+  "value": "La douche suffisamment chaude. Les poumons qui fonctionnent. L'espèce d'oiseau devant votre fenêtre. Le cerveau qui peut lire, se souvenir et rêver.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::4.s0.continueLabel",
+  "value": "Dites-m'en plus",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::5.s3.a1",
+  "value": "Gardez une petite note dans votre téléphone intitulée « gratitude ». Ajoutez-y chaque jour.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::6.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::6.s2.title",
+  "value": "Vous n'avez pas à créer le sol sur lequel vous vous tenez.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::7.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::2.s2.continueLabel",
+  "value": "Priez avec moi",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::2.s3.p0",
+  "value": "Cessez de cacher les parties de vous que vous croyez indignes de Lui.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::4.s3.p0",
+  "value": "Dites-le comme Jérémie. Comme si vous le pensiez. Comme si vous croyiez qu'Il le peut.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::5.s3.a2",
+  "value": "Écrivez Jérémie 30:17 de votre propre main. Gardez-le visible.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::6.s2.p3",
+  "value": "Les blessures ne guérissent pas pendant que vous les mettez à l'épreuve. Elles guérissent dans le calme. Dans l'obscurité. Dans le sommeil. Au moment où vous vous asseyez et cessez d'essayer de les améliorer par la force.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::7.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::7.s3.a0",
+  "value": "Laissez-vous pleurer si vous en avez besoin. Il les recueille.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::2.s2.p1",
+  "value": "Imagine Dieu déjà présent dans chacun d'eux. Il attend votre arrivée.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::3.s2.p0",
+  "value": "Pensez à la pire nuit de votre vie. Imaginez-la maintenant vécue dans une solitude absolue. Imaginez ensuite qu'une personne se soit assise à vos côtés — sans un mot, juste là.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::4.s0.p0",
+  "value": "Comme si vous disparaissiez une semaine, personne ne le remarquerait. Le téléphone ne sonnerait pas. La chaise resterait juste vide.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::4.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::4.s3.a0",
+  "value": "Envoyez un message à quelqu'un à qui vous n'avez pas parlé depuis longtemps. N'attendez pas après eux.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::5.s0.p2",
+  "value": "C'est la connexion profonde de l'âme pour laquelle vous avez été créé.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::5.s2.p2",
+  "value": "Lorsque vous essayez qu'un humain comble cela pour vous, vous l'écrasez sous un poids qu'il n'était pas fait pour porter. Et de toute façon, vous restez seul.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::6.s0.continueLabel",
+  "value": "Dites-moi",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::6.s3.a2",
+  "value": "Dormez avec un verset sur votre écran de verrouillage pour la semaine.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::7.s2.p4",
+  "value": "Vous ne serez jamais ignoré par Lui. Pas un instant. Ni quand vous dormez. Ni quand vous tombez. Ni le jour de votre mort.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::1.s2.continueLabel",
+  "value": "Priez avec moi",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::2.s2.continueLabel",
+  "value": "Priez avec moi",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::3.s1.p2",
+  "value": "Si tout allait bien, vous n'en auriez pas besoin. Le fait que vous en manquiez signifie que vous êtes au bon endroit.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::4.s0.p0",
+  "value": "La réunion. L'appel que vous avez repoussé. Le rendez-vous chez le médecin. La date du procès. La conversation avec la personne que vous aimez qui pourrait tout changer.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::5.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::6.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::7.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "j.building-faith.d3.explanation",
+  "value": "Ta compréhension a des limites — pas la Sienne. La foi, c'est choisir de t'appuyer sur Celui qui voit la carte entière alors que tu ne vois que le prochain pas.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Confie-toi en l'Éternel de tout ton cœur, et ne t'appuie pas sur ta sagesse; reconnais-le dans toutes tes voies, et il aplanira tes sentiers.",
+  "quoted": [
+   "est choisir de t"
+  ]
+ },
+ {
+  "key": "j.gratitude-joy.d1.explanation",
+  "value": "Pas « pour » toutes les circonstances — mais « dans » toutes les circonstances. Tu n'as pas à le remercier pour les choses difficiles, mais tu peux le remercier au milieu d'elles. Il y a toujours quelque chose.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Rendez grâces en toutes circonstances, car c'est la volonté de Dieu en Jésus-Christ à votre égard.",
+  "quoted": [
+   " pour ",
+   " dans "
+  ]
+ },
+ {
+  "key": "j.grief-loss.d8.explanation",
+  "value": "Paul écrit ceci comme une provocation à un ennemi vaincu. La tombe fait toujours mal, mais elle ne détient plus la fin. L'histoire continue au-delà d'elle.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Ô mort, où est ta victoire ? Ô mort, où est ton aiguillon ?",
+  "quoted": [
+   "histoire continue au-delà d"
+  ]
+ },
+ {
+  "key": "j.marriage-love.d3.explanation",
+  "value": "Trois points. Prompt à écouter. Lent à parler. Lent à se fâcher. La plupart des mariages font exactement l'inverse. Inverse l'ordre. Regarde ce qui change.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Chacun doit être prompt à écouter, lent à parler, lent à se mettre en colère.",
+  "quoted": [
+   "inverse. Inverse l"
+  ]
+ },
+ {
+  "key": "j.money-provision.d3.explanation",
+  "value": "Jésus nous a appris à demander pour aujourd'hui. Pas pour l'année. La provision de Dieu arrive généralement juste à temps plutôt qu'en avance — ce n'est pas un oubli, c'est une relation.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Donne-nous aujourd'hui notre pain quotidien.",
+  "quoted": [
+   "hui. Pas pour l",
+   "en avance — ce n"
+  ]
+ },
+ {
+  "key": "j.overcoming-temptation.d7.explanation",
+  "value": "La transformation se passe d'abord dans l'esprit. Si tu continues à l'alimenter de la même manière, tu retomberas toujours dans les mêmes travers. Change les entrées. Les sorties suivront.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Ne vous conformez pas au monde présent, mais soyez transformés par le renouvellement de l'intelligence.",
+  "quoted": [
+   "abord dans l"
+  ]
+ },
+ {
+  "key": "j.purpose-calling.d5.explanation",
+  "value": "Tu as déjà ce qu'il te faut. Il te suffit de commencer à l'utiliser pour quelqu'un d'autre que toi. Le don grandit en étant donné.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Mettez au service les uns des autres les dons que chacun a reçus, comme de bons intendants de la grâce de Dieu sous ses diverses formes.",
+  "quoted": [
+   "utiliser pour quelqu"
+  ]
+ },
+ {
+  "key": "j.strength-hard-times.d7.explanation",
+  "value": "Les nuits se terminent. Même les plus longues. Ce n'est pas nier l'obscurité — c'est une promesse que le noir n'est pas éternel. Le soleil est déjà en chemin.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Les pleurs peuvent durer une nuit, mais le matin ramène la joie.",
+  "quoted": [
+   "est pas nier l",
+   "est une promesse que le noir n"
+  ]
+ }
+]

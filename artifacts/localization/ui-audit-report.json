@@ -1,0 +1,979 @@
+{
+  "generatedAt": "2026-08-22T08:46:09.120Z",
+  "summary": {
+    "fil:untranslated": 33,
+    "fr:untranslated": 16,
+    "es:untranslated": 5,
+    "pt:untranslated": 7,
+    "id:untranslated": 13,
+    "hi:untranslated": 3,
+    "es:extra_key": 10,
+    "pt:extra_key": 10,
+    "fil:extra_key": 10,
+    "hi:extra_key": 10,
+    "id:extra_key": 10,
+    "fr:extra_key": 10,
+    "de:extra_key": 10
+  },
+  "issues": [
+    {
+      "locale": "fil",
+      "label": "screens/companion",
+      "key": "chat.header.title",
+      "type": "untranslated",
+      "value": "Bible Chat"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/companion",
+      "key": "chat.starter.someone.meta",
+      "type": "untranslated",
+      "value": "Intercession"
+    },
+    {
+      "locale": "es",
+      "label": "screens/dailyverse",
+      "key": "dv.cta.premium",
+      "type": "untranslated",
+      "value": "PREMIUM"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/dailyverse",
+      "key": "dv.cta.premium",
+      "type": "untranslated",
+      "value": "PREMIUM"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/dailyverse",
+      "key": "dv.cta.premium",
+      "type": "untranslated",
+      "value": "PREMIUM"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/dailyverse",
+      "key": "dv.target.home",
+      "type": "untranslated",
+      "value": "Home Screen"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/dailyverse",
+      "key": "dv.target.lock",
+      "type": "untranslated",
+      "value": "Lock Screen"
+    },
+    {
+      "locale": "id",
+      "label": "screens/dailyverse",
+      "key": "dv.cta.premium",
+      "type": "untranslated",
+      "value": "PREMIUM"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/dailyverse",
+      "key": "dv.cta.premium",
+      "type": "untranslated",
+      "value": "PREMIUM"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/devotional",
+      "key": "dev.slide.amen",
+      "type": "untranslated",
+      "value": "Amen"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/devotional",
+      "key": "dev.slide.amen",
+      "type": "untranslated",
+      "value": "Amen"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/favorites",
+      "key": "fav.tab.photos",
+      "type": "untranslated",
+      "value": "📸 Photos"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/onboarding",
+      "key": "onb.verse.headlineGold",
+      "type": "untranslated",
+      "value": "lock screen"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/onboarding",
+      "key": "onb.time.appSubtitle",
+      "type": "untranslated",
+      "value": "Bible Prayer & Verse"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/onboarding",
+      "key": "onb.time.appSubtitle",
+      "type": "untranslated",
+      "value": "Bible Prayer & Verse"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/onboarding",
+      "key": "onb.focus.gratitudeTitle",
+      "type": "untranslated",
+      "value": "Gratitude"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/overlays",
+      "key": "ov.card.wallpaper",
+      "type": "untranslated",
+      "value": "Wallpaper"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/overlays",
+      "key": "ov.companion.cardTitle",
+      "type": "untranslated",
+      "value": "Bible Chat"
+    },
+    {
+      "locale": "id",
+      "label": "screens/overlays",
+      "key": "ov.card.wallpaper",
+      "type": "untranslated",
+      "value": "Wallpaper"
+    },
+    {
+      "locale": "es",
+      "label": "screens/parallax",
+      "key": "px.personalBadge",
+      "type": "untranslated",
+      "value": "Personal"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/parallax",
+      "key": "px.personalBadge",
+      "type": "untranslated",
+      "value": "Personal"
+    },
+    {
+      "locale": "id",
+      "label": "screens/parallax",
+      "key": "px.personalBadge",
+      "type": "untranslated",
+      "value": "Personal"
+    },
+    {
+      "locale": "es",
+      "label": "screens/prayer",
+      "key": "pr.personal.charCount",
+      "type": "untranslated",
+      "value": "{{count}}/500"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/prayer",
+      "key": "pr.personal.charCount",
+      "type": "untranslated",
+      "value": "{{count}}/500"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/prayer",
+      "key": "pr.personal.charCount",
+      "type": "untranslated",
+      "value": "{{count}}/500"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/prayer",
+      "key": "pr.personal.charCount",
+      "type": "untranslated",
+      "value": "{{count}}/500"
+    },
+    {
+      "locale": "id",
+      "label": "screens/prayer",
+      "key": "pr.personal.charCount",
+      "type": "untranslated",
+      "value": "{{count}}/500"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/prayer",
+      "key": "pr.personal.charCount",
+      "type": "untranslated",
+      "value": "{{count}}/500"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/prayer",
+      "key": "pr.topic.gratitude",
+      "type": "untranslated",
+      "value": "Gratitude"
+    },
+    {
+      "locale": "es",
+      "label": "screens/premium",
+      "key": "premium.review.1.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "es",
+      "label": "screens/premium",
+      "key": "premium.review.2.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "es",
+      "label": "screens/premium",
+      "key": "premium.review.3.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "es",
+      "label": "screens/premium",
+      "key": "premium.review.4.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "es",
+      "label": "screens/premium",
+      "key": "premium.review.5.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "es",
+      "label": "screens/premium",
+      "key": "premium.review.6.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "es",
+      "label": "screens/premium",
+      "key": "premium.review.7.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "es",
+      "label": "screens/premium",
+      "key": "premium.review.8.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "es",
+      "label": "screens/premium",
+      "key": "premium.review.9.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "es",
+      "label": "screens/premium",
+      "key": "premium.review.10.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/premium",
+      "key": "premium.review.1.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/premium",
+      "key": "premium.review.2.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/premium",
+      "key": "premium.review.3.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/premium",
+      "key": "premium.review.4.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/premium",
+      "key": "premium.review.5.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/premium",
+      "key": "premium.review.6.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/premium",
+      "key": "premium.review.7.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/premium",
+      "key": "premium.review.8.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/premium",
+      "key": "premium.review.9.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/premium",
+      "key": "premium.review.10.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/premium",
+      "key": "premium.benefit.bibleChat.title",
+      "type": "untranslated",
+      "value": "Bible Chat"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/premium",
+      "key": "premium.review.1.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/premium",
+      "key": "premium.review.2.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/premium",
+      "key": "premium.review.3.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/premium",
+      "key": "premium.review.4.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/premium",
+      "key": "premium.review.5.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/premium",
+      "key": "premium.review.6.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/premium",
+      "key": "premium.review.7.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/premium",
+      "key": "premium.review.8.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/premium",
+      "key": "premium.review.9.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/premium",
+      "key": "premium.review.10.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/premium",
+      "key": "premium.review.1.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/premium",
+      "key": "premium.review.2.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/premium",
+      "key": "premium.review.3.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/premium",
+      "key": "premium.review.4.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/premium",
+      "key": "premium.review.5.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/premium",
+      "key": "premium.review.6.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/premium",
+      "key": "premium.review.7.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/premium",
+      "key": "premium.review.8.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/premium",
+      "key": "premium.review.9.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/premium",
+      "key": "premium.review.10.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "id",
+      "label": "screens/premium",
+      "key": "premium.review.1.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "id",
+      "label": "screens/premium",
+      "key": "premium.review.2.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "id",
+      "label": "screens/premium",
+      "key": "premium.review.3.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "id",
+      "label": "screens/premium",
+      "key": "premium.review.4.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "id",
+      "label": "screens/premium",
+      "key": "premium.review.5.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "id",
+      "label": "screens/premium",
+      "key": "premium.review.6.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "id",
+      "label": "screens/premium",
+      "key": "premium.review.7.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "id",
+      "label": "screens/premium",
+      "key": "premium.review.8.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "id",
+      "label": "screens/premium",
+      "key": "premium.review.9.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "id",
+      "label": "screens/premium",
+      "key": "premium.review.10.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/premium",
+      "key": "premium.review.1.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/premium",
+      "key": "premium.review.2.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/premium",
+      "key": "premium.review.3.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/premium",
+      "key": "premium.review.4.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/premium",
+      "key": "premium.review.5.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/premium",
+      "key": "premium.review.6.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/premium",
+      "key": "premium.review.7.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/premium",
+      "key": "premium.review.8.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/premium",
+      "key": "premium.review.9.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/premium",
+      "key": "premium.review.10.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "de",
+      "label": "screens/premium",
+      "key": "premium.review.1.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "de",
+      "label": "screens/premium",
+      "key": "premium.review.2.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "de",
+      "label": "screens/premium",
+      "key": "premium.review.3.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "de",
+      "label": "screens/premium",
+      "key": "premium.review.4.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "de",
+      "label": "screens/premium",
+      "key": "premium.review.5.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "de",
+      "label": "screens/premium",
+      "key": "premium.review.6.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "de",
+      "label": "screens/premium",
+      "key": "premium.review.7.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "de",
+      "label": "screens/premium",
+      "key": "premium.review.8.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "de",
+      "label": "screens/premium",
+      "key": "premium.review.9.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "de",
+      "label": "screens/premium",
+      "key": "premium.review.10.name",
+      "type": "extra_key"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/quiz",
+      "key": "quiz.hype.combo",
+      "type": "untranslated",
+      "value": "🔥 Combo!"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/quiz",
+      "key": "quiz.header.title",
+      "type": "untranslated",
+      "value": "Bible Quiz"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/quiz",
+      "key": "quiz.header.streak",
+      "type": "untranslated",
+      "value": "Streak Mode"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/quiz",
+      "key": "quiz.mode.streak.title",
+      "type": "untranslated",
+      "value": "Streak Mode"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/quiz",
+      "key": "quiz.mode.boss.title",
+      "type": "untranslated",
+      "value": "Boss Round"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/quiz",
+      "key": "quiz.mode.speedrun.title",
+      "type": "untranslated",
+      "value": "Speed Run"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/quiz",
+      "key": "quiz.mode.speedrun.tag",
+      "type": "untranslated",
+      "value": "⚡ 5s Timer"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/quiz",
+      "key": "quiz.hype.combo",
+      "type": "untranslated",
+      "value": "🔥 Combo!"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/quiz",
+      "key": "quiz.revive.reviveLabelOne",
+      "type": "untranslated",
+      "value": "revive"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/quiz",
+      "key": "quiz.mode.challenge.tag",
+      "type": "untranslated",
+      "value": "⚔️ 12 Questions"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/quiz",
+      "key": "quiz.mode.pack.tag",
+      "type": "untranslated",
+      "value": "✨ 12 Packs"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/quiz",
+      "key": "quiz.picker.questions",
+      "type": "untranslated",
+      "value": "{{count}} questions"
+    },
+    {
+      "locale": "es",
+      "label": "screens/today",
+      "key": "today.footer.soliDeo",
+      "type": "untranslated",
+      "value": "Soli Deo gloria"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/today",
+      "key": "today.footer.soliDeo",
+      "type": "untranslated",
+      "value": "Soli Deo gloria"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/today",
+      "key": "today.picks.live",
+      "type": "untranslated",
+      "value": "LIVE"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/today",
+      "key": "today.footer.soliDeo",
+      "type": "untranslated",
+      "value": "Soli Deo gloria"
+    },
+    {
+      "locale": "hi",
+      "label": "screens/today",
+      "key": "today.footer.soliDeo",
+      "type": "untranslated",
+      "value": "Soli Deo gloria"
+    },
+    {
+      "locale": "id",
+      "label": "screens/today",
+      "key": "today.month.3",
+      "type": "untranslated",
+      "value": "April"
+    },
+    {
+      "locale": "id",
+      "label": "screens/today",
+      "key": "today.month.8",
+      "type": "untranslated",
+      "value": "September"
+    },
+    {
+      "locale": "id",
+      "label": "screens/today",
+      "key": "today.month.10",
+      "type": "untranslated",
+      "value": "November"
+    },
+    {
+      "locale": "id",
+      "label": "screens/today",
+      "key": "today.picks.live",
+      "type": "untranslated",
+      "value": "LIVE"
+    },
+    {
+      "locale": "id",
+      "label": "screens/today",
+      "key": "today.nudge.cta",
+      "type": "untranslated",
+      "value": "UPGRADE"
+    },
+    {
+      "locale": "id",
+      "label": "screens/today",
+      "key": "today.footer.soliDeo",
+      "type": "untranslated",
+      "value": "Soli Deo gloria"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/today",
+      "key": "today.quick.photos",
+      "type": "untranslated",
+      "value": "Photos"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/today",
+      "key": "today.footer.soliDeo",
+      "type": "untranslated",
+      "value": "Soli Deo gloria"
+    },
+    {
+      "locale": "pt",
+      "label": "screens/wallpapers",
+      "key": "wp.feed.jesus",
+      "type": "untranslated",
+      "value": "Jesus"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/wallpapers",
+      "key": "wp.reel.static",
+      "type": "untranslated",
+      "value": "Static"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/wallpapers",
+      "key": "wp.detail.home",
+      "type": "untranslated",
+      "value": "Home Screen"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/wallpapers",
+      "key": "wp.detail.lock",
+      "type": "untranslated",
+      "value": "Lock Screen"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/wallpapers",
+      "key": "wp.packs.preview",
+      "type": "untranslated",
+      "value": "{{label}} · Preview"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/wallpapers",
+      "key": "wp.feed.jesus",
+      "type": "untranslated",
+      "value": "Jesus"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/wallpapers",
+      "key": "wp.feed.aesthetic",
+      "type": "untranslated",
+      "value": "Aesthetic"
+    },
+    {
+      "locale": "fil",
+      "label": "screens/wallpapers",
+      "key": "wp.search.staticBadge",
+      "type": "untranslated",
+      "value": "🖼 Static"
+    },
+    {
+      "locale": "id",
+      "label": "screens/wallpapers",
+      "key": "wp.parallax.edit",
+      "type": "untranslated",
+      "value": "Edit"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/wallpapers",
+      "key": "wp.category.collection",
+      "type": "untranslated",
+      "value": "Collection"
+    },
+    {
+      "locale": "fr",
+      "label": "screens/wallpapers",
+      "key": "wp.mode.photos",
+      "type": "untranslated",
+      "value": "Photos"
+    },
+    {
+      "locale": "es",
+      "label": "base",
+      "key": "settings.section.legal",
+      "type": "untranslated",
+      "value": "Legal"
+    },
+    {
+      "locale": "pt",
+      "label": "base",
+      "key": "nav.quiz",
+      "type": "untranslated",
+      "value": "Quiz"
+    },
+    {
+      "locale": "pt",
+      "label": "base",
+      "key": "settings.section.legal",
+      "type": "untranslated",
+      "value": "Legal"
+    },
+    {
+      "locale": "fil",
+      "label": "base",
+      "key": "nav.quiz",
+      "type": "untranslated",
+      "value": "Quiz"
+    },
+    {
+      "locale": "fil",
+      "label": "base",
+      "key": "settings.section.profile",
+      "type": "untranslated",
+      "value": "Profile"
+    },
+    {
+      "locale": "fil",
+      "label": "base",
+      "key": "settings.theme.system",
+      "type": "untranslated",
+      "value": "System"
+    },
+    {
+      "locale": "fil",
+      "label": "base",
+      "key": "settings.section.legal",
+      "type": "untranslated",
+      "value": "Legal"
+    },
+    {
+      "locale": "id",
+      "label": "base",
+      "key": "settings.premium.badgeUpgrade",
+      "type": "untranslated",
+      "value": "UPGRADE"
+    },
+    {
+      "locale": "id",
+      "label": "base",
+      "key": "settings.section.legal",
+      "type": "untranslated",
+      "value": "Legal"
+    },
+    {
+      "locale": "fr",
+      "label": "base",
+      "key": "nav.quiz",
+      "type": "untranslated",
+      "value": "Quiz"
+    },
+    {
+      "locale": "fr",
+      "label": "base",
+      "key": "settings.version",
+      "type": "untranslated",
+      "value": "Version {{version}}"
+    }
+  ]
+}
