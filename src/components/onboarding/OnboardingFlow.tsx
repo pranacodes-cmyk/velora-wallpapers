@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { motion, AnimatePresence, MotionConfig, PanInfo } from "framer-motion";
 import { Capacitor } from "@capacitor/core";
 import { OnboardingContext } from "@/contexts/OnboardingContext";
 import { useT } from "@/i18n";
@@ -124,8 +124,12 @@ function LockScreenMock() {
         padding: 4,
         background:
           "linear-gradient(160deg, hsl(220 10% 38%) 0%, hsl(220 15% 10%) 50%, hsl(220 10% 30%) 100%)",
-        boxShadow:
-          "0 40px 80px -25px hsl(0 0% 0% / 0.85), 0 0 0 1px hsl(0 0% 100% / 0.06)",
+        // A 80px-blur shadow over a full-screen background is one of the most
+        // expensive things a mid-range Android WebView can paint. Keep the
+        // depth cue, shrink the blur radius on Android.
+        boxShadow: IS_ANDROID
+          ? "0 14px 26px -14px hsl(0 0% 0% / 0.9), 0 0 0 1px hsl(0 0% 100% / 0.06)"
+          : "0 40px 80px -25px hsl(0 0% 0% / 0.85), 0 0 0 1px hsl(0 0% 100% / 0.06)",
       }}
     >
       <div
@@ -300,7 +304,7 @@ function VerseSlide({ active, exiting }: { active: boolean; exiting?: boolean })
       animate={{ opacity: exiting ? 0 : 1 }}
       exit={ONB_SLIDE_EXIT}
       transition={{ duration: ONB_SLIDE_FADE_SECONDS, ease: "easeOut" }}
-      className="absolute inset-0 flex flex-col items-center justify-center"
+      className="onb-slide-layer absolute inset-0 flex flex-col items-center justify-center"
     >
       {/* Atmospheric bg */}
       <div
@@ -781,6 +785,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         style={{ background: "hsl(220 65% 4%)" }}
       />
 
+      {/* On Android WebView, Framer animates transforms by writing inline
+          styles from JS every frame. With ~70 motion nodes per slide that is
+          pure main-thread work and it collides with taps. `reducedMotion`
+          snaps transforms to their end value and keeps only opacity fades —
+          same look, no per-frame transform math. */}
+      <MotionConfig reducedMotion={IS_ANDROID ? "always" : "user"}>
       <AnimatePresence>
         {active && (
           <motion.div
@@ -917,13 +927,23 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
             `}</style>
 
 
+            {/* Android: detect the swipe with a pan gesture instead of `drag`.
+                `drag` physically moves the whole full-screen slide subtree, so
+                every few pixels of finger travel re-measured and re-painted the
+                entire tree — even on a plain tap. Pan reads the same gesture
+                with zero layout work. Web/iOS keep the rubber-band drag. */}
             <motion.div
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.15}
-              onDragEnd={handleDragEnd}
+              {...(IS_ANDROID
+                ? { onPanEnd: handleDragEnd }
+                : {
+                    drag: "x" as const,
+                    dragConstraints: { left: 0, right: 0 },
+                    dragElastic: 0.15,
+                    onDragEnd: handleDragEnd,
+                  })}
               className="absolute inset-0"
             >
+
               {/* Suspense wraps AnimatePresence because slides 2–6 are
                   React.lazy(). Chunk is prefetched on step 0/1 so Suspense
                   should never actually suspend in practice — fallback=null
@@ -1034,6 +1054,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
           </motion.div>
         )}
       </AnimatePresence>
+      </MotionConfig>
 
     </OnboardingContext.Provider>
   );

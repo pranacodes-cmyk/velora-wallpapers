@@ -8,6 +8,7 @@ import {
   ONBOARDING_REPLAY_KEY,
   POST_ONBOARDING_FLOW_COMPLETE_EVENT,
 } from "@/components/onboarding/OnboardingFlow";
+import { markShown } from "@/lib/paywallScheduler";
 
 const SHOWN_KEY = "cw_post_onboarding_premium_shown";
 
@@ -46,6 +47,27 @@ export function PostOnboardingPremium() {
     };
   }, []);
 
+  // Entitlement updates may arrive while the final onboarding frame is still
+  // mounted (restore, purchase, or a CustomerInfo push). Premium users never
+  // need the offer; release the onboarding surface immediately rather than
+  // relying on a timer owned by the previous free-state effect.
+  useEffect(() => {
+    if (!isPremium) return;
+    setShowTrialTransition(false);
+    setOpen(false);
+    if (releaseRef.current) {
+      releaseRef.current();
+      releaseRef.current = null;
+    }
+    try {
+      if (localStorage.getItem("cw_onboarded_v3") === "true") {
+        completeOnboardingHandoff();
+      }
+    } catch {
+      completeOnboardingHandoff();
+    }
+  }, [isPremium]);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -79,6 +101,10 @@ export function PostOnboardingPremium() {
       } catch {}
       releaseRef.current = release;
       if (allowPremiumReplay) setPreviewingReplayOffer(true);
+      // This is the session's premium offer. Count it in the global scheduler
+      // so a later notification permission result or home event cannot cause a
+      // second automatic paywall immediately after onboarding.
+      if (!allowPremiumReplay) markShown();
       const introTimer = window.setTimeout(() => {
         if (cancelled || (isPremium && !allowPremiumReplay)) {
           release(); releaseRef.current = null; return;
@@ -135,7 +161,9 @@ export function PostOnboardingPremium() {
     };
   }, [isPremium]);
 
-  if (isPremium && !previewingReplayOffer) return null;
+  // Stay mounted while the sheet is open even if the purchase flips isPremium —
+  // otherwise the sheet unmounts mid-flow and the onboarding handoff never runs.
+  if (isPremium && !previewingReplayOffer && !open) return null;
 
   const handleClose = () => {
     setOpen(false);

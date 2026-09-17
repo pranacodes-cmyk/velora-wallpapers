@@ -46,6 +46,7 @@ import { DailyPermissionNudge } from "@/components/DailyPermissionNudge";
 import { PostOnboardingPremium } from "@/components/PostOnboardingPremium";
 import { AutoPaywall } from "@/components/AutoPaywall";
 import { OnboardingProvider } from "@/components/onboarding/OnboardingFlow";
+import { PremiumBootstrap } from "@/components/PremiumBootstrap";
 import { useIsOnboardingActive } from "@/contexts/OnboardingContext";
 import FunnelHandoff from "@/components/today/FunnelHandoff";
 import { AnrBreadcrumbs } from "@/components/AnrBreadcrumbs";
@@ -136,7 +137,8 @@ function NativeSetup() {
       }).catch(() => {});
     }, 5500);
 
-    // Initialize RevenueCat & reconcile premium status - delayed.
+    // PremiumBootstrap performs the authoritative cold-start reconciliation
+    // before onboarding can render. This deferred pass is only a safety sync.
     // The heavy lifting (localStorage flag, in-app event, native
     // daily-verse `setPremium`, parallax `clearIfActive` on downgrade)
     // lives in premium-sync.ts — called here on cold start and on every
@@ -165,7 +167,7 @@ function NativeSetup() {
     };
 
 
-    runAfterBoot(() => { reconcilePremium(); }, 7500);
+    runAfterBoot(() => { reconcilePremium(); }, 12_000);
 
     // Re-reconcile on app resume (catches Play Store cancellations / refunds).
     // Delay the native App plugin import too; importing it during first paint
@@ -337,6 +339,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
       <TooltipProvider>
+        <PremiumBootstrap>
         <OnboardingProvider>
           <NativeSetup />
           <GatedOverlays />
@@ -352,6 +355,7 @@ const App = () => {
           </BrowserRouter>
 
         </OnboardingProvider>
+        </PremiumBootstrap>
       </TooltipProvider>
       </I18nProvider>
     </QueryClientProvider>

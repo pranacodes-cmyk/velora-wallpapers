@@ -81,6 +81,15 @@ function subscribe(cb: () => void): () => void {
 }
 
 function getSnapshot(): Snapshot {
+  // PremiumBootstrap reconciles RevenueCat before any usePremium consumer is
+  // mounted. Events dispatched during that bootstrap therefore have no
+  // subscribers, so the module snapshot can otherwise stay falsely "free"
+  // until the user taps Restore Purchases. Reconcile from storage on every
+  // read while preserving object identity when nothing changed.
+  const next = { isPremium: readPremium(), adFreeUntil: readAdFreeUntil() };
+  if (next.isPremium !== snapshot.isPremium || next.adFreeUntil !== snapshot.adFreeUntil) {
+    snapshot = next;
+  }
   return snapshot;
 }
 

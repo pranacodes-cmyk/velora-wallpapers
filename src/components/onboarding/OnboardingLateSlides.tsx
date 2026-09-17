@@ -13,6 +13,9 @@ import {
   ONB_REPEAT,
   ONB_BLUR_14,
   ONB_SLIDE_FADE_SECONDS,
+  ONB_BG_INITIAL,
+  onbBgAnimate,
+  onbBgTransition,
   ONB_SLIDE_EXIT,
   ONB_IN_DELAY,
   ONB_IN_DUR,
@@ -36,15 +39,15 @@ export function PrayerSlide({ active, exiting }: { active: boolean; exiting?: bo
       animate={{ opacity: exiting ? 0 : 1 }}
       exit={ONB_SLIDE_EXIT}
       transition={{ duration: ONB_SLIDE_FADE_SECONDS, ease: "easeOut" }}
-      className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden"
+      className="onb-slide-layer absolute inset-0 flex flex-col items-center justify-center overflow-hidden"
     >
       {/* Warm prayer background */}
       <motion.img
         src={devotionalBg}
         alt=""
-        initial={{ scale: 1.15, opacity: 0 }}
-        animate={{ scale: exiting ? 1.05 : 1, opacity: exiting ? 0 : 0.45 }}
-        transition={{ duration: exiting ? 0.6 : 8, ease: "easeOut" }}
+        initial={ONB_BG_INITIAL}
+        animate={onbBgAnimate(exiting)}
+        transition={onbBgTransition(exiting)}
         className="absolute inset-0 w-full h-full object-cover"
       />
       <div
@@ -296,7 +299,7 @@ export function BibleChatSlide({ active, exiting }: { active: boolean; exiting?:
       animate={{ opacity: exiting ? 0 : 1 }}
       exit={ONB_SLIDE_EXIT}
       transition={{ duration: ONB_SLIDE_FADE_SECONDS, ease: "easeOut" }}
-      className="absolute inset-0 flex flex-col items-center justify-start overflow-y-auto overflow-x-hidden"
+      className="onb-slide-layer absolute inset-0 flex flex-col items-center justify-start overflow-y-auto overflow-x-hidden"
     >
       {/* Atmospheric backdrop — kept identical to sibling slides */}
       <div
@@ -551,7 +554,7 @@ export function FocusSlide({ active, exiting, picked, onPick }: { active: boolea
       animate={{ opacity: exiting ? 0 : 1 }}
       exit={ONB_SLIDE_EXIT}
       transition={{ duration: ONB_SLIDE_FADE_SECONDS, ease: "easeOut" }}
-      className="absolute inset-0 flex flex-col items-center overflow-hidden"
+      className="onb-slide-layer absolute inset-0 flex flex-col items-center overflow-hidden"
     >
       <div
         className="absolute inset-0"
@@ -1273,7 +1276,7 @@ export function TimeSlide({
       animate={{ opacity: exiting ? 0 : 1 }}
       exit={ONB_SLIDE_EXIT}
       transition={{ duration: ONB_SLIDE_FADE_SECONDS, ease: "easeOut" }}
-      className="absolute inset-0 flex flex-col items-center overflow-y-auto overflow-x-hidden overscroll-contain"
+      className="onb-slide-layer absolute inset-0 flex flex-col items-center overflow-y-auto overflow-x-hidden overscroll-contain"
       style={{
         WebkitOverflowScrolling: "touch",
         touchAction: "pan-y",

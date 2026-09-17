@@ -792,8 +792,24 @@
    the single biggest driver of RenderThread stalls (draw_gl frames dominate
    our ANR traces). Drop them on Android — visual difference on tiny mobile
    screens is negligible; ANR budget savings are large. */
-.android-device * {
+.low-end-device * {
   mix-blend-mode: normal !important;
+}
+
+/* Onboarding paint budget (Android).
+   Profiling the onboarding on a 6x-throttled WebView showed ~70% of every
+   frame in browser-internal style/paint work — not JS. The two worst offenders
+   were wide-blur text shadows on headlines sitting over full-screen imagery,
+   and slide subtrees repainting layer-by-layer during the cross-fade.
+   Cheap shadows + a promoted, contained layer per slide fixes both. */
+.android-device [data-onboarding="active"] > div {
+  contain: paint style;
+}
+
+.android-device [data-onboarding="active"] .onb-slide-layer {
+  will-change: opacity;
+  transform: translateZ(0);
+  contain: paint style;
 }
 
 .android-device .will-change-transform,
@@ -819,46 +835,6 @@
 .startup-safe-mode [style*="filter"],
 .low-end-device [style*="filter"],
 .low-end-device [class*="blur-"] {
-  filter: none !important;
-}
-
-/* =========================================================================
-   Onboarding perf scope.
-   Onboarding is a one-time 30s flow — ambient/infinite effects (ken-burns,
-   prayer aura, shimmer sweeps, backdrop blurs) are pure GPU waste here and
-   were the main cause of the "tap Continue feels delayed" feel on mid-range
-   Androids. We freeze every infinite loop and drop every blur pass *inside*
-   the onboarding subtree only. Entrance/exit framer-motion transitions,
-   one-shot fade/scale/translate animations, drag gestures, and the
-   lockscreen verse cross-fade all keep working — visuals look identical.
-   Applied unconditionally (not gated on .low-end-device) because the
-   benefit on mid-tier phones is huge and high-end phones don't lose
-   anything visible.
-   ========================================================================= */
-[data-onboarding="active"],
-[data-onboarding="active"] * {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-[data-onboarding="active"] [class*="blur-"] {
-  filter: none !important;
-}
-
-[data-onboarding="active"] .animate-ken-burns,
-[data-onboarding="active"] .animate-ken-burns-alt,
-[data-onboarding="active"] .animate-ken-burns-zoom,
-[data-onboarding="active"] .animate-verse-scroll,
-[data-onboarding="active"] .animate-spin-slow,
-[data-onboarding="active"] .animate-shimmer,
-[data-onboarding="active"] .shimmer-skeleton::before,
-[data-onboarding="active"] .shimmer-skeleton::after,
-[data-onboarding="active"] .prayer-kenburns,
-[data-onboarding="active"] .prayer-rays,
-[data-onboarding="active"] .prayer-aura,
-[data-onboarding="active"] .prayer-ember,
-[data-onboarding="active"] .prayer-breathe {
-  animation: none !important;
   filter: none !important;
 }
 

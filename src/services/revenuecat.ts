@@ -247,7 +247,7 @@ export async function restorePurchases(): Promise<boolean> {
   return hasPremiumEntitlement(customerInfo);
 }
 
-const AUTO_RESTORE_KEY = "cw_rc_auto_restored_v1";
+const AUTO_RESTORE_USER_KEY = "cw_rc_auto_restored_user_v2";
 
 /**
  * Silent entitlement recovery — the piece that makes reinstalls work without
@@ -258,20 +258,44 @@ const AUTO_RESTORE_KEY = "cw_rc_auto_restored_v1";
  * though the Google account on the device still owns an active subscription.
  * RevenueCat does not restore that automatically — the app must ask once.
  *
- * We do it silently, once per install (the flag lives in localStorage, which
- * is wiped by an uninstall, so the next install tries again). The Play Store
- * remains the single source of truth; the local flag is only an offline cache.
+ * We do it silently once per RevenueCat anonymous user. Android can restore
+ * WebView localStorage from cloud backup after a reinstall, so a plain boolean
+ * "already restored" flag is unsafe: it can come back while RevenueCat has
+ * created a different anonymous user. Tying the marker to the current RC user
+ * makes every reinstall reconcile Play ownership again without repeatedly
+ * opening Billing for established free installs.
  */
-export async function recoverEntitlementIfNeeded(): Promise<"premium" | "free" | "unknown"> {
+export async function recoverEntitlementIfNeeded(force = false): Promise<"premium" | "free" | "unknown"> {
   if (!isRevenueCatAvailable()) return "unknown";
-  try {
-    if (localStorage.getItem(AUTO_RESTORE_KEY) === "true") return "unknown";
-  } catch { /* ignore */ }
   try {
     await initRevenueCat();
     if (!initialized) return "unknown";
-    const isPremium = await restorePurchases();
-    try { localStorage.setItem(AUTO_RESTORE_KEY, "true"); } catch { /* ignore */ }
+    const { appUserID } = await Purchases.getAppUserID();
+    try {
+      if (!force && appUserID && localStorage.getItem(AUTO_RESTORE_USER_KEY) === appUserID) {
+        return "unknown";
+      }
+    } catch { /* ignore */ }
+    // Google Billing can answer before its service connection has fully warmed
+    // immediately after an install/reinstall. A manual Restore works later for
+    // exactly this reason. Retry the same silent reconciliation here so the
+    // user never has to reach Settings or see a free-user offer first.
+    let isPremium = false;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      isPremium = await restorePurchases();
+      if (isPremium) break;
+      if (attempt < 2) {
+        await new Promise((resolve) => setTimeout(resolve, 1200 * (attempt + 1)));
+      }
+    }
+    try {
+      // Only cache a positive recovery. A negative answer may be a cold Play
+      // connection, so future launches must remain eligible to retry.
+      if (appUserID && isPremium) localStorage.setItem(AUTO_RESTORE_USER_KEY, appUserID);
+      // Remove the old boolean marker so an Android cloud-backup restore can
+      // never suppress ownership recovery again.
+      localStorage.removeItem("cw_rc_auto_restored_v1");
+    } catch { /* ignore */ }
     return isPremium ? "premium" : "free";
   } catch {
     // Do NOT mark as done — a failed attempt should retry on the next launch.

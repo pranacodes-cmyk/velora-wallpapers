@@ -333,7 +333,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
   const plans = useMemo(() => buildPlans(t), [t]);
   const benefits = useMemo(() => buildBenefits(t), [t]);
   const [selectedPlan, setSelectedPlan] = useState<PlanId>("yearly");
-  const { unlock } = usePremium();
+  const { unlock, isPremium } = usePremium();
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [packages, setPackages] = useState<{ weekly?: PremiumPackage; monthly?: PremiumPackage; yearly?: PremiumPackage }>({});
@@ -343,6 +343,12 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
   // Social-proof scarcity line — stable per-open count in the 30–60 range so
   // it feels live without being a fake ticking timer. Faith-toned, honest.
   const [joinedToday] = useState(() => 2400 + Math.floor(Math.random() * 600));
+
+  // Adaptive density — short screens (small/budget phones, landscape-ish
+  // heights) get a tighter, professional layout instead of an overflowing
+  // wall of cards. Computed once per open; the sheet is short-lived.
+  const [compact] = useState(() => typeof window !== "undefined" && window.innerHeight < 740);
+  const [tiny] = useState(() => typeof window !== "undefined" && window.innerHeight < 620);
 
 
   // Advertise on-screen presence so the rating prompt (and any other
@@ -466,6 +472,18 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
         return { title: t("premium.hero.default.title"), sub: t("premium.hero.default.sub") };
     }
   })();
+
+  // Safety net: if premium turns on while the sheet is open (purchase confirmed
+  // by Play/RevenueCat, or a background sync/restore), never leave the paywall
+  // sitting on screen — close it automatically.
+  useEffect(() => {
+    if (!isOpen || !isPremium) return;
+    const timer = window.setTimeout(() => {
+      if (onUnlock) onUnlock();
+      onClose();
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [isOpen, isPremium, onUnlock, onClose]);
 
   const handleContinue = async () => {
     haptic("medium");
@@ -616,6 +634,9 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                 background: "hsl(var(--background))",
                 boxShadow: "0 -20px 80px hsl(var(--foreground) / 0.25)",
                 borderTop: "1px solid hsl(var(--border))",
+                // Keep the whole sheet below the status bar / notch — the X
+                // was rendering at status-bar level on notched Android phones.
+                paddingTop: "max(env(safe-area-inset-top), 10px)",
               }}
             >
               {/* Drag handle */}
@@ -627,7 +648,10 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
               </div>
 
               <div className="flex-1 overflow-y-auto overscroll-contain" style={{ touchAction: "pan-y" }}>
-                <div className="relative px-5 pb-3">
+                <div
+                  className="relative px-5"
+                  style={{ paddingBottom: "max(env(safe-area-inset-bottom), 14px)" }}
+                >
 
                   {/* Single dismiss control — X only (no duplicate Cancel pill) */}
 
@@ -666,7 +690,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                       initial={{ scale: 1 }}
                       animate={IS_ANDROID ? { scale: 1 } : { scale: [1, 1.04, 1] }}
                       transition={IS_ANDROID ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                      className="relative w-10 h-10 rounded-[14px] flex items-center justify-center mb-1.5"
+                      className={`relative ${compact ? "w-8 h-8 rounded-[11px] mb-1" : "w-10 h-10 rounded-[14px] mb-1.5"} flex items-center justify-center`}
                       style={{
                         background: `linear-gradient(135deg, ${gold}33, ${gold}10)`,
                         border: `1.5px solid ${gold}55`,
@@ -678,7 +702,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                     {/* Limited-time offer badge — urgency framing above the hero */}
                     {/* (badge moved down into the urgency strip below) */}
                     <h2
-                      className="relative text-[23px] text-center leading-[1.08]"
+                      className={`relative ${compact ? "text-[19px]" : "text-[23px]"} text-center leading-[1.08]`}
                       style={{
                         color: "hsl(var(--foreground))",
                         fontFamily: "'Cormorant Garamond', Georgia, serif",
@@ -689,7 +713,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                       {heroCopy.title}
                     </h2>
                     <p
-                      className="relative text-[12.5px] mt-1 text-center max-w-[280px] italic"
+                      className={`relative ${compact ? "text-[11.5px] mt-0.5" : "text-[12.5px] mt-1"} text-center max-w-[280px] italic`}
                       style={{
                         color: "hsl(var(--muted-foreground))",
                         fontFamily: "'Cormorant Garamond', Georgia, serif",
@@ -700,7 +724,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                     </p>
 
                     {/* Honest social proof — rating-based, no fake user count */}
-                    <div className="relative mt-2 flex items-center gap-1.5">
+                    <div className={`relative ${compact ? "mt-1" : "mt-2"} flex items-center gap-1.5`}>
                       <div className="flex items-center gap-0.5">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <span key={i} className="text-[11px] leading-none" style={{ color: "#e8b94a" }}>★</span>
@@ -712,22 +736,25 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                     </div>
                   </div>
 
-                  {/* ── Floating social proof ── */}
-                  <div className="mt-2 mb-2">
-                    <FloatingSocialProof />
-                  </div>
+                  {/* ── Floating social proof — dropped on very short screens
+                      so plans + CTA stay above the fold ── */}
+                  {!tiny && (
+                    <div className={compact ? "mt-1.5 mb-1.5" : "mt-2 mb-2"}>
+                      <FloatingSocialProof />
+                    </div>
+                  )}
 
 
 
 
                   {/* ── What you unlock — 2-col bento grid, concrete features ── */}
-                  <div className="mb-3 grid grid-cols-2 gap-1.5">
+                  <div className={`${compact ? "mb-2" : "mb-3"} grid grid-cols-2 gap-1.5`}>
                     {benefits.map((b) => {
                       const Icon = b.icon;
                       return (
                         <div
                           key={b.title}
-                          className="flex items-center gap-2 rounded-xl px-2.5 py-1.5"
+                          className={`flex items-center gap-2 rounded-xl px-2.5 ${compact ? "py-1" : "py-1.5"}`}
                           style={{
                             background: `linear-gradient(135deg, ${gold}0e, ${gold}03)`,
                             border: `1px solid ${gold}24`,
@@ -769,7 +796,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
 
                   {/* ── Urgency strip: social proof scarcity ── */}
                   <div
-                    className="mb-2 flex items-center justify-between gap-2 rounded-xl px-3 py-1.5"
+                    className={`mb-2 flex items-center justify-between gap-2 rounded-xl px-3 ${compact ? "py-1" : "py-1.5"}`}
                     style={{
                       background: `linear-gradient(135deg, ${gold}1f, ${gold}07)`,
                       border: `1px solid ${gold}4d`,
@@ -795,7 +822,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
 
 
                   {/* ── Plans ── */}
-                  <div className="space-y-1.5 mb-3">
+                  <div className={`${compact ? "space-y-1 mb-2" : "space-y-1.5 mb-3"}`}>
 
 
                     {livePlans.map((plan) => {
@@ -811,7 +838,9 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                           whileTap={{ scale: 0.99 }}
                           className="w-full rounded-2xl relative text-left transition-all"
                           style={{
-                            padding: hasBadge ? "11px 14px" : "9px 14px",
+                            padding: compact
+                              ? (hasBadge ? "8px 12px" : "7px 12px")
+                              : (hasBadge ? "11px 14px" : "9px 14px"),
                             background: isSel
                               ? `linear-gradient(135deg, ${gold}28, ${gold}0c)`
                               : "hsl(var(--muted) / 0.35)",
@@ -858,13 +887,13 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
 
                             <div className="flex-1 min-w-0">
                               <p
-                                className="text-[14.5px] font-semibold leading-tight"
+                                className={`${compact ? "text-[13.5px]" : "text-[14.5px]"} font-semibold leading-tight`}
                                 style={{ color: "hsl(var(--foreground))", letterSpacing: "-0.01em" }}
                               >
                                 {plan.label}
                               </p>
                               <p
-                                className="text-[11px] mt-[2px] leading-tight"
+                                className={`${compact ? "text-[10px]" : "text-[11px]"} mt-[2px] leading-tight`}
                                 style={{ color: "hsl(var(--muted-foreground))" }}
                               >
                                 {plan.subtitle}
@@ -874,7 +903,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                             <div className="text-right flex-shrink-0">
                               {(plan.id === "yearly" || plan.id === "monthly") && (
                                 <span
-                                  className="inline-flex items-center mb-1.5 text-[9px] font-bold tracking-[0.08em] px-2 py-[3px] rounded-full uppercase"
+                                  className={`inline-flex items-center ${compact ? "mb-1" : "mb-1.5"} text-[9px] font-bold tracking-[0.08em] px-2 py-[2px] rounded-full uppercase`}
                                   style={{
                                     background: `linear-gradient(180deg, ${gold}26, ${gold}12)`,
                                     color: gold,
@@ -888,7 +917,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                                 </span>
                               )}
                               <p
-                                className="text-[15px] font-semibold tracking-tight leading-none"
+                                className={`${compact ? "text-[14px]" : "text-[15px]"} font-semibold tracking-tight leading-none`}
                                 style={{ color: "hsl(var(--foreground))", letterSpacing: "-0.015em" }}
                               >
                                 {plan.price}
@@ -917,7 +946,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
 
                   {/* ── Trust strip: cancel anytime + no ads + faith-first ── */}
                   <div
-                    className="mb-2 flex items-center justify-center gap-3 rounded-xl py-1.5"
+                    className={`mb-2 flex items-center justify-center gap-3 rounded-xl ${compact ? "py-1" : "py-1.5"}`}
                     style={{
                       background: "hsl(var(--muted) / 0.25)",
                       border: "1px solid hsl(var(--border) / 0.4)",
@@ -953,7 +982,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                     whileTap={{ scale: 0.98 }}
                     onClick={handleContinue}
                     disabled={purchasing}
-                    className="w-full py-[11px] rounded-2xl font-semibold text-[15px] tracking-tight relative overflow-hidden flex flex-col items-center justify-center gap-[2px]"
+                    className={`w-full ${compact ? "py-[8px]" : "py-[11px]"} rounded-2xl font-semibold text-[15px] tracking-tight relative overflow-hidden flex flex-col items-center justify-center gap-[2px]`}
                     style={{
                       background: `linear-gradient(135deg, hsl(45 92% 62%), ${gold} 50%, hsl(35 92% 50%))`,
                       color: "hsl(0 0% 0%)",

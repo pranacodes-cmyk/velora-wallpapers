@@ -25,8 +25,8 @@ export const IS_ANDROID =
 
 export const ONB_REPEAT: number = IS_ANDROID ? 0 : Infinity;
 export const ONB_BLUR_14 = IS_ANDROID ? "none" : "blur(14px)";
-export const ONB_NAV_LOCK_MS = IS_ANDROID ? 260 : 420;
-export const ONB_SLIDE_FADE_SECONDS = IS_ANDROID ? 0.16 : 0.34;
+export const ONB_NAV_LOCK_MS = IS_ANDROID ? 190 : 420;
+export const ONB_SLIDE_FADE_SECONDS = IS_ANDROID ? 0.11 : 0.34;
 export const ONB_PRESENCE_MODE: "wait" | "sync" = IS_ANDROID ? "wait" : "sync";
 export const ONB_SLIDE_EXIT = IS_ANDROID ? undefined : { opacity: 0 };
 
@@ -36,8 +36,23 @@ export const ONB_SLIDE_EXIT = IS_ANDROID ? undefined : { opacity: 0 };
 // hesitation users feel when tapping Continue. Shorter, near-immediate reveals
 // keep the same fade-up look but make each slide land at once.
 export const ONB_IN_DELAY = IS_ANDROID ? 0 : 0.05;
-export const ONB_IN_DUR = IS_ANDROID ? 0.24 : 0.32;
-export const ONB_STAGGER = IS_ANDROID ? 0.035 : 0.05;
+export const ONB_IN_DUR = IS_ANDROID ? 0.16 : 0.32;
+export const ONB_STAGGER = IS_ANDROID ? 0 : 0.05;
+
+// Full-screen background reveal. On Android the old 8-second Ken Burns
+// (scale 1.15 -> 1) meant Framer wrote inline transforms on a viewport-sized
+// <img> for ~480 frames per slide on the main thread — every tap during that
+// window landed mid-animation, which is the "baggy/laggy" feel. Android now
+// gets a short opacity-only reveal (no transform work at all).
+export const ONB_BG_INITIAL = IS_ANDROID ? { opacity: 0 } : { scale: 1.15, opacity: 0 };
+export const onbBgAnimate = (exiting: boolean, peak = 0.45) =>
+  IS_ANDROID
+    ? { opacity: exiting ? 0 : Math.max(peak, 0.65) }
+    : { scale: exiting ? 1.05 : 1, opacity: exiting ? 0 : peak };
+export const onbBgTransition = (exiting: boolean) =>
+  IS_ANDROID
+    ? { duration: exiting ? 0.18 : 0.28, ease: "easeOut" as const }
+    : { duration: exiting ? 0.6 : 8, ease: "easeOut" as const };
 
 export const headlineStyle = {
   color: "hsl(40 30% 96%)",

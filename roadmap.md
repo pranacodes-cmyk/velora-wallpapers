@@ -1,16 +1,4 @@
-# Android performance recovery
-
-## Onboarding and theme consistency
-
-- [x] Add a Settings action to replay onboarding without clearing user data
-- [x] Lock onboarding, trial transition, and post-onboarding Premium offer to midnight-gold
-- [x] Preserve System/Light/Dark homepage behavior and verify the replay flow
-
-- [ ] Make startup and abnormal-exit diagnostics reliable
-- [ ] Reduce initial bundle and startup contention
-- [ ] Reduce onboarding image decode contention
-- [ ] Move wallpaper preview encoding off immediate interaction path
-- [ ] Throttle and pause parallax preview dynamically
-- [ ] Harden native bitmap decode and background execution
-- [ ] Simplify duplicate prayer alarm scheduling
-- [ ] Verify core flows and release configuration
+- [x] Fix cold-start premium entitlement before onboarding and suppress trial/paywall for existing Pro users
+- [x] Verify and prevent duplicate onboarding/notification paywalls
+- [x] Restore default Jesus-love, verse, and name-area content with live name updates
+- [x] Increase homepage preview-only tilt by 10–20% without changing actual wallpaper

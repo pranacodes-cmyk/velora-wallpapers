@@ -89,11 +89,11 @@ export default function ParallaxPreview() {
     const whole = !!scene.wholeMove;
 
     // Spring integrators per layer — bg heavy, fg crisp, glow/shadow between.
-    const bgSx = new Spring(55, 13), bgSy = new Spring(55, 13);
-    const fgSx = new Spring(150, 16), fgSy = new Spring(150, 16);
-    const glSx = new Spring(95, 14), glSy = new Spring(95, 14);
-    const shSx = new Spring(110, 15), shSy = new Spring(110, 15);
-    const whSx = new Spring(90, 14), whSy = new Spring(90, 14);
+    const bgSx = new Spring(55, 16), bgSy = new Spring(55, 16);
+    const fgSx = new Spring(150, 20), fgSy = new Spring(150, 20);
+    const glSx = new Spring(95, 18), glSy = new Spring(95, 18);
+    const shSx = new Spring(110, 19), shSy = new Spring(110, 19);
+    const whSx = new Spring(90, 18), whSy = new Spring(90, 18);
 
     const loop = (nowTs: number) => {
       const dt = Math.max(0.001, (nowTs - lastFrameMs) / 1000);
@@ -110,20 +110,20 @@ export default function ParallaxPreview() {
         const wy = whSy.step(targetY, dt);
         // Whole-frame scenes need strong sideways motion, but only a tiny
         // vertical crop so tall Android lock screens don't cut the artwork.
-        const px = wx * 34, py = wy * 8;
-        if (bgRef.current) bgRef.current.style.transform = `translate3d(${px}px, ${py}px, 0) scale(1.018)`;
+        const px = wx * 46, py = wy * 12;
+        if (bgRef.current) bgRef.current.style.transform = `translate3d(${px}px, ${py}px, 0) scale(1.025)`;
         if (glowRef.current) glowRef.current.style.transform = `translate3d(${px}px, ${py}px, 0)`;
-        if (fgRef.current) fgRef.current.style.transform = `translate3d(${px}px, ${py}px, 0) scale(1.01)`;
+        if (fgRef.current) fgRef.current.style.transform = `translate3d(${px}px, ${py}px, 0) scale(1.015)`;
         if (shadowRef.current) shadowRef.current.style.transform = `translate3d(${px}px, ${py * 0.7}px, 0)`;
       } else {
         const bx = bgSx.step(targetX, dt), by = bgSy.step(targetY, dt);
         const gx = glSx.step(targetX, dt), gy = glSy.step(targetY, dt);
         const fx = fgSx.step(targetX, dt), fy = fgSy.step(targetY, dt);
         const sx = shSx.step(targetX, dt), sy = shSy.step(targetY, dt);
-        if (bgRef.current) bgRef.current.style.transform = `translate3d(${bx * 10}px, ${by * 10}px, 0) scale(1.12)`;
-        if (glowRef.current) glowRef.current.style.transform = `translate3d(${gx * 16}px, ${gy * 16}px, 0)`;
-        if (fgRef.current) fgRef.current.style.transform = `translate3d(${fx * 30}px, ${fy * 30}px, 0) scale(1.04)`;
-        if (shadowRef.current) shadowRef.current.style.transform = `translate3d(${sx * 24}px, ${sy * 18}px, 0)`;
+        if (bgRef.current) bgRef.current.style.transform = `translate3d(${bx * 14}px, ${by * 14}px, 0) scale(1.14)`;
+        if (glowRef.current) glowRef.current.style.transform = `translate3d(${gx * 23}px, ${gy * 23}px, 0)`;
+        if (fgRef.current) fgRef.current.style.transform = `translate3d(${fx * 42}px, ${fy * 42}px, 0) scale(1.05)`;
+        if (shadowRef.current) shadowRef.current.style.transform = `translate3d(${sx * 34}px, ${sy * 26}px, 0)`;
       }
       raf = requestAnimationFrame(loop);
     };
@@ -245,7 +245,7 @@ export default function ParallaxPreview() {
       <div key={scene.id} className={`absolute inset-0 ${swipeAnim ? `prayly-scene-${swipeAnim}` : ""}`} style={{ perspective: "1200px" }}>
         <div
           ref={bgRef}
-          className={`absolute ${scene.wholeMove ? "-inset-3" : "-inset-8"} ${freezePreview ? "" : "will-change-transform"}`}
+          className={`absolute ${scene.wholeMove ? "-inset-4" : "-inset-9"} ${freezePreview ? "" : "will-change-transform"}`}
           style={{
             backgroundImage: `url(${scene.bg})`,
             backgroundSize: "cover",

@@ -26,10 +26,13 @@ export function AutoPaywall() {
 
   useEffect(() => {
     // Cold-launch session counter — fires a trigger every Nth open.
+    // Never consume or emit this trigger behind onboarding; the dedicated
+    // post-onboarding offer owns that journey and must be the only paywall.
+    if (isOnboardingActive) return;
     try {
       firePaywallTrigger("app_session");
     } catch {}
-  }, []);
+  }, [isOnboardingActive]);
 
   useEffect(() => {
     const onTrigger = async (e: Event) => {

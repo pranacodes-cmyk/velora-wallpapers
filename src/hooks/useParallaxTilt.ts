@@ -35,8 +35,8 @@ export function useParallaxTilt(opts?: { enableMouse?: boolean; container?: Reac
     const handler = (e: DeviceOrientationEvent) => {
       const gamma = e.gamma ?? 0;
       const beta = (e.beta ?? 45) - 45;
-      target.current.x = -Math.max(-1, Math.min(1, gamma / 22));
-      target.current.y = -Math.max(-1, Math.min(1, beta / 22));
+      target.current.x = -Math.max(-1, Math.min(1, gamma / 20));
+      target.current.y = -Math.max(-1, Math.min(1, beta / 20));
     };
     window.addEventListener("deviceorientation", handler);
     return () => window.removeEventListener("deviceorientation", handler);

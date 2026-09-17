@@ -89,9 +89,9 @@ function ParallaxHero({
     let lastPaintMs = 0;
     let lastFrameMs = performance.now();
     const start = lastFrameMs;
-    // In-app preview only (+15% travel so the depth reads better on screen).
+    // In-app preview only (+32% travel so the depth is clearly noticeable).
     // The real lock-screen output is the native service and is untouched.
-    const displacement = (constrainedMotion ? 0.72 : 1) * 1.15;
+    const displacement = (constrainedMotion ? 0.72 : 1) * 1.32;
 
     // One-euro filters smooth noisy gyro input without adding perceptible lag.
     // Tuned soft: min cutoff 1.0Hz, beta 0.015 — kills jitter, keeps intent.
@@ -120,8 +120,8 @@ function ParallaxHero({
       const t = (now - start) / 1000;
 
       // Gentle sine idle drift so it never looks frozen on desktop.
-      const idleX = Math.sin(t * 0.25) * 0.4;
-      const idleY = Math.sin(t * 0.18 + 1.1) * 0.28;
+      const idleX = Math.sin(t * 0.25) * 0.46;
+      const idleY = Math.sin(t * 0.18 + 1.1) * 0.32;
       let targetX = idleX;
       let targetY = idleY;
       const gyroFresh = gyroActive.current && now - lastGyroAtRef.current < 900;
@@ -146,11 +146,11 @@ function ParallaxHero({
         // Whole-composition scene (e.g. Calvary Sunrise) — keep vertical fit
         // intact so Android-sized previews don't crop, but let it breathe
         // horizontally so motion is still obvious.
-        if (bgRef.current) bgRef.current.style.transform = `translate3d(${bgX * 24 * d}px, ${bgY * 7 * d}px, 0) scale(1.015)`;
+        if (bgRef.current) bgRef.current.style.transform = `translate3d(${bgX * 24 * d}px, ${bgY * 7 * d}px, 0) scale(1.02)`;
         if (haloRef.current) haloRef.current.style.transform = `translate3d(${haX * 24 * d}px, ${haY * 7 * d}px, 0)`;
       } else {
-        if (bgRef.current) bgRef.current.style.transform = `translate3d(${bgX * 8 * d}px, ${bgY * 7 * d}px, 0) scale(1.06)`;
-        if (fgRef.current) fgRef.current.style.transform = `translate3d(${fgX * 24 * d}px, ${fgY * 16 * d}px, 0) scale(1.02)`;
+        if (bgRef.current) bgRef.current.style.transform = `translate3d(${bgX * 8 * d}px, ${bgY * 7 * d}px, 0) scale(1.07)`;
+        if (fgRef.current) fgRef.current.style.transform = `translate3d(${fgX * 24 * d}px, ${fgY * 16 * d}px, 0) scale(1.025)`;
         if (haloRef.current) haloRef.current.style.transform = `translate3d(${haX * 14 * d}px, ${haY * 12 * d}px, 0)`;
       }
       raf = requestAnimationFrame(loop);
@@ -231,8 +231,8 @@ function ParallaxHero({
         return;
       }
       const tSec = performance.now() / 1000;
-      const rawX = (e.gamma - (baseGamma ?? 0)) / 22;
-      const rawY = (e.beta - (baseBeta ?? 0)) / 22;
+      const rawX = (e.gamma - (baseGamma ?? 0)) / 20;
+      const rawY = (e.beta - (baseBeta ?? 0)) / 20;
       const smoothedX = fx.filter(rawX, tSec);
       const smoothedY = fy.filter(rawY, tSec);
       gyroXY.current = {
@@ -338,7 +338,7 @@ function ParallaxHero({
     >
       <div
         ref={bgRef}
-          className={`absolute ${scene.wholeMove ? "-inset-2" : "-inset-6"} ${freezeParallax ? "" : "will-change-transform"}`}
+          className={`absolute ${scene.wholeMove ? "-inset-2.5" : "-inset-7"} ${freezeParallax ? "" : "will-change-transform"}`}
         style={{
           backgroundImage: loadImage ? `url(${scene.bgCard || scene.bg})` : undefined,
           // Rail card is a small preview — always fill (cover) so no side
@@ -454,11 +454,9 @@ function ParallaxHero({
 
       {/* Personalized engraving — identical component used by the
           ParallaxPreview so what you see here is exactly what gets applied. */}
-      {personalName ? (
-        <div className="absolute inset-0 z-30 pointer-events-none">
-          <EngravedOverlay name={personalName} verse={personalVerse} compact />
-        </div>
-      ) : null}
+      <div className="absolute inset-0 z-30 pointer-events-none">
+        <EngravedOverlay name={personalName} verse={personalVerse} compact />
+      </div>
 
       {/* Keyframes — one small block, GPU-cheap */}
       <style>{`
