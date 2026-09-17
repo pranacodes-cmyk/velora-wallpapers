@@ -4,6 +4,7 @@
 // We intentionally do NOT ship a manual background-picker feature: the
 // rotation runs automatically each day so the experience stays effortless.
 
+import { toAbsoluteAssetUrl } from "@/utils/assetUrl";
 import card01 from "@/assets/verse-bg-card/bg-01-card.webp.asset.json";
 import card02 from "@/assets/verse-bg-card/bg-02-card.webp.asset.json";
 import card03 from "@/assets/verse-bg-card/bg-03-card.webp.asset.json";
@@ -70,7 +71,9 @@ const backgrounds: VerseBackground[] = Array.from({ length: 20 }, (_, idx) => {
   return {
     id: `bg-${String(n).padStart(2, "0")}`,
     url: r2(n),
-    cardUrl: CARD_URLS[idx],
+    // Native WebViews serve from https://localhost, which cannot resolve the
+    // relative /__l5e/ asset path — always use an absolute CDN URL here.
+    cardUrl: toAbsoluteAssetUrl(CARD_URLS[idx]),
     label: `Background ${n}`,
   };
 });
