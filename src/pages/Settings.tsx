@@ -6,7 +6,7 @@ import { haptic } from "@/utils/haptics";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Crown, ChevronRight, Shield, Share2, Star, Heart,
-  ExternalLink, Info, FileText, Mail, Sun, Moon, Monitor, Trash2, SlidersHorizontal, User, Check, X, RotateCcw, PlayCircle, Image as ImageIcon,
+  ExternalLink, Info, FileText, Mail, Sun, Moon, Monitor, Trash2, SlidersHorizontal, User, Check, X, RotateCcw, Image as ImageIcon,
 } from "lucide-react";
 import { restorePurchases } from "@/services/revenuecat";
 import { toast } from "sonner";
@@ -20,7 +20,6 @@ import { LANGUAGES } from "@/i18n/config";
 import { showPrivacyOptionsForm } from "@/services/ads";
 import { Capacitor } from "@capacitor/core";
 import promoLifeCalendar from "@/assets/promo-life-calendar.png";
-import { REDO_ONBOARDING_EVENT } from "@/components/onboarding/OnboardingFlow";
 
 const LIFE_CALENDAR_URL = "https://play.google.com/store/apps/details?id=com.mylifecalendar.app";
 
@@ -414,17 +413,6 @@ export default function Settings() {
         </SettingSection>
 
         <SettingSection title={t("settings.section.support")}>
-          <SettingRow
-            icon={PlayCircle}
-            label={t("settings.redoOnboarding")}
-            desc={t("settings.redoOnboardingDesc")}
-            iconColor="hsl(var(--accent))"
-            onClick={() => {
-              window.dispatchEvent(new Event(REDO_ONBOARDING_EVENT));
-              navigate("/");
-            }}
-          />
-          {divider}
           <SettingRow icon={Star} label={t("settings.rate")} desc={t("settings.rateDesc")} iconColor="hsl(var(--primary))" onClick={() => window.open(PLAY_STORE_URL, "_blank")} trailing={<ExternalLink className="w-3.5 h-3.5 text-muted-foreground/40" />} />
           {divider}
           <SettingRow icon={Share2} label={t("settings.share")} desc={t("settings.shareDesc")} iconColor="hsl(160 55% 45%)" onClick={handleShare} trailing={null} />
