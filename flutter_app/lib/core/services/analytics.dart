@@ -5,14 +5,24 @@ import 'package:posthog_flutter/posthog_flutter.dart';
 class Analytics {
   const Analytics._();
 
+  static Map<String, Object>? _clean(Map<String, Object?>? props) {
+    if (props == null) return null;
+    final out = <String, Object>{};
+    props.forEach((k, v) {
+      if (v != null) out[k] = v;
+    });
+    return out;
+  }
+
   static Future<void> capture(
     String event, [
-    Map<String, Object>? props,
+    Map<String, Object?>? props,
   ]) async {
     try {
-      await Posthog().capture(eventName: event, properties: props);
+      await Posthog().capture(eventName: event, properties: _clean(props));
     } catch (_) {}
   }
+
 
   static Future<void> identify(
     String userId, [

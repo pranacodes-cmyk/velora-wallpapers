@@ -43,7 +43,7 @@ class AppTheme {
         displayColor: AppColors.foreground,
       ),
       dividerColor: AppColors.border,
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.card,
         elevation: 0,
         shape: RoundedRectangleBorder(

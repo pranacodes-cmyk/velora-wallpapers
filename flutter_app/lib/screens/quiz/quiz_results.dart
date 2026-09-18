@@ -710,7 +710,7 @@ class _ConfettiLayerState extends State<_ConfettiLayer>
     super.dispose();
   }
 
-  static const _colors = [
+  static final _colors = <Color>[
     AppColors.primary,
     AppColors.accent,
     Color(0xFFEAB93A),
