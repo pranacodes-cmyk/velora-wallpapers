@@ -20,6 +20,7 @@ import '../../state/app_providers.dart';
 import '../../widgets/app_toast.dart';
 import '../../widgets/premium_sheet.dart';
 import '../favorites/wallpaper_detail.dart';
+import 'live_preview_clip.dart';
 import '../favorites/wallpaper_tiles.dart';
 import 'feed_banners.dart';
 
@@ -526,7 +527,7 @@ class _WallpapersScreenState extends ConsumerState<WallpapersScreen> {
 
     return ListView(
       controller: _scrollController,
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 96),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 128),
       children: [
         // Same placement as web: LiveFeed shows the "new today" banner + daily
         // verse card on the "all" category, StaticWallpapers shows only the
@@ -640,7 +641,7 @@ class _WallpapersScreenState extends ConsumerState<WallpapersScreen> {
 
   Widget _skeletonGrid(double aspect) {
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 128),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 10,
@@ -1103,6 +1104,8 @@ class _LivePreviewOverlayState extends State<_LivePreviewOverlay> {
                   child: VideoPlayer(_controller!),
                 ),
               )
+            else if (isLivePreviewClip(w.thumbnailUrl))
+              LivePreviewClip(url: w.thumbnailUrl!)
             else if (w.thumbnailUrl != null)
               CachedNetworkImage(imageUrl: w.thumbnailUrl!, fit: BoxFit.cover)
             else
@@ -1423,7 +1426,9 @@ class _SearchOverlayState extends State<_SearchOverlay> {
                               fit: StackFit.expand,
                               children: [
                                 ColoredBox(color: AppColors.secondary),
-                                if (img != null)
+                                if (isLivePreviewClip(img))
+                                  LivePreviewClip(url: img!)
+                                else if (img != null)
                                   CachedNetworkImage(
                                     imageUrl: img,
                                     fit: BoxFit.cover,

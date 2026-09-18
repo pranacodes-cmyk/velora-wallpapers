@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../wallpapers/live_preview_clip.dart';
+
 import '../../core/services/haptics.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -251,6 +253,12 @@ class _LiveWallpaperTileState extends State<LiveWallpaperTile> {
                     height: _controller!.value.size.height,
                     child: VideoPlayer(_controller!),
                   ),
+                )
+              else if (isLivePreviewClip(w.thumbnailUrl))
+                LivePreviewClip(
+                  url: w.thumbnailUrl!,
+                  autoplay: !_previewActive,
+                  placeholder: const _Shimmer(),
                 )
               else if (w.thumbnailUrl != null)
                 CachedNetworkImage(
