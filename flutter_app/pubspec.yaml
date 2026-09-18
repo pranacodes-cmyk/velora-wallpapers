@@ -46,7 +46,7 @@ dependencies:
   google_mobile_ads: ^5.1.0
 
   # Analytics — same PostHog project and event names
-  posthog_flutter: ^4.7.0
+  posthog_flutter: ^5.44.2
 
   # UI helpers
   flutter_svg: ^2.0.10+1
