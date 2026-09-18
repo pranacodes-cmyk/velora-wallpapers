@@ -13,7 +13,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     // Play Store package — locked, cannot change.
     namespace = "com.jesuswallpaperbible.app"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
