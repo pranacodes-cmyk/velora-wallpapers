@@ -2,8 +2,11 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // Pangle (ByteDance) SDK — required by com.google.ads.mediation:pangle adapter.
+        maven { url 'https://artifact.bytedance.com/repository/pangle/' }
     }
 }
+
 
 rootProject.buildDir = "../build"
 
