@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/ads_service.dart';
@@ -7,6 +10,7 @@ import '../../core/services/analytics.dart';
 import '../../core/services/content_data.dart';
 import '../../core/services/haptics.dart';
 import '../../core/services/journey_progress_store.dart';
+import '../../core/services/journey_narration_audio.dart';
 import '../../core/services/rating_service.dart';
 import '../../core/services/streak_store.dart';
 import '../../core/services/user_profile.dart';
@@ -271,6 +275,7 @@ class _JourneyDayScreenState extends ConsumerState<JourneyDayScreen> {
     switch (_stage) {
       case _Stage.opening:
         return _OpeningStage(
+          journeyId: widget.journeyId,
           hue: hue,
           day: _selectedDay,
           dayData: dayData,
@@ -349,11 +354,13 @@ class _RoundButton extends StatelessWidget {
 
 class _OpeningStage extends StatelessWidget {
   const _OpeningStage({
+    required this.journeyId,
     required this.hue,
     required this.day,
     required this.dayData,
     required this.onBegin,
   });
+  final String journeyId;
   final double hue;
   final int day;
   final JourneyDay dayData;
@@ -375,6 +382,8 @@ class _OpeningStage extends StatelessWidget {
             color: hsl(hue, 75, 72),
           ),
         ),
+        const SizedBox(height: 12),
+        _JourneyNarrationButton(journeyId: journeyId, day: day, hue: hue),
         const SizedBox(height: 12),
         Text(
           dayData.title,
@@ -837,6 +846,201 @@ class _PrimaryButton extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Icon(icon, size: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _JourneyNarrationButton extends StatefulWidget {
+  const _JourneyNarrationButton({
+    required this.journeyId,
+    required this.day,
+    required this.hue,
+  });
+
+  final String journeyId;
+  final int day;
+  final double hue;
+
+  @override
+  State<_JourneyNarrationButton> createState() =>
+      _JourneyNarrationButtonState();
+}
+
+class _JourneyNarrationButtonState extends State<_JourneyNarrationButton> {
+  String? _url;
+  AudioPlayer? _player;
+  bool _loading = true;
+  bool _playing = false;
+  double _progress = 0;
+  final _subs = <StreamSubscription<dynamic>>[];
+
+  @override
+  void initState() {
+    super.initState();
+    _resolve();
+  }
+
+  @override
+  void didUpdateWidget(covariant _JourneyNarrationButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.journeyId != widget.journeyId ||
+        oldWidget.day != widget.day) {
+      _disposePlayer();
+      setState(() {
+        _url = null;
+        _loading = true;
+        _playing = false;
+        _progress = 0;
+      });
+      _resolve();
+    }
+  }
+
+  @override
+  void dispose() {
+    _disposePlayer();
+    super.dispose();
+  }
+
+  void _disposePlayer() {
+    for (final s in _subs) {
+      s.cancel();
+    }
+    _subs.clear();
+    _player?.dispose();
+    _player = null;
+  }
+
+  Future<void> _resolve() async {
+    final url = await JourneyNarrationAudio.resolve(
+      widget.journeyId,
+      widget.day,
+    );
+    if (!mounted) return;
+    setState(() {
+      _url = url;
+      _loading = false;
+    });
+  }
+
+  AudioPlayer _ensurePlayer(String url) {
+    final existing = _player;
+    if (existing != null) return existing;
+    final p = AudioPlayer();
+    _subs.add(
+      p.positionStream.listen((pos) {
+        final d = p.duration;
+        if (d != null && d.inMilliseconds > 0 && mounted) {
+          setState(() => _progress = pos.inMilliseconds / d.inMilliseconds);
+        }
+      }),
+    );
+    _subs.add(
+      p.playerStateStream.listen((state) {
+        if (!mounted) return;
+        setState(() {
+          _playing =
+              state.playing &&
+              state.processingState != ProcessingState.completed;
+          if (state.processingState == ProcessingState.completed) _progress = 1;
+        });
+      }),
+    );
+    p.setUrl(url).catchError((_) => null);
+    _player = p;
+    return p;
+  }
+
+  Future<void> _toggle() async {
+    final url = _url;
+    if (url == null) return;
+    haptic(HapticStyle.soft);
+    final p = _ensurePlayer(url);
+    if (_playing) {
+      await p.pause();
+    } else {
+      await p.play().catchError((_) {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return SizedBox(
+        width: 26,
+        height: 26,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: hsl(widget.hue, 75, 68),
+        ),
+      );
+    }
+    if (_url == null) return const SizedBox.shrink();
+    return GestureDetector(
+      onTap: _toggle,
+      child: Container(
+        height: 40,
+        constraints: const BoxConstraints(maxWidth: 150),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(999),
+          color: Colors.white.withValues(alpha: 0.07),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            FractionallySizedBox(
+              widthFactor: _progress.clamp(0, 1).toDouble(),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      hsl(widget.hue, 70, 55, 0.28),
+                      hsl(widget.hue, 80, 65, 0.14),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          hsl(widget.hue, 75, 60),
+                          hsl(widget.hue, 80, 48),
+                        ],
+                      ),
+                    ),
+                    child: Icon(
+                      _playing ? Icons.pause : Icons.play_arrow,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _playing
+                        ? t('jn.narration.listening')
+                        : t('jn.narration.listen'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

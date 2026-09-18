@@ -461,9 +461,10 @@ class _ParallaxHeroState extends State<_ParallaxHero>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late final Ticker _ticker;
 
-  // In-app preview only (+32% travel so the depth is clearly noticeable).
+  // Home rail preview only. The full ParallaxPreview screen carries the larger
+  // sensor movement; Today must stay smooth while other sections load.
   // The real lock-screen output is the native service and is untouched.
-  static const double _displacement = 0.72 * 1.32;
+  static const double _displacement = 0.50;
 
   final _fx = OneEuro(1.0, 0.015, 1);
   final _fy = OneEuro(1.0, 0.015, 1);
@@ -521,7 +522,6 @@ class _ParallaxHeroState extends State<_ParallaxHero>
     _lastFrameMs = 0;
     _startMs = 0;
     _ticker.start();
-    _accel ??= accelerometerEventStream().listen(_onAccel);
   }
 
   void _stop() {
@@ -580,8 +580,8 @@ class _ParallaxHeroState extends State<_ParallaxHero>
       _startMs = now;
       _lastFrameMs = now;
     }
-    // Time-based 30fps cap — correct on 60/90/120Hz panels.
-    if (now - _lastPaintMs < 31) return;
+    // Time-based 15fps cap on the home rail.
+    if (now - _lastPaintMs < 64) return;
     _lastPaintMs = now;
     final dt = math.max(0.001, (now - _lastFrameMs) / 1000);
     _lastFrameMs = now;
@@ -660,103 +660,105 @@ class _ParallaxHeroState extends State<_ParallaxHero>
           onPointerMove: (e) => _onPointerMove(e.localPosition, size),
           onPointerUp: (_) => _release(),
           onPointerCancel: (_) => _release(),
-          child: TapScale(
-            scale: 0.99,
-            onTap: () {
-              // Suppress the tap that ends a horizontal swipe.
-              if (_swiping) {
-                _swiping = false;
-                return;
-              }
-              haptic(HapticStyle.light);
-              widget.onOpen();
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(
-                    color: hsl(0, 0, 0, 0.95),
-                    blurRadius: 60,
-                    offset: const Offset(0, 30),
-                    spreadRadius: -24,
-                  ),
-                  BoxShadow(
-                    color: hsl(42, 60, 40, 0.35),
-                    blurRadius: 22,
-                    offset: const Offset(0, 8),
-                    spreadRadius: -12,
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(28),
-                child: Stack(
-                  children: [
-                    // ---- background layer (heavy spring) ----------------
-                    Positioned(
-                      left: scene.wholeMove ? -10 : -28,
-                      right: scene.wholeMove ? -10 : -28,
-                      top: scene.wholeMove ? -10 : -28,
-                      bottom: scene.wholeMove ? -10 : -28,
-                      child: Transform.translate(
-                        offset: _bg,
-                        child: Transform.scale(
-                          scale: scene.wholeMove ? 1.02 : 1.07,
-                          child: widget.loadImage
-                              ? CachedNetworkImage(
-                                  imageUrl: scene.bgCard.isNotEmpty
-                                      ? scene.bgCard
-                                      : scene.bg,
-                                  fit: BoxFit.cover,
-                                  fadeInDuration: const Duration(
-                                    milliseconds: 220,
-                                  ),
-                                  placeholder: (_, __) =>
-                                      const ColoredBox(color: Colors.black),
-                                  errorWidget: (_, __, ___) =>
-                                      const ColoredBox(color: Colors.black),
-                                )
-                              : const ColoredBox(color: Colors.black),
+          child: RepaintBoundary(
+            child: TapScale(
+              scale: 0.99,
+              onTap: () {
+                // Suppress the tap that ends a horizontal swipe.
+                if (_swiping) {
+                  _swiping = false;
+                  return;
+                }
+                haptic(HapticStyle.light);
+                widget.onOpen();
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: hsl(0, 0, 0, 0.72),
+                      blurRadius: 36,
+                      offset: const Offset(0, 30),
+                      spreadRadius: -24,
+                    ),
+                    BoxShadow(
+                      color: hsl(42, 60, 40, 0.12),
+                      blurRadius: 12,
+                      offset: const Offset(0, 8),
+                      spreadRadius: -12,
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(28),
+                  child: Stack(
+                    children: [
+                      // ---- background layer (heavy spring) ----------------
+                      Positioned(
+                        left: scene.wholeMove ? -10 : -28,
+                        right: scene.wholeMove ? -10 : -28,
+                        top: scene.wholeMove ? -10 : -28,
+                        bottom: scene.wholeMove ? -10 : -28,
+                        child: Transform.translate(
+                          offset: _bg,
+                          child: Transform.scale(
+                            scale: scene.wholeMove ? 1.02 : 1.07,
+                            child: widget.loadImage
+                                ? CachedNetworkImage(
+                                    imageUrl: scene.bgCard.isNotEmpty
+                                        ? scene.bgCard
+                                        : scene.bg,
+                                    fit: BoxFit.cover,
+                                    fadeInDuration: const Duration(
+                                      milliseconds: 220,
+                                    ),
+                                    placeholder: (_, __) =>
+                                        const ColoredBox(color: Colors.black),
+                                    errorWidget: (_, __, ___) =>
+                                        const ColoredBox(color: Colors.black),
+                                  )
+                                : const ColoredBox(color: Colors.black),
+                          ),
                         ),
                       ),
-                    ),
 
-                    // ---- foreground cutout (crisp spring) ---------------
-                    if (!scene.wholeMove && widget.loadImage)
-                      Positioned.fill(
-                        child: IgnorePointer(
-                          child: Transform.translate(
-                            offset: _fg,
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Transform.scale(
-                                scale: 1.025,
-                                child: SizedBox(
-                                  height: size.height * scene.fgHeight / 100,
-                                  child: AspectRatio(
-                                    aspectRatio: 832 / 1472,
-                                    child: ShaderMask(
-                                      blendMode: BlendMode.dstIn,
-                                      shaderCallback: (r) =>
-                                          const LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Colors.black,
-                                              Colors.black,
-                                              Colors.transparent,
-                                            ],
-                                            stops: [0, 0.9, 1],
-                                          ).createShader(r),
-                                      child: CachedNetworkImage(
-                                        imageUrl: scene.fgCardFor(),
-                                        fit: BoxFit.contain,
-                                        placeholder: (_, __) =>
-                                            const SizedBox.shrink(),
-                                        errorWidget: (_, __, ___) =>
-                                            const SizedBox.shrink(),
+                      // ---- foreground cutout (crisp spring) ---------------
+                      if (!scene.wholeMove && widget.loadImage)
+                        Positioned.fill(
+                          child: IgnorePointer(
+                            child: Transform.translate(
+                              offset: _fg,
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Transform.scale(
+                                  scale: 1.025,
+                                  child: SizedBox(
+                                    height: size.height * scene.fgHeight / 100,
+                                    child: AspectRatio(
+                                      aspectRatio: 832 / 1472,
+                                      child: ShaderMask(
+                                        blendMode: BlendMode.dstIn,
+                                        shaderCallback: (r) =>
+                                            const LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: [
+                                                Colors.black,
+                                                Colors.black,
+                                                Colors.transparent,
+                                              ],
+                                              stops: [0, 0.9, 1],
+                                            ).createShader(r),
+                                        child: CachedNetworkImage(
+                                          imageUrl: scene.fgCardFor(),
+                                          fit: BoxFit.contain,
+                                          placeholder: (_, __) =>
+                                              const SizedBox.shrink(),
+                                          errorWidget: (_, __, ___) =>
+                                              const SizedBox.shrink(),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -765,20 +767,42 @@ class _ParallaxHeroState extends State<_ParallaxHero>
                             ),
                           ),
                         ),
+
+                      // ---- halo (mid spring) ------------------------------
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: Transform.translate(
+                            offset: _halo,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: RadialGradient(
+                                  center: const Alignment(0, -0.1),
+                                  radius: 0.75,
+                                  colors: [
+                                    hsl(42, 90, 70, 0.04),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
 
-                    // ---- halo (mid spring) ------------------------------
-                    Positioned.fill(
-                      child: IgnorePointer(
-                        child: Transform.translate(
-                          offset: _halo,
+                      // ---- top vignette ----------------------------------
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        height: size.height * 0.18,
+                        child: IgnorePointer(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
-                              gradient: RadialGradient(
-                                center: const Alignment(0, -0.1),
-                                radius: 0.75,
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
                                 colors: [
-                                  hsl(42, 90, 70, 0.10),
+                                  hsl(0, 0, 0, 0.55),
                                   Colors.transparent,
                                 ],
                               ),
@@ -786,120 +810,101 @@ class _ParallaxHeroState extends State<_ParallaxHero>
                           ),
                         ),
                       ),
-                    ),
 
-                    // ---- top vignette ----------------------------------
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      top: 0,
-                      height: size.height * 0.18,
-                      child: IgnorePointer(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [hsl(0, 0, 0, 0.55), Colors.transparent],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // ---- bottom vignette -------------------------------
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      height: size.height * 0.36,
-                      child: IgnorePointer(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                                hsl(0, 0, 0, 0.82),
-                                hsl(0, 0, 0, 0.28),
-                                Colors.transparent,
-                              ],
-                              stops: const [0, 0.55, 1],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // ---- inner hairline ring ---------------------------
-                    Positioned.fill(
-                      child: IgnorePointer(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(28),
-                            border: Border.all(
-                              color: hsl(42, 70, 70, 0.14),
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // ---- corner brackets (viewfinder cue) --------------
-                    for (final corner in const ['tl', 'tr', 'bl', 'br'])
+                      // ---- bottom vignette -------------------------------
                       Positioned(
-                        top: corner.startsWith('t') ? 10 : null,
-                        bottom: corner.startsWith('b') ? 10 : null,
-                        left: corner.endsWith('l') ? 10 : null,
-                        right: corner.endsWith('r') ? 10 : null,
-                        child: IgnorePointer(child: _Bracket(corner: corner)),
-                      ),
-
-                    // ---- LIVE chip -------------------------------------
-                    Positioned(
-                      top: 12,
-                      left: 12,
-                      child: IgnorePointer(child: const _LiveChip()),
-                    ),
-
-                    // ---- tilt hint chip --------------------------------
-                    Positioned(
-                      top: 12,
-                      right: 12,
-                      child: IgnorePointer(
-                        child: Container(
-                          height: 24,
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: hsl(0, 0, 0, 0.42),
-                            borderRadius: BorderRadius.circular(99),
-                            border: Border.all(
-                              color: hsl(0, 0, 100, 0.12),
-                              width: 1,
-                            ),
-                          ),
-                          child: Text(
-                            t('px.tiltDepth').toUpperCase(),
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 10 * 0.14,
-                              color: Colors.white.withValues(alpha: 0.8),
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: size.height * 0.36,
+                        child: IgnorePointer(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [
+                                  hsl(0, 0, 0, 0.82),
+                                  hsl(0, 0, 0, 0.28),
+                                  Colors.transparent,
+                                ],
+                                stops: const [0, 0.55, 1],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
 
-                    // ---- personalized engraving (shared widget) --------
-                    EngravedOverlay(
-                      name: widget.personalName,
-                      verse: widget.personalVerse,
-                      compact: true,
-                    ),
-                  ],
+                      // ---- inner hairline ring ---------------------------
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(28),
+                              border: Border.all(
+                                color: hsl(42, 70, 70, 0.14),
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // ---- corner brackets (viewfinder cue) --------------
+                      for (final corner in const ['tl', 'tr', 'bl', 'br'])
+                        Positioned(
+                          top: corner.startsWith('t') ? 10 : null,
+                          bottom: corner.startsWith('b') ? 10 : null,
+                          left: corner.endsWith('l') ? 10 : null,
+                          right: corner.endsWith('r') ? 10 : null,
+                          child: IgnorePointer(child: _Bracket(corner: corner)),
+                        ),
+
+                      // ---- LIVE chip -------------------------------------
+                      Positioned(
+                        top: 12,
+                        left: 12,
+                        child: IgnorePointer(child: const _LiveChip()),
+                      ),
+
+                      // ---- tilt hint chip --------------------------------
+                      Positioned(
+                        top: 12,
+                        right: 12,
+                        child: IgnorePointer(
+                          child: Container(
+                            height: 24,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: hsl(0, 0, 0, 0.42),
+                              borderRadius: BorderRadius.circular(99),
+                              border: Border.all(
+                                color: hsl(0, 0, 100, 0.12),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              t('px.tiltDepth').toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 10 * 0.14,
+                                color: Colors.white.withValues(alpha: 0.8),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // ---- personalized engraving (shared widget) --------
+                      EngravedOverlay(
+                        name: widget.personalName,
+                        verse: widget.personalVerse,
+                        compact: true,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

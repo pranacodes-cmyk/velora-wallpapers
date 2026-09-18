@@ -6,9 +6,10 @@ on:
       mode:
         description: Build type
         required: true
-        default: 'debug'
+        default: 'debug-arm64'
         type: choice
         options:
+          - 'debug-arm64'
           - 'debug'
           - 'release'
 
@@ -38,6 +39,24 @@ jobs:
         with:
           channel: stable
           cache: true
+
+      - name: Cache Flutter pub
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            flutter_app/.dart_tool
+          key: flutter-pub-${{ runner.os }}-${{ hashFiles('flutter_app/pubspec.lock') }}
+          restore-keys: flutter-pub-${{ runner.os }}-
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: flutter-gradle-${{ runner.os }}-${{ hashFiles('flutter_app/android/**/*.gradle*', 'flutter_app/android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: flutter-gradle-${{ runner.os }}-
 
       - name: Generate Android platform files
         run: |
@@ -73,6 +92,8 @@ jobs:
         run: |
           if [ "${{ inputs.mode }}" = "release" ]; then
             flutter build apk --release
+          elif [ "${{ inputs.mode }}" = "debug-arm64" ]; then
+            flutter build apk --debug --target-platform android-arm64
           else
             flutter build apk --debug
           fi

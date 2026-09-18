@@ -35,10 +35,7 @@ class VerseHero extends ConsumerStatefulWidget {
 }
 
 class _VerseHeroState extends ConsumerState<VerseHero> {
-  final _controller = PageController(
-    initialPage: 3,
-    viewportFraction: 0.44, // 36% slide + 6% gaps ≈ web's 32% side padding
-  );
+  final _controller = PageController(initialPage: 3, viewportFraction: 0.38);
 
   int _activeIdx = 3;
   int _settledIdx = 3;
@@ -145,8 +142,8 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
       });
     }
 
-    final height = MediaQuery.sizeOf(context).height * 0.38;
-    final carouselHeight = height.clamp(300.0, 420.0);
+    final height = MediaQuery.sizeOf(context).height * 0.32;
+    final carouselHeight = height.clamp(250.0, 350.0);
 
     return FadeRise(
       child: Container(
@@ -159,7 +156,7 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
             center: const Alignment(0, -1),
             radius: 1.2,
             colors: [
-              AppColors.primary.withValues(alpha: 0.10),
+              AppColors.primary.withValues(alpha: 0.06),
               AppColors.card,
               AppColors.background,
             ],
@@ -168,7 +165,7 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.75),
-              blurRadius: 48,
+              blurRadius: 30,
               spreadRadius: -22,
               offset: const Offset(0, 22),
             ),
@@ -187,8 +184,8 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
                   decoration: BoxDecoration(
                     gradient: RadialGradient(
                       colors: [
-                        hsl(42, 95, 62, 0.30),
-                        hsl(38, 90, 55, 0.18),
+                        hsl(42, 95, 62, 0.13),
+                        hsl(38, 90, 55, 0.07),
                         Colors.transparent,
                       ],
                       stops: const [0, 0.35, 0.65],
@@ -269,7 +266,7 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
                         final isToday = offset == 0;
                         final locked = !isPremium && !isToday;
                         final isActive = i == _activeIdx;
-                        final near = (i - _settledIdx).abs() <= 2;
+                        final near = i == _settledIdx;
 
                         return GestureDetector(
                           behavior: HitTestBehavior.opaque,

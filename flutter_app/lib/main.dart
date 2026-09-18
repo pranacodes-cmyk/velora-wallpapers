@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/env.dart';
 import 'core/services/ads_service.dart';
+import 'core/services/backend_service.dart';
 import 'core/services/prefs.dart';
 import 'core/services/rating_service.dart';
 import 'core/theme/app_theme.dart';
@@ -16,6 +17,15 @@ import 'state/app_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  assert(() {
+    debugPaintBaselinesEnabled = false;
+    debugPaintSizeEnabled = false;
+    debugPaintPointersEnabled = false;
+    debugPaintLayerBordersEnabled = false;
+    debugRepaintRainbowEnabled = false;
+    return true;
+  }());
 
   // Transparent status bar over the content, same as the web/Capacitor build.
   SystemChrome.setSystemUIOverlayStyle(
@@ -31,10 +41,7 @@ Future<void> main() async {
   // Backend + analytics start in parallel and never block first paint.
   Future.microtask(() async {
     try {
-      await Supabase.initialize(
-        url: Env.supabaseUrl,
-        anonKey: Env.supabaseAnonKey,
-      );
+      await BackendService.ensure();
     } catch (_) {}
     try {
       await Posthog().setup(

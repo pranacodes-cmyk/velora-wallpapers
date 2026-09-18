@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
-/// Typography parity: body/UI uses the system sans stack, scripture/headline
-/// serif uses Cormorant Garamond (same font the web app imports in index.css).
+/// Typography parity: body/UI uses Android's native sans; scripture/headline
+/// serif uses the platform Georgia/Times family, matching the web stack.
 class AppTheme {
   const AppTheme._();
+
+  static const _bodyFamily = 'Roboto';
+  static const _serifFamily = 'Georgia';
+  static const _serifFallback = <String>['Times New Roman', 'serif'];
 
   static TextStyle serif({
     double size = 20,
@@ -14,13 +17,25 @@ class AppTheme {
     Color? color,
     double height = 1.3,
     double letterSpacing = 0,
-  }) => GoogleFonts.cormorantGaramond(
+  }) => TextStyle(
+    fontFamily: _serifFamily,
+    fontFamilyFallback: _serifFallback,
     fontSize: size,
     fontWeight: weight,
     color: color,
     height: height,
     letterSpacing: letterSpacing,
+    decoration: TextDecoration.none,
   );
+
+  static TextTheme _cleanTextTheme(TextTheme base, Color color) {
+    return base.apply(
+      fontFamily: _bodyFamily,
+      bodyColor: color,
+      displayColor: color,
+      decoration: TextDecoration.none,
+    );
+  }
 
   static ThemeData dark() {
     final base = ThemeData.dark(useMaterial3: true);
@@ -37,11 +52,13 @@ class AppTheme {
         error: AppColors.destructive,
         outline: AppColors.border,
       ),
-      splashFactory: InkSparkle.splashFactory,
-      textTheme: base.textTheme.apply(
-        bodyColor: AppColors.foreground,
-        displayColor: AppColors.foreground,
+      splashFactory: InkRipple.splashFactory,
+      textTheme: _cleanTextTheme(base.textTheme, AppColors.foreground),
+      primaryTextTheme: _cleanTextTheme(
+        base.primaryTextTheme,
+        AppColors.foreground,
       ),
+      fontFamily: _bodyFamily,
       dividerColor: AppColors.border,
       cardTheme: CardThemeData(
         color: AppColors.card,
@@ -66,10 +83,12 @@ class AppTheme {
         onSurface: AppColors.lightForeground,
         outline: AppColors.lightBorder,
       ),
-      textTheme: base.textTheme.apply(
-        bodyColor: AppColors.lightForeground,
-        displayColor: AppColors.lightForeground,
+      textTheme: _cleanTextTheme(base.textTheme, AppColors.lightForeground),
+      primaryTextTheme: _cleanTextTheme(
+        base.primaryTextTheme,
+        AppColors.lightForeground,
       ),
+      fontFamily: _bodyFamily,
       dividerColor: AppColors.lightBorder,
     );
   }

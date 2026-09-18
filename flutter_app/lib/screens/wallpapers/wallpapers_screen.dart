@@ -8,6 +8,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/analytics.dart';
+import '../../core/services/backend_service.dart';
 import '../../core/services/favorites_store.dart';
 import '../../core/services/haptics.dart';
 import '../../core/services/prefs.dart';
@@ -188,10 +189,11 @@ class _WallpapersScreenState extends ConsumerState<WallpapersScreen> {
   }
 
   Future<void> _fetchPage({required bool reset}) async {
-    final client = Supabase.instance.client;
     final category = _activeCategory == 'all' ? null : _activeCategory;
 
     try {
+      await BackendService.ensure();
+      final client = Supabase.instance.client;
       if (_needsLive) {
         final page = _livePage;
         var q = client.from('live_wallpapers').select('*');
@@ -708,7 +710,9 @@ class _WallpapersScreenState extends ConsumerState<WallpapersScreen> {
     final prev = idx > 0 ? list[idx - 1] : null;
     final next = (idx >= 0 && idx < list.length - 1) ? list[idx + 1] : null;
     if (idx >= 0 && idx >= list.length - 3 && _staticHasMore && !_loadingMore) {
-      _loadMore();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _loadMore();
+      });
     }
     return Positioned.fill(
       child: WallpaperDetail(
@@ -1282,6 +1286,7 @@ class _SearchOverlayState extends State<_SearchOverlay> {
   Future<void> _search(String q) async {
     setState(() => _loading = true);
     try {
+      await BackendService.ensure();
       final client = Supabase.instance.client;
       final term = '%$q%';
       final staticRows = await client

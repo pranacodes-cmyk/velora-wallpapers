@@ -49,7 +49,9 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     super.initState();
     // Streak ticks on mount, same as the web page's `useStreak()`.
     StreakStore.bumpIfNewDay();
-    ContentData.load();
+    ContentData.load().then((_) {
+      if (mounted) setState(() {});
+    });
     // Same as the web `usePrayerAlarms()` mount: status refresh, the one-shot
     // 21:00 evening-bell migration and the self-heal reschedule.
     PrayerAlarms.bootstrap();
@@ -213,7 +215,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
           // ---------------- Scroll body ----------------
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.only(top: 12, bottom: 112),
+              padding: const EdgeInsets.only(top: 12, bottom: 148),
               children: [
                 VerseHero(
                   onPremium: _openPremium,

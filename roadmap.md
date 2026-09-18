@@ -81,8 +81,19 @@
       Play Store fallback, mailto feedback) wired to wallpaper apply, live/parallax apply, favorite
       added, journey day complete, quiz leave, daily verse apply, pack activation; paywall parks it
 - [ ] Notifications / content push (reuse existing Java plugins)
-- [ ] First debug APK via GitHub Actions + on-device QA pass (needs your go-ahead)
+- [ ] First recovery debug APK via GitHub Actions after current Flutter fixes are pushed
 - [ ] Side-by-side parity QA pass (screen-by-screen screenshot diff vs web)
+
+## Flutter recovery pass
+- [x] Disable debug paint baselines/overlays that caused yellow lines in the debug APK.
+- [x] Make home content data reload trigger a real first-paint update.
+- [x] Reduce Today mockup size, mount only the settled phone, and lower glow/shadow cost.
+- [x] Reduce home ParallaxRail sensor/ticker cost and isolate it with repaint boundaries.
+- [x] Make backend initialization deterministic for wallpaper/search feeds.
+- [x] Add safe journey image fallback and bundle nested journey assets explicitly.
+- [x] Add journey narration playback when generated narration exists.
+- [x] Add faster cached `debug-arm64` Flutter APK workflow mode.
+- [ ] Push recovery fixes and run the Flutter debug APK workflow.
 
 ## Phase 5 — After parity
 - [ ] Remove Bible Chat

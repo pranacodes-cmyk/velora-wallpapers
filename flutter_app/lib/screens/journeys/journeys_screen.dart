@@ -222,7 +222,7 @@ class _JourneysScreenState extends ConsumerState<JourneysScreen> {
             _buildHeader(context, ink, muted, streakDays, surface, isDark),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 112),
+                padding: const EdgeInsets.only(bottom: 148),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -454,10 +454,7 @@ class _JourneysScreenState extends ConsumerState<JourneysScreen> {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.asset(
-                        kJourneyImages[featured.id] ?? '',
-                        fit: BoxFit.cover,
-                      ),
+                      _JourneyImage(path: kJourneyImages[featured.id]),
                       DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -920,10 +917,7 @@ class _JourneyCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(
-                    kJourneyImages[journey.id] ?? '',
-                    fit: BoxFit.cover,
-                  ),
+                  _JourneyImage(path: kJourneyImages[journey.id]),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: FractionallySizedBox(
@@ -1170,6 +1164,43 @@ class _RoundBadge extends StatelessWidget {
         gradient: LinearGradient(colors: gradientColors),
       ),
       child: child,
+    );
+  }
+}
+
+class _JourneyImage extends StatelessWidget {
+  const _JourneyImage({required this.path});
+
+  final String? path;
+
+  @override
+  Widget build(BuildContext context) {
+    final src = path;
+    if (src == null || src.isEmpty) return const _JourneyFallback();
+    return Image.asset(
+      src,
+      fit: BoxFit.cover,
+      errorBuilder: (_, _, _) => const _JourneyFallback(),
+    );
+  }
+}
+
+class _JourneyFallback extends StatelessWidget {
+  const _JourneyFallback();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [hsl(222, 34, 16), hsl(222, 40, 7)],
+        ),
+      ),
+      child: Center(
+        child: Icon(Icons.auto_stories, size: 34, color: hsl(42, 85, 55, 0.7)),
+      ),
     );
   }
 }

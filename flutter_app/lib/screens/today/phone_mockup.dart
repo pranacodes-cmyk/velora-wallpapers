@@ -524,8 +524,25 @@ class _Bg extends StatelessWidget {
       imageUrl: src,
       fit: BoxFit.cover,
       fadeInDuration: Duration(milliseconds: eager ? 0 : 160),
-      placeholder: (_, __) => const SizedBox.shrink(),
-      errorWidget: (_, __, ___) => const SizedBox.shrink(),
+      placeholder: (_, __) => const _ImagePlaceholder(),
+      errorWidget: (_, __, ___) => const _ImagePlaceholder(),
+    );
+  }
+}
+
+class _ImagePlaceholder extends StatelessWidget {
+  const _ImagePlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [hsl(222, 42, 10), hsl(222, 52, 5)],
+        ),
+      ),
     );
   }
 }
