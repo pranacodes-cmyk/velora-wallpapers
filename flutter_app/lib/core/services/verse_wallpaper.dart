@@ -355,11 +355,14 @@ class VerseWallpaper {
         '${dir.path}/daily-verse-${DateTime.now().millisecondsSinceEpoch}.png',
       );
       await file.writeAsBytes(bytes, flush: true);
-      final result = await Share.shareXFiles(
-        [XFile(file.path, mimeType: 'image/png')],
-        text: caption,
-        subject: 'Daily Bible Verse',
+      final result = await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path, mimeType: 'image/png')],
+          text: caption,
+          subject: 'Daily Bible Verse',
+        ),
       );
+
       Analytics.capture('share_invoked', {
         'method': 'native_image',
         'status': result.status == ShareResultStatus.dismissed

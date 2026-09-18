@@ -110,7 +110,10 @@ class _VerseReflectionSheetState extends State<VerseReflectionSheet> {
       // the image file with the verse caption + Play Store link.
       final ok = await VerseWallpaper.share();
       if (!ok) {
-        await Share.share('"${verse.text}"\n— ${verse.reference}');
+        await SharePlus.instance.share(
+          ShareParams(text: '"${verse.text}"\n— ${verse.reference}'),
+        );
+
       }
       Analytics.capture('reflection_share_completed', {
         'reference': verse.reference,

@@ -58,7 +58,10 @@ class ShareService {
         : composed.text;
 
     try {
-      final result = await Share.share(payload, subject: title);
+      final result = await SharePlus.instance.share(
+        ShareParams(text: payload, subject: title),
+      );
+
       _report(
         'native',
         result.status == ShareResultStatus.dismissed ? 'cancelled' : 'shown',
