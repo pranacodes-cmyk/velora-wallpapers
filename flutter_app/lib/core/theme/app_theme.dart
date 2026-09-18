@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 
-/// Typography parity: body/UI uses Android's native sans; scripture/headline
-/// serif uses the platform Georgia/Times family, matching the web stack.
+/// Typography parity with the web build: Inter for UI/body text and Cormorant
+/// Garamond for scripture / headline serif. Both are bundled as assets so the
+/// very first frame already uses the right faces (no network font fetch).
 class AppTheme {
   const AppTheme._();
 
-  static const _bodyFamily = 'Roboto';
-  static const _serifFamily = 'Georgia';
-  static const _serifFallback = <String>['Times New Roman', 'serif'];
+  static const _bodyFamily = 'Inter';
+  static const _serifFamily = 'Cormorant Garamond';
+  static const _serifFallback = <String>['Georgia', 'Times New Roman', 'serif'];
 
   static TextStyle serif({
     double size = 20,
@@ -58,7 +59,6 @@ class AppTheme {
         base.primaryTextTheme,
         AppColors.foreground,
       ),
-      fontFamily: _bodyFamily,
       dividerColor: AppColors.border,
       cardTheme: CardThemeData(
         color: AppColors.card,
@@ -88,7 +88,6 @@ class AppTheme {
         base.primaryTextTheme,
         AppColors.lightForeground,
       ),
-      fontFamily: _bodyFamily,
       dividerColor: AppColors.lightBorder,
     );
   }
