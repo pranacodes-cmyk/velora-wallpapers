@@ -1,0 +1,54 @@
+package com.jesuswallpaperbible.app;
+
+import android.content.Intent;
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import io.flutter.embedding.android.FlutterActivity;
+import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.plugin.common.MethodChannel;
+
+/**
+ * Flutter host activity. Registers the three native bridges that replace the
+ * old Capacitor plugins:
+ *   • wallpaper          → static / video live / daily verse wallpapers
+ *   • parallax_wallpaper → 3D parallax live wallpaper
+ *   • prayer_alarm       → AlarmManager prayer bells
+ */
+public class MainActivity extends FlutterActivity {
+
+    private WallpaperChannel wallpaperChannel;
+    private ParallaxChannel parallaxChannel;
+
+    @Override
+    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
+        super.configureFlutterEngine(flutterEngine);
+
+        wallpaperChannel = new WallpaperChannel(this);
+        parallaxChannel = new ParallaxChannel(this);
+
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), WallpaperChannel.CHANNEL)
+                .setMethodCallHandler(wallpaperChannel);
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), ParallaxChannel.CHANNEL)
+                .setMethodCallHandler(parallaxChannel);
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), PrayerAlarmChannel.CHANNEL)
+                .setMethodCallHandler(new PrayerAlarmChannel(this));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == WallpaperChannel.REQUEST_CODE && wallpaperChannel != null) {
+            wallpaperChannel.onPickerResult(resultCode);
+        } else if (requestCode == ParallaxChannel.REQUEST_CODE && parallaxChannel != null) {
+            parallaxChannel.onPickerResult(resultCode);
+        }
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+}
