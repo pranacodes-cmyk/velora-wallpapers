@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' show FontFeature;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/localization/app_localizations.dart';
@@ -70,12 +71,26 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
     final best = page.round().clamp(0, kDayOffsets.length - 1);
     if (best != _activeIdx) {
       haptic(HapticStyle.soft);
-      setState(() => _activeIdx = best);
+      // Scroll notifications can arrive while the viewport is laying out, so a
+      // direct setState here trips the relayout-boundary assertion. Defer it.
+      _deferSetState(() => _activeIdx = best);
     }
     // Never mount a heavy mockup mid-swipe — wait for the swipe to settle.
     _settleTimer?.cancel();
     _settleTimer = Timer(const Duration(milliseconds: 140), () {
       if (mounted && _settledIdx != best) setState(() => _settledIdx = best);
+    });
+  }
+
+  void _deferSetState(VoidCallback fn) {
+    final phase = SchedulerBinding.instance.schedulerPhase;
+    if (phase == SchedulerPhase.idle ||
+        phase == SchedulerPhase.postFrameCallbacks) {
+      if (mounted) setState(fn);
+      return;
+    }
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(fn);
     });
   }
 
@@ -266,7 +281,7 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
                         final isToday = offset == 0;
                         final locked = !isPremium && !isToday;
                         final isActive = i == _activeIdx;
-                        final near = i == _settledIdx;
+                        final near = (i - _settledIdx).abs() <= 1;
 
                         return GestureDetector(
                           behavior: HitTestBehavior.opaque,
@@ -309,7 +324,7 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
                                           isToday: isToday,
                                           isLocked: false,
                                         )
-                                      : const LiteMockup(),
+                                      : LiteMockup(date: date),
                                 ),
                               ),
                             ),

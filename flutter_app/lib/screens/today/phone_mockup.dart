@@ -12,10 +12,15 @@ import 'today_shared.dart';
 /// Placeholder for off-screen carousel slides — port of `LiteMockup` in
 /// `src/pages/Today.tsx`. Flat titanium frame, no image decode, no verse lookup.
 class LiteMockup extends StatelessWidget {
-  const LiteMockup({super.key});
+  const LiteMockup({super.key, this.date});
+
+  /// When given, the side card shows that day's real (cached) wallpaper so the
+  /// carousel never looks like a row of black holes — same as the web build.
+  final DateTime? date;
 
   @override
   Widget build(BuildContext context) {
+    final src = date == null ? null : ContentData.bgCardForDay(date!);
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
@@ -27,7 +32,8 @@ class LiteMockup extends StatelessWidget {
           stops: const [0, 0.55, 1],
         ),
       ),
-      child: DecoratedBox(
+      child: Container(
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(23),
           gradient: LinearGradient(
@@ -36,6 +42,16 @@ class LiteMockup extends StatelessWidget {
             colors: [hsl(220, 45, 9), hsl(220, 55, 5)],
           ),
         ),
+        child: src == null
+            ? const SizedBox.expand()
+            : CachedNetworkImage(
+                imageUrl: src,
+                fit: BoxFit.cover,
+                fadeInDuration: const Duration(milliseconds: 120),
+                memCacheWidth: 240,
+                placeholder: (_, _) => const SizedBox.expand(),
+                errorWidget: (_, _, _) => const SizedBox.expand(),
+              ),
       ),
     );
   }

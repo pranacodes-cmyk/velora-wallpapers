@@ -97,6 +97,30 @@ class _PraylyAppState extends ConsumerState<PraylyApp> {
       // Same three-way choice the Settings page writes to `cw-theme`.
       themeMode: ref.watch(themeModeProvider),
       home: _ready ? const RootGate() : const _BootScreen(),
+      builder: (context, child) {
+        final theme = Theme.of(context);
+        // 1) Every subtree gets a Material ancestor + an explicit DefaultTextStyle
+        //    so no Text can ever fall back to Flutter's yellow-underlined
+        //    error style (what showed up as double yellow lines on device).
+        // 2) The web build renders at a fixed CSS font size, so the OS font
+        //    scale must not resize text here — that was causing the shifted
+        //    positions and overflow stripes on large-font devices.
+        return MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.noScaling),
+          child: Material(
+            type: MaterialType.transparency,
+            child: DefaultTextStyle(
+              style: (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
+                decoration: TextDecoration.none,
+                decorationColor: Colors.transparent,
+              ),
+              child: child ?? const SizedBox.shrink(),
+            ),
+          ),
+        );
+      },
     );
   }
 }
