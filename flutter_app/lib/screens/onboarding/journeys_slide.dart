@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../core/localization/app_localizations.dart';
-import 'onboarding_shared.dart';
 import 'verse_slide.dart' show OnbHeadline;
 
 /// 1:1 port of `JourneysSlide` (slide 1) from `OnboardingFlow.tsx`.

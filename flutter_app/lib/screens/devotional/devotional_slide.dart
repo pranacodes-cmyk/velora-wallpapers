@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/localization/app_localizations.dart';
+import '../../core/services/device_perf.dart';
 import '../../core/services/haptics.dart';
 import '../../core/services/share_service.dart';
 import '../../widgets/app_toast.dart';
@@ -98,6 +99,11 @@ class _DevotionalSlideState extends State<DevotionalSlide>
   }
 
   void _startLoops() {
+    // Low-end devices: skip the infinite ambient loops (ken-burns zoom, rays,
+    // halo aura, rising embers). These are the GPU-heaviest effects on the
+    // screen; the web build disables the same ones via `.low-end-device`.
+    // The background image and static layers still render — just not animated.
+    if (DevicePerf.disableInfiniteAnimations()) return;
     _ken.repeat(reverse: true);
     _rays.repeat();
     _aura.repeat(reverse: true);

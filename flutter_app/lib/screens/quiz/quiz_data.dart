@@ -108,7 +108,9 @@ class QuizBank {
 
   /// Deterministic per-day set — same seeded-random algorithm as web.
   static List<QuizQuestion> getDailyQuestions() {
-    final today = DateTime.now();
+    // UTC date key so the seeded daily set matches web (quizQuestions.ts uses
+    // `new Date().toISOString().split("T")[0]`) — same day => same questions.
+    final today = DateTime.now().toUtc();
     final key =
         '${today.year.toString().padLeft(4, '0')}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
     var seed = 0;

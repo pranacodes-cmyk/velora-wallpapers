@@ -88,7 +88,9 @@ double _scoreMultiplierForMode(QuizMode m) {
 }
 
 String _todayKey() {
-  final d = DateTime.now();
+  // UTC to match web `useQuiz.ts` (`new Date().toISOString().split("T")[0]`),
+  // so "daily quiz completed" resets on the same boundary as the web build.
+  final d = DateTime.now().toUtc();
   return '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }
 

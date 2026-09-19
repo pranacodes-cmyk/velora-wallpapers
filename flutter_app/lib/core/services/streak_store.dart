@@ -29,10 +29,16 @@ class StreakStore {
   /// Notifies listeners in place of the web `cw_streak_changed` window event.
   static final revision = ValueNotifier<int>(0);
 
-  static String _today() => _dayKey(DateTime.now());
+  static String _today() => _dayKey(DateTime.now().toUtc());
 
-  static String _dayKey(DateTime d) =>
-      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  // Web uses `new Date().toISOString().split("T")[0]`, which is a UTC calendar
+  // date. We MUST match that (not local time) or an install's streak would
+  // bump/break on a different day than the web build — e.g. between local
+  // midnight and UTC midnight the two would disagree. So all day keys are UTC.
+  static String _dayKey(DateTime d) {
+    final u = d.toUtc();
+    return '${u.year.toString().padLeft(4, '0')}-${u.month.toString().padLeft(2, '0')}-${u.day.toString().padLeft(2, '0')}';
+  }
 
   static StreakData load() {
     try {
@@ -67,7 +73,9 @@ class StreakStore {
     final today = _today();
     if (data.lastDate == today) return data;
 
-    final yesterday = _dayKey(DateTime.now().subtract(const Duration(days: 1)));
+    final yesterday = _dayKey(
+      DateTime.now().toUtc().subtract(const Duration(days: 1)),
+    );
     final isConsecutive = data.lastDate == yesterday;
     final next = StreakData(
       current: isConsecutive ? data.current + 1 : 1,
