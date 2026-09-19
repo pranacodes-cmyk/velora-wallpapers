@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:typed_data' show Uint8List;
 import 'dart:ui' show ImageFilter;
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -67,6 +68,7 @@ class PhoneMockup extends StatelessWidget {
     required this.isToday,
     this.isLocked = false,
     this.previewSrc,
+    this.previewBytes,
     this.loading = false,
   });
 
@@ -74,6 +76,12 @@ class PhoneMockup extends StatelessWidget {
   final bool isToday;
   final bool isLocked;
   final String? previewSrc;
+
+  /// Locally rendered verse wallpaper (PNG bytes from `VerseWallpaper.render`).
+  /// The web build shows the RENDERED wallpaper on today's card — verse text
+  /// and Prayly branding baked into the image — so when these bytes are
+  /// available they take priority over the plain background photo.
+  final Uint8List? previewBytes;
   final bool loading;
 
   @override
@@ -178,7 +186,17 @@ class PhoneMockup extends StatelessWidget {
               ),
               child: Stack(
                 children: [
-                  if (src != null)
+                  // Today's card shows the RENDERED verse wallpaper when we have
+                  // it (verse text + Prayly branding baked in, same as web).
+                  if (isToday && previewBytes != null)
+                    Positioned.fill(
+                      child: Image.memory(
+                        previewBytes!,
+                        fit: BoxFit.cover,
+                        gaplessPlayback: true,
+                      ),
+                    )
+                  else if (src != null)
                     Positioned.fill(
                       child: isLocked
                           ? ImageFiltered(
@@ -194,7 +212,7 @@ class PhoneMockup extends StatelessWidget {
                           : _Bg(src: src, eager: isToday),
                     ),
 
-                  if (loading && isToday && previewSrc == null)
+                  if (loading && isToday && previewSrc == null && previewBytes == null)
                     const Positioned.fill(
                       child: Center(child: _GoldenPulseDots()),
                     ),

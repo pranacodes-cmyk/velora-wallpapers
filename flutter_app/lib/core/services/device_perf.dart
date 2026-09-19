@@ -44,19 +44,38 @@ class DevicePerf {
       if (Platform.isAndroid) {
         final a = await info.androidInfo;
         osLowRam = a.isLowRamDevice;
-        // Android doesn't expose total RAM via device_info_plus; use the
-        // OS low-RAM flag + core count as the signal, mirroring the web
-        // heuristic (deviceMemory<=3 || cores<=4).
-        isLowEnd = osLowRam || cores <= 4;
+        ramMb = _readTotalRamMb();
+        // Web's heuristic is `deviceMemory <= 3 || cores <= 4`, but on a phone
+        // core count alone is a poor signal (plenty of capable 4-core parts,
+        // and emulators report 4) — tagging those low-end stripped the frosted
+        // glass everywhere and made surfaces look flat/muddy. So require a
+        // genuine memory signal: the OS low-RAM flag, or <= 3GB RAM. Very small
+        // core counts still count as low-end.
+        isLowEnd =
+            osLowRam || (ramMb > 0 && ramMb <= 3072) || (cores > 0 && cores <= 2);
       } else if (Platform.isIOS) {
         // iOS devices in support range are not low-end for our purposes.
         isLowEnd = cores <= 2;
       } else {
-        isLowEnd = cores <= 4;
+        isLowEnd = cores <= 2;
       }
     } catch (_) {
-      // If detection fails, be conservative only on very low core counts.
-      isLowEnd = cores > 0 && cores <= 4;
+      // If detection fails, assume a capable device (never strip visuals on a
+      // guess — a wrong "low-end" verdict is what made the UI look cheap).
+      isLowEnd = false;
+    }
+  }
+
+  /// Total physical RAM in MB, read from `/proc/meminfo` (Android/Linux).
+  /// Returns 0 when unavailable.
+  static int _readTotalRamMb() {
+    try {
+      final text = File('/proc/meminfo').readAsStringSync();
+      final m = RegExp(r'MemTotal:\s+(\d+)\s*kB').firstMatch(text);
+      if (m == null) return 0;
+      return (int.parse(m.group(1)!) / 1024).round();
+    } catch (_) {
+      return 0;
     }
   }
 

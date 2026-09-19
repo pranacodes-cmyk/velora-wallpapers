@@ -132,13 +132,6 @@ class _StaticWallpaperTileState extends State<StaticWallpaperTile> {
                 placeholder: (_, _) => const _Shimmer(),
                 errorWidget: (_, _, _) => const _TileError(),
               ),
-              // Gold edge flash when the tile mounts — port of the web
-              // `.tile-reveal-glow` (inset gold ring, ~0.8s, then fades out).
-              // Skipped on low-end devices.
-              if (!DevicePerf.disableInfiniteAnimations())
-                const Positioned.fill(
-                  child: IgnorePointer(child: _TileRevealGlow()),
-                ),
               // Bottom gradient for legibility.
               DecoratedBox(
                 decoration: BoxDecoration(
@@ -477,55 +470,6 @@ class _ShimmerState extends State<_Shimmer>
               ],
               stops: const [0.0, 0.42, 0.5, 0.58, 1.0],
             ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// One-shot gold edge flash on mount — port of the web `.tile-reveal-glow`
-/// (`tile-edge-flash` keyframes: inset gold ring, opacity 1 -> 0 over ~0.8s).
-class _TileRevealGlow extends StatefulWidget {
-  const _TileRevealGlow();
-  @override
-  State<_TileRevealGlow> createState() => _TileRevealGlowState();
-}
-
-class _TileRevealGlowState extends State<_TileRevealGlow>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 800),
-  )..forward();
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _c,
-      builder: (context, _) {
-        final o = (1.0 - _c.value).clamp(0.0, 1.0); // fade 1 -> 0
-        if (o <= 0.01) return const SizedBox.shrink();
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: AppColors.premiumGold.withValues(alpha: 0.5 * o),
-              width: 2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.premiumGold.withValues(alpha: 0.15 * o),
-                blurRadius: 20,
-                spreadRadius: 4,
-              ),
-            ],
           ),
         );
       },

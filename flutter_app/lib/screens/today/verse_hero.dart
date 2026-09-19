@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data' show Uint8List;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -6,7 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/analytics.dart';
+import '../../core/services/content_data.dart';
 import '../../core/services/haptics.dart';
+import '../../core/services/verse_wallpaper.dart';
 import '../../core/theme/app_colors.dart';
 import '../../state/app_providers.dart';
 import 'phone_mockup.dart';
@@ -43,6 +46,12 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
   DateTime _now = DateTime.now();
   final _seenLocked = <int>{};
 
+  /// Locally rendered verse wallpaper for TODAY, shown inside the centre phone
+  /// mockup. The web build renders this on a canvas and displays it on today's
+  /// card (verse text + Prayly branding baked in); this reproduces that.
+  Uint8List? _todayPreview;
+  bool _previewLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -52,6 +61,28 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
       if (mounted) setState(() => _now = DateTime.now());
     });
     _controller.addListener(_onScroll);
+    // Render after the first frame so the hero paints immediately.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _renderTodayPreview());
+  }
+
+  Future<void> _renderTodayPreview() async {
+    if (_previewLoading || _todayPreview != null) return;
+    if (mounted) setState(() => _previewLoading = true);
+    try {
+      // The verse text + background photo come from ContentData, which loads
+      // asynchronously. Rendering before it is ready produced a wallpaper with
+      // an EMPTY verse and no background, so wait for the content first.
+      await ContentData.load();
+      final bytes = await VerseWallpaper.render(date: DateTime.now());
+      if (mounted) {
+        setState(() {
+          _todayPreview = bytes;
+          _previewLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _previewLoading = false);
+    }
   }
 
   @override
@@ -169,7 +200,14 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
             center: const Alignment(0, -1),
             radius: 1.2,
             colors: [
-              AppColors.primary.withValues(alpha: 0.06),
+              // Pre-blended opaque warm-dark instead of a TRANSLUCENT gold.
+              // Interpolating translucent gold -> opaque navy passes through a
+              // bright ~50%-alpha gold, which produced a washed gold band
+              // across the top of the card (web keeps this dark).
+              Color.alphaBlend(
+                AppColors.primary.withValues(alpha: 0.10),
+                AppColors.card,
+              ),
               AppColors.card,
               AppColors.background,
             ],
@@ -186,27 +224,6 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
         ),
         child: Stack(
           children: [
-            // Ambient aurora behind the phone
-            Positioned(
-              top: carouselHeight * 0.28,
-              left: 0,
-              right: 0,
-              height: carouselHeight * 0.54,
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      colors: [
-                        hsl(42, 95, 62, 0.13),
-                        hsl(38, 90, 55, 0.07),
-                        Colors.transparent,
-                      ],
-                      stops: const [0, 0.35, 0.65],
-                    ),
-                  ),
-                ),
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
               child: Column(
@@ -268,7 +285,38 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
                   // Swipe carousel of phone mockups
                   SizedBox(
                     height: carouselHeight,
-                    child: PageView.builder(
+                    child: Stack(
+                      children: [
+                        // Apple-style ambient aurora BEHIND the phones. Web
+                        // positions this inside the carousel (`top-[28%]
+                        // h-[54%] w-[92%]`), not at the card's top — placing it
+                        // at the card top washed gold over the headline text.
+                        Positioned(
+                          top: carouselHeight * 0.28,
+                          height: carouselHeight * 0.54,
+                          left: 0,
+                          right: 0,
+                          child: IgnorePointer(
+                            child: Center(
+                              child: FractionallySizedBox(
+                                widthFactor: 0.92,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        hsl(42, 95, 62, 0.13),
+                                        hsl(38, 90, 55, 0.07),
+                                        Colors.transparent,
+                                      ],
+                                      stops: const [0, 0.35, 0.65],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        PageView.builder(
                       controller: _controller,
                       padEnds: true,
                       itemCount: kDayOffsets.length,
@@ -321,6 +369,10 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
                                           date: date,
                                           isToday: isToday,
                                           isLocked: false,
+                                          previewBytes: isToday
+                                              ? _todayPreview
+                                              : null,
+                                          loading: isToday && _previewLoading,
                                         )
                                       : LiteMockup(date: date),
                                 ),
@@ -329,6 +381,8 @@ class _VerseHeroState extends ConsumerState<VerseHero> {
                           ),
                         );
                       },
+                    ),
+                      ],
                     ),
                   ),
 
