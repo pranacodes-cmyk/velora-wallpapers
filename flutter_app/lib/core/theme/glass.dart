@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import '../services/device_perf.dart';
 
 /// Glassmorphism surface used by headers, sheets, nav bar and tiles —
 /// mirrors the `.glass` / `--nav-blur` styles from `src/index.css`.
@@ -26,18 +27,29 @@ class GlassPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final panel = DecoratedBox(
+      decoration: BoxDecoration(
+        color: color ?? AppColors.glass,
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: borderColor ?? AppColors.glassBorder),
+      ),
+      child: Padding(padding: padding, child: child),
+    );
+
+    // On low-end devices, drop the BackdropFilter blur entirely (biggest GPU
+    // cost on Mali/Adreno) — same as the web build removing `backdrop-filter`.
+    if (DevicePerf.disableBlur) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: panel,
+      );
+    }
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: color ?? AppColors.glass,
-            borderRadius: BorderRadius.circular(radius),
-            border: Border.all(color: borderColor ?? AppColors.glassBorder),
-          ),
-          child: Padding(padding: padding, child: child),
-        ),
+        child: panel,
       ),
     );
   }

@@ -13,7 +13,6 @@ import '../../state/app_providers.dart';
 import '../../widgets/premium_sheet.dart';
 import 'pro_quiz_picker.dart';
 import 'quiz_controller.dart';
-import 'quiz_data.dart';
 import 'quiz_question_card.dart';
 import 'quiz_results.dart';
 import 'quiz_revive.dart';

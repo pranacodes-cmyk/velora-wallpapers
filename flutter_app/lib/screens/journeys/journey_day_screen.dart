@@ -12,7 +12,6 @@ import '../../core/services/haptics.dart';
 import '../../core/services/journey_progress_store.dart';
 import '../../core/services/journey_narration_audio.dart';
 import '../../core/services/rating_service.dart';
-import '../../core/services/streak_store.dart';
 import '../../core/services/user_profile.dart';
 import '../../state/app_providers.dart';
 import '../../widgets/app_toast.dart';

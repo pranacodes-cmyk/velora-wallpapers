@@ -33,10 +33,17 @@ class Onb {
   static const goldBright = Color(0xFFFFB855); // hsl(38 100% 66%)
   static const goldLabel = Color(0xFFEDBB47); // hsl(42 85% 60%)
 
+  // Headline gold gradient — exact match to the web `goldSpan`
+  // (linear-gradient hsl(42 85% 55%) -> hsl(38 100% 70%)). The previous
+  // values (52% / 66%) rendered the onboarding headline slightly darker &
+  // less bright than the web build.
+  static const goldSpanStart = Color(0xFFE9B435); // hsl(42 85% 55%)
+  static const goldSpanEnd = Color(0xFFFFCB66); // hsl(38 100% 70%)
+
   static const goldGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [gold, goldBright],
+    colors: [goldSpanStart, goldSpanEnd],
   );
 
   /// `headlineStyle`: -0.02em tracking (scales with the font size like CSS em),

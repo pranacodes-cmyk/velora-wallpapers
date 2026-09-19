@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../core/localization/app_localizations.dart';
 import '../core/services/analytics.dart';
 import '../core/services/haptics.dart';
 import '../core/services/rating_service.dart';

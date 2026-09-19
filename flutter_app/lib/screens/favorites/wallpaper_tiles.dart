@@ -5,6 +5,7 @@ import 'package:video_player/video_player.dart';
 import '../wallpapers/live_preview_clip.dart';
 
 import '../../core/services/haptics.dart';
+import '../../core/services/device_perf.dart';
 import '../../core/theme/app_colors.dart';
 
 /// Shape of a row from Supabase `wallpapers` — mirrors `StaticWallpaperDB`
@@ -131,6 +132,13 @@ class _StaticWallpaperTileState extends State<StaticWallpaperTile> {
                 placeholder: (_, _) => const _Shimmer(),
                 errorWidget: (_, _, _) => const _TileError(),
               ),
+              // Gold edge flash when the tile mounts — port of the web
+              // `.tile-reveal-glow` (inset gold ring, ~0.8s, then fades out).
+              // Skipped on low-end devices.
+              if (!DevicePerf.disableInfiniteAnimations())
+                const Positioned.fill(
+                  child: IgnorePointer(child: _TileRevealGlow()),
+                ),
               // Bottom gradient for legibility.
               DecoratedBox(
                 decoration: BoxDecoration(
@@ -409,11 +417,120 @@ class _RoundIconButton extends StatelessWidget {
   }
 }
 
-class _Shimmer extends StatelessWidget {
+/// Loading placeholder — port of the web `.shimmer-skeleton`: a dark base with
+/// a gold gradient sweep sliding across it. On low-end devices the sweep is
+/// dropped (static base only), matching the web `.low-end-device` throttle.
+class _Shimmer extends StatefulWidget {
   const _Shimmer();
   @override
-  Widget build(BuildContext context) =>
-      ColoredBox(color: AppColors.muted.withValues(alpha: 0.5));
+  State<_Shimmer> createState() => _ShimmerState();
+}
+
+class _ShimmerState extends State<_Shimmer>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _c;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!DevicePerf.disableInfiniteAnimations()) {
+      _c = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 1500),
+      )..repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _c?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Dark base — hsl(222 25% 5%) like the web skeleton.
+    const base = Color(0xFF0A0D14);
+    final controller = _c;
+    if (controller == null) {
+      return const ColoredBox(color: base);
+    }
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        final t = controller.value; // 0..1
+        // Slide a soft gold band across (matches shimmer-gold keyframes).
+        final begin = Alignment(-1.0 + t * 3.0, 0);
+        final end = Alignment(-0.5 + t * 3.0, 0);
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: base,
+            gradient: LinearGradient(
+              begin: begin,
+              end: end,
+              colors: [
+                base,
+                AppColors.primary.withValues(alpha: 0.08),
+                AppColors.premiumGoldGlow.withValues(alpha: 0.12),
+                AppColors.primary.withValues(alpha: 0.08),
+                base,
+              ],
+              stops: const [0.0, 0.42, 0.5, 0.58, 1.0],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// One-shot gold edge flash on mount — port of the web `.tile-reveal-glow`
+/// (`tile-edge-flash` keyframes: inset gold ring, opacity 1 -> 0 over ~0.8s).
+class _TileRevealGlow extends StatefulWidget {
+  const _TileRevealGlow();
+  @override
+  State<_TileRevealGlow> createState() => _TileRevealGlowState();
+}
+
+class _TileRevealGlowState extends State<_TileRevealGlow>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 800),
+  )..forward();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (context, _) {
+        final o = (1.0 - _c.value).clamp(0.0, 1.0); // fade 1 -> 0
+        if (o <= 0.01) return const SizedBox.shrink();
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.premiumGold.withValues(alpha: 0.5 * o),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.premiumGold.withValues(alpha: 0.15 * o),
+                blurRadius: 20,
+                spreadRadius: 4,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 class _TileError extends StatelessWidget {

@@ -7,6 +7,7 @@ import 'package:posthog_flutter/posthog_flutter.dart';
 import 'core/env.dart';
 import 'core/services/ads_service.dart';
 import 'core/services/backend_service.dart';
+import 'core/services/device_perf.dart';
 import 'core/services/prefs.dart';
 import 'core/services/rating_service.dart';
 import 'core/theme/app_theme.dart';
@@ -37,6 +38,10 @@ Future<void> main() async {
   );
 
   await Prefs.init();
+
+  // Detect low-end device ONCE (RAM/cores) so heavy effects can be throttled,
+  // mirroring the web build's `.low-end-device` tagging. Never blocks paint.
+  await DevicePerf.init();
 
   // Backend + analytics start in parallel and never block first paint.
   Future.microtask(() async {

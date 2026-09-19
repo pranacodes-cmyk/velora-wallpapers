@@ -32,7 +32,8 @@ class TodayTasksStore {
   static final revision = ValueNotifier<int>(0);
 
   static String todayKey() {
-    final d = DateTime.now();
+    // UTC to match web `useTodayTasks.ts` day boundary.
+    final d = DateTime.now().toUtc();
     return '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
   }
 

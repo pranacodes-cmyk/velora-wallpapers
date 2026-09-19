@@ -26,7 +26,9 @@ class DailyFunnel {
   static int _prayerViewedMs = 0;
 
   static String _today() {
-    final d = DateTime.now();
+    // UTC to match web `dailyFunnel.ts` (`new Date().toISOString()`), so the
+    // funnel's "today" boundary is identical to the web build.
+    final d = DateTime.now().toUtc();
     return '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
   }
 
