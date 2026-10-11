@@ -1,0 +1,22 @@
+project_id = "jbwhlogvldhsnxtpxwih"
+
+[functions.revenuecat-webhook]
+verify_jwt = false
+
+[functions.meta-capi]
+verify_jwt = false
+
+[functions.bible-companion]
+verify_jwt = false
+
+[functions.ai-pastoral]
+verify_jwt = false
+
+[functions.posthog-today-ex-india]
+verify_jwt = false
+
+[functions.posthog-24h-snapshot]
+verify_jwt = false
+
+[functions.posthog-4d-exindia]
+verify_jwt = false

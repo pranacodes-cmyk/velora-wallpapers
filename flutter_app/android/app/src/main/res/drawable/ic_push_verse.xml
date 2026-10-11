@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Open book glyph — for the daily verse push. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:strokeColor="#F2D87B"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M3,4.5L3,18C5.5,17 8.5,17 12,18C15.5,17 18.5,17 21,18L21,4.5C18.5,3.5 15.5,3.5 12,4.5C8.5,3.5 5.5,3.5 3,4.5Z" />
+    <path
+        android:strokeColor="#F2D87B"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M12,4.5L12,18" />
+</vector>

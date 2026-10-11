@@ -1,0 +1,421 @@
+[
+ {
+  "key": "jr.anxiety-peace::7.s3.a0",
+  "value": "Choisissez un verset de cette semaine à garder sur votre écran de verrouillage.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::1.s2.p2",
+  "value": "On n'admire pas un fondement. On ne le publie pas sur les réseaux. On bâtit sa vie dessus et il vous soutient.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::2.s2.p0",
+  "value": "Si vous étiez devant une cheminée, vous n'essaieriez pas de sentir la chaleur. Vous resteriez juste là assez longtemps pour qu'elle agisse.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::3.s0.p3",
+  "value": "Ce soir, il s'agit de vous appuyer sur ce qui peut vraiment porter votre poids.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::4.s0.p2",
+  "value": "Les gens qui ne croient pas ne cherchent pas. Vous, vous cherchez. C'est la foi qui opère déjà.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::4.s2.p4",
+  "value": "Si vous êtes toujours tourné vers Lui, même de très loin, Il en tient compte. Il le récompense.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::5.s0.continueLabel",
+  "value": "Dites-m'en plus",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::5.s2.p3",
+  "value": "Lorsque votre petite foi est enracinée dans un Dieu qui ouvre les mers, ressuscite les morts et appelle Lazare hors de sa tombe, la petitesse n'est plus le point important.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::5.s3.p0",
+  "value": "Apportez ce que vous avez. Il s'occupera de la taille.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::6.s2.p4",
+  "value": "Et la réponse de Jésus à cela — à chaque fois — est le mouvement. La guérison. La proximité. Pas une leçon sur comment vous devriez mieux croire.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::7.s0.p1",
+  "value": "Ce n'est pas une vie, et vous le savez. C'est pourquoi vous êtes là.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::7.s2.p1",
+  "value": "Maintenant, la question est : demain, quand l'e-mail arrivera, quand les gros titres vous effrayeront, quand un ami vous enverra un message douloureux — à quoi répondrez-vous ?",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.building-faith::7.s3.a0",
+  "value": "Choisissez un seul verset de cette semaine à mémoriser. Un seul.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::1.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::2.s0.p2",
+  "value": "Essayez ceci différemment demain. Avant la liste de choses à faire, avant le réveil, avant ce qui a déjà mal tourné — ce jour est quelque chose qu'Il a créé et vous a confié.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::2.s2.p0",
+  "value": "Imaginez que quelqu'un vous tende une boîte emballée chaque matin. Vous ne l'ouvrez pas. Vous la portez immédiatement comme un fardeau tout au long de votre journée.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::3.s0.p2",
+  "value": "Toute bonne chose a une source. Jacques nous la révèle ce soir, et cela transformera votre façon d'être au quotidien.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::3.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::3.s2.p4",
+  "value": "Une fois que vous le voyez, vous ne pouvez plus l'ignorer. Le monde entier devient une liste de remerciements avec un Visage derrière elle.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::4.s0.p1",
+  "value": "La joie est différente. La joie est ce que vous choisissez quand rien ne se passe comme vous le voudriez.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::6.s1.p1",
+  "value": "C'est Son sentiment — Son délice, Sa jubilation à votre égard — qui devient la structure qui vous soutient.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::6.s2.p2",
+  "value": "Pas la meilleure version de vous. Pas la version de vous qui a enfin tout réglé. Mais vous.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.gratitude-joy::6.s3.a1",
+  "value": "Cessez de jouer un rôle pour une personne demain. Soyez simplement.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::2.s0.p2",
+  "value": "Il est au plus près de vous quand vous êtes le plus brisé. Votre désordre ne Le repousse pas.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::2.s2.p0",
+  "value": "La plupart des religions vous enseignent à vous purifier avant de vous approcher de Dieu. De gagner votre place. De présenter une bonne image.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::4.s2.continueLabel",
+  "value": "Priez avec moi",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::5.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::6.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::7.s0.p1",
+  "value": "Un jour — et Il vous le garantit — Sa propre main essuiera chaque larme de votre visage. Celles que personne n'a vues. Celles que vous avez versées seule en voiture.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::7.s2.p3",
+  "value": "Quoi que vous ayez pleuré cette saison — Il a tout recueilli. Non pas qu'Il n'ait pas pu l'arrêter. Mais parce qu'Il est le genre de Dieu qui n'oublie pas le prix que cela vous a coûté.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.healing::7.s3.p0",
+  "value": "Sept jours. Vous êtes resté. Il vous a vu rester.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::2.s3.a1",
+  "value": "Parlez à une personne d'un endroit qui vous fait vous sentir seul.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::3.s2.p3",
+  "value": "Vous êtes peut-être encore dans cette vallée en lisant ceci. Peut-être y êtes-vous depuis des mois. Dieu ne vous en sort pas par un raccourci. Il fait mieux — Il la traverse avec vous.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::4.s0.title",
+  "value": "Vous vous sentez invisible.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::4.s2.p2",
+  "value": "Votre rôle n'est pas de forcer le résultat. Votre rôle est de continuer à vous montrer. Dites oui quand d'habitude vous diriez non. Envoyez un message à la personne à qui vous pensez. Allez à l'événement qui vous semble un effort.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::4.s3.a2",
+  "value": "Remarquez une personne solitaire aujourd'hui. Parlez-lui. Transmettez.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::5.s2.continueLabel",
+  "value": "Priez avec moi",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::5.s3.a0",
+  "value": "Asseyez-vous en silence pendant deux minutes. Soyez simplement avec Dieu. Pas un mot.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::6.s1.p1",
+  "value": "Y compris celui-ci. Y compris demain. Y compris le jour où vous L'avez oublié. Y compris le pire jour qui vous attend encore.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.loneliness::7.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::1.s0.p0",
+  "value": "Après la semaine que vous venez de passer. Après tout ce qui s'accumule. Vous êtes quand même venu.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::1.s2.p2",
+  "value": "Vous n'avez pas besoin de vous sentir puissant en ce moment. Vous n'avez besoin de rien ressentir de particulier.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::2.s2.p0",
+  "value": "Quelque part en chemin, vous avez commencé à croire que les personnes fortes que vous admirez ne se fatiguent jamais.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::3.s2.eyebrow",
+  "value": "Ce que cela signifie pour vous",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::4.s0.p3",
+  "value": "Maintenant pour vous.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::6.s0.p0",
+  "value": "Il sait déjà. Il était là à 3h du matin quand vous avez pleuré. Il était dans la salle de bain au travail quand vous avez fermé la porte une seconde pour respirer.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "jr.strength-hard-times::6.s3.a2",
+  "value": "Remerciez Dieu pour une chose qui ne s'est pas passée comme vous le vouliez.",
+  "issues": [
+   "register"
+  ]
+ },
+ {
+  "key": "j.anxiety-peace.d5.explanation",
+  "value": "Jésus est pragmatique, pas poétique. Ton esprit emprunte la douleur d'un jour qui n'est pas encore arrivé. Reste dans l'aujourd'hui — c'est le seul endroit où la grâce est donnée.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Ne vous inquiétez donc pas du lendemain, car le lendemain s'inquiétera de lui-même. À chaque jour suffit sa peine.",
+  "quoted": [
+   "aujourd"
+  ]
+ },
+ {
+  "key": "j.forgiveness-letting-go.d4.explanation",
+  "value": "Jésus répète cela plus que presque toute autre chose. Non comme une menace — mais comme une loi de la physique. Tu ne peux pas recevoir ce que tu refuses de donner. La main qui s'accroche à une rancune ne peut pas s'ouvrir pour recevoir la miséricorde.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Car si vous pardonnez aux autres leurs fautes, votre Père céleste vous pardonnera aussi. Mais si vous ne pardonnez pas leurs fautes aux autres, votre Père ne vous pardonnera pas non plus les vôtres.",
+  "quoted": [
+   "accroche à une rancune ne peut pas s"
+  ]
+ },
+ {
+  "key": "j.gratitude-joy.d5.explanation",
+  "value": "L'action de grâces est la porte d'entrée. Tu n'approches pas Dieu en mendiant — tu L'approches reconnaissant pour ce qu'Il a déjà fait. La gratitude est la posture de la proximité.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Entrez dans Ses portes avec des actions de grâces, et dans Ses parvis avec la louange; célébrez-Le, bénissez Son nom.",
+  "quoted": [
+   "approches pas Dieu en mendiant — tu L"
+  ]
+ },
+ {
+  "key": "j.healing.d5.explanation",
+  "value": "Ce n'est pas un peut-être. C'est une déclaration. La restauration, ce n'est pas redevenir ce que tu étais — c'est devenir quelqu'un qui a été guéri, ce qui est plus fort.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Je te restaurerai la santé et je guérirai tes blessures, déclare l'Éternel.",
+  "quoted": [
+   "est pas un peut-être. C",
+   "est pas redevenir ce que tu étais — c"
+  ]
+ },
+ {
+  "key": "j.marriage-love.d6.explanation",
+  "value": "La norme n'est pas « quand ils le méritent ». La norme est « comment Il t'a pardonné » — entièrement, alors que tu étais encore dans l'erreur, sans rien retenir. C'est ça la mesure.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Supportez-vous les uns les autres, et pardonnez-vous mutuellement si l'un de vous a un reproche contre quelqu'un. Pardonnez comme le Seigneur vous a pardonné.",
+  "quoted": [
+   ". La norme est ",
+   "erreur, sans rien retenir. C"
+  ]
+ },
+ {
+  "key": "j.money-provision.d7.explanation",
+  "value": "Ton effort est une adoration quand il Lui est offert. Fais le travail d'aujourd'hui fidèlement et laisse Dieu gérer le résultat que tu ne peux pas contrôler.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Tout ce que vous faites, faites-le de bon cœur, comme pour le Seigneur et non pour des hommes.",
+  "quoted": [
+   "aujourd"
+  ]
+ },
+ {
+  "key": "j.overcoming-temptation.d9.explanation",
+  "value": "La liberté a été achetée, pas méritée. Tu ne te bats pas pour l'obtenir — tu la reçois et ensuite tu refuses de remettre la chaîne. Il l'a déjà brisée. Tu te tiens sur ce qu'Il a fait.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "C'est pour la liberté que Christ nous a libérés. Tenez bon, donc, et ne vous laissez pas de nouveau réduire en esclavage.",
+  "quoted": [
+   "a déjà brisée. Tu te tiens sur ce qu"
+  ]
+ },
+ {
+  "key": "j.rest-sleep.d8.explanation",
+  "value": "La paix n'attend pas des eaux calmes. C'est faire confiance à Celui qui peut parler au vent. Il est dans ta barque ce soir.",
+  "issues": [
+   "quote"
+  ],
+  "verse": "Jésus, à l'arrière, dormait sur un coussin.",
+  "quoted": [
+   "attend pas des eaux calmes. C"
+  ]
+ }
+]

@@ -1,0 +1,89 @@
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    // Play Store package — locked, cannot change.
+    namespace = "com.jesuswallpaperbible.app"
+    compileSdk = 36
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    defaultConfig {
+        applicationId = "com.jesuswallpaperbible.app"
+        minSdk = 24
+        // Play requires target API 36 for new uploads.
+        targetSdk = 36
+
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = file(keystoreProperties["storeFile"])
+                storePassword = keystoreProperties["storePassword"]
+                keyAlias = keystoreProperties["keyAlias"]
+                keyPassword = keystoreProperties["keyPassword"]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig = keystorePropertiesFile.exists()
+                ? signingConfigs.release
+                : signingConfigs.debug
+            crunchPngs true
+            // R8 shrink + obfuscate: smaller AAB and the SDK wiring is no
+            // longer readable. Keep rules live in proguard-rules.pro.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+        }
+    }
+
+    bundle {
+        language { enableSplit = true }
+        density { enableSplit = true }
+        abi { enableSplit = true }
+    }
+
+    // Safety net: never ship Vulkan validation layers or other debug-only
+    // native libs that third-party SDKs sometimes bundle (~15 MB each).
+    packagingOptions {
+        exclude '**/libVkLayer_khronos_validation.so'
+        exclude '**/libVkLayer*.so'
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+dependencies {
+    implementation "androidx.appcompat:appcompat:1.7.0"
+    implementation "androidx.core:core:1.13.1"
+
+    // AdMob mediation adapters. Pangle (ByteDance) was removed on purpose: it
+    // dragged in a ~15 MB Vulkan validation layer and strict device filters.
+    implementation "com.google.ads.mediation:vungle:7.7.3.0"
+}

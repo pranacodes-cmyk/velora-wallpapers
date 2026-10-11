@@ -1,0 +1,1 @@
+DELETE FROM wallpapers WHERE title IN ('Captain Shield', 'Cosmic Captain');

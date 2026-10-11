@@ -1,0 +1,1 @@
+ALTER TABLE public.ota_bundles ADD COLUMN IF NOT EXISTS urgent boolean NOT NULL DEFAULT false;

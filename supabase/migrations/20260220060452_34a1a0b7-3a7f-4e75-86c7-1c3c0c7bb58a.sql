@@ -1,0 +1,1 @@
+ALTER TABLE public.live_wallpapers ADD COLUMN thumbnail_url text;

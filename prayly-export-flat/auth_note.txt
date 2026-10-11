@@ -1,0 +1,7 @@
+Auth Users Note:
+- auth.users cannot be dumped from a managed project (Supabase locks the auth schema).
+- For this app: create your admin login on the new project, then insert one row:
+
+  INSERT INTO public.user_roles (user_id, role) VALUES ('<your-new-admin-uuid>', 'admin');
+
+- Other users will re-create themselves naturally when they sign in on the new app.

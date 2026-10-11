@@ -1,0 +1,898 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
+@tailwind base;
+
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base - Deep Midnight Navy */
+    --background: 222 30% 5%;
+    --foreground: 40 20% 96%;
+
+    --card: 222 25% 8%;
+    --card-foreground: 40 20% 96%;
+
+    --popover: 222 25% 8%;
+    --popover-foreground: 40 20% 96%;
+
+    /* Brand - Royal Gold */
+    --primary: 42 85% 52%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 222 20% 10%;
+    --secondary-foreground: 40 15% 85%;
+
+    --muted: 222 15% 14%;
+    --muted-foreground: 40 10% 50%;
+
+    /* Accent - Deep Royal Blue */
+    --accent: 220 75% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 222 15% 15%;
+    --input: 222 20% 10%;
+    --ring: 42 85% 52%;
+
+    --radius: 1.25rem;
+
+    /* Custom Tokens */
+    --glass: 222 20% 5% / 0.88;
+    --glass-border: 42 40% 30% / 0.15;
+    --premium-gold: 42 85% 55%;
+    --premium-gold-glow: 38 100% 65%;
+    --nav-blur: 222 25% 4% / 0.94;
+
+    /* Premium tile tokens (dark) */
+    --tile-grad: radial-gradient(130% 90% at 50% 0%, hsl(var(--primary) / 0.18) 0%, hsl(var(--card)) 42%, hsl(var(--background)) 100%);
+    --tile-grad-soft: linear-gradient(165deg, hsl(222 24% 11%) 0%, hsl(222 28% 7%) 100%);
+    --tile-border: hsl(var(--primary) / 0.4);
+    --tile-shadow: 0 18px 40px -18px hsl(0 0% 0% / 0.7), 0 0 0 1px hsl(var(--primary) / 0.22), inset 0 0 0 1px hsl(var(--primary) / 0.18), inset 0 1px 0 hsl(var(--primary) / 0.22);
+    --tile-shadow-soft: 0 18px 38px -16px hsl(0 0% 0% / 0.65), 0 0 0 1px hsl(var(--primary) / 0.2), inset 0 0 0 1px hsl(var(--primary) / 0.16), inset 0 1px 0 hsl(0 0% 100% / 0.05);
+    --tile-inner-bg: hsl(var(--primary) / 0.08);
+    --tile-inner-border: hsl(var(--primary) / 0.22);
+    --tile-divider: hsl(var(--primary) / 0.28);
+    --tile-aurora: hsl(42 95% 60% / 0.35);
+  }
+
+  .light {
+    /* Premium warm off-white — soft cream tone, not flat */
+    --background: 40 30% 97%;
+    --foreground: 222 35% 9%;
+
+    --card: 40 40% 99%;
+    --card-foreground: 222 35% 9%;
+
+    --popover: 40 40% 99%;
+    --popover-foreground: 222 35% 9%;
+
+    --primary: 42 85% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 10% 94%;
+    --secondary-foreground: 222 25% 18%;
+
+    --muted: 40 8% 91%;
+    --muted-foreground: 222 15% 38%;
+
+    --accent: 220 75% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 40 10% 82%;
+    --input: 40 8% 93%;
+    --ring: 42 85% 42%;
+
+    --glass: 0 0% 100% / 0.97;
+    --glass-border: 42 30% 60% / 0.3;
+    --premium-gold: 42 85% 44%;
+    --premium-gold-glow: 38 100% 52%;
+    --nav-blur: 0 0% 98% / 0.97;
+
+    /* Premium tile tokens (light) — ivory cards with a duotone of warm gold + deep royal blue.
+       Gold is the accent (warm spark), royal blue is the structural frame (cool premium depth). */
+    --tile-grad: radial-gradient(140% 100% at 50% 0%, hsl(42 95% 78% / 0.32) 0%, hsl(42 50% 97%) 30%, hsl(220 40% 99%) 75%);
+    --tile-grad-soft: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 50% 98%) 100%);
+    --tile-border: hsl(222 55% 32% / 0.32);
+    --tile-shadow:
+      0 1px 2px hsl(222 50% 18% / 0.07),
+      0 10px 24px -8px hsl(222 60% 28% / 0.18),
+      0 28px 52px -20px hsl(222 65% 22% / 0.28),
+      0 0 0 1px hsl(222 55% 32% / 0.22),
+      inset 0 0 0 1px hsl(42 90% 65% / 0.42),
+      inset 0 1px 0 hsl(0 0% 100% / 1);
+    --tile-shadow-soft:
+      0 1px 2px hsl(222 50% 18% / 0.06),
+      0 8px 20px -6px hsl(222 60% 28% / 0.15),
+      0 22px 44px -18px hsl(222 65% 22% / 0.22),
+      0 0 0 1px hsl(222 55% 32% / 0.18),
+      inset 0 0 0 1px hsl(42 90% 65% / 0.36),
+      inset 0 1px 0 hsl(0 0% 100% / 1);
+    --tile-inner-bg: hsl(220 60% 50% / 0.08);
+    --tile-inner-border: hsl(222 55% 32% / 0.22);
+    --tile-divider: hsl(222 55% 32% / 0.18);
+    --tile-aurora: hsl(42 95% 60% / 0.42);
+  }
+
+  /* The onboarding trial beat is intentionally always midnight, independent
+     of the user's reading theme, so it flows directly into the Premium sheet. */
+  .trial-transition-theme,
+  .onboarding-theme,
+  .premium-sheet-dark {
+    --background: 222 30% 5%;
+    --foreground: 40 20% 96%;
+    --card: 222 25% 8%;
+    --card-foreground: 40 20% 96%;
+    --popover: 222 25% 8%;
+    --popover-foreground: 40 20% 96%;
+    --muted: 222 15% 14%;
+    --muted-foreground: 40 10% 62%;
+    --border: 222 15% 15%;
+    --primary: 42 85% 52%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 220 75% 55%;
+    --accent-foreground: 0 0% 100%;
+    --glass: 222 20% 5% / 0.88;
+    --glass-border: 42 40% 30% / 0.15;
+    --premium-gold: 42 85% 55%;
+    color-scheme: dark;
+  }
+
+  /* ===========================================================
+     Light-mode scoped override for the Today page.
+     Pure gold-on-white reads cheap. Pro fix = duotone: remap
+     "primary" to deep royal-blue INK so all the existing
+     hsl(var(--primary)) styling (borders, rings, gradients,
+     bars, chips, glows) reads as elegant navy on cream. Gold
+     is preserved on the actual lockscreen mockups (hard-coded
+     hsl tokens) and stays as a sparing accent via --accent.
+     Scoped via data-theme-scope so no other page is affected.
+     =========================================================== */
+  .light [data-theme-scope="today"] {
+    /* Deep royal-blue ink replaces gold as the structural color */
+    --primary: 222 60% 24%;
+    --primary-foreground: 40 30% 98%;
+    --ring: 222 60% 24%;
+
+    /* Gold becomes the sparing accent (was royal blue in light) */
+    --accent: 42 88% 44%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Tone down the gold tokens used in nudges/glows so any
+       remaining gold reads as subtle warm highlight, not garish */
+    --premium-gold: 42 70% 42%;
+    --premium-gold-glow: 38 75% 50%;
+    --glass-border: 222 40% 30% / 0.18;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    overflow: hidden;
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    height: 100%;
+    overflow: hidden;
+    padding-bottom: env(safe-area-inset-bottom);
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Hide default browser video play button overlay on Android */
+  video::-webkit-media-controls,
+  video::-webkit-media-controls-enclosure,
+  video::-webkit-media-controls-panel,
+  video::-webkit-media-controls-play-button,
+  video::-webkit-media-controls-start-playback-button,
+  video::-webkit-media-controls-overlay-play-button {
+    display: none !important;
+    -webkit-appearance: none;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* Scrollbar hiding */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scroll-container {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+}
+
+@layer utilities {
+  /* ─────────────────────────────────────────────────────────────
+     FLUID TYPE + SPACE SCALE
+     Tuned for phones 320px → 480px, clamped so tablets don't blow up.
+     ────────────────────────────────────────────────────────────── */
+  .fluid-caption { font-size: clamp(10px, 2.7vw, 11.5px); line-height: 1.4; }
+  .fluid-small   { font-size: clamp(11px, 3.0vw, 13px);   line-height: 1.45; }
+  .fluid-body    { font-size: clamp(13px, 3.6vw, 15px);   line-height: 1.55; }
+  .fluid-lead    { font-size: clamp(14px, 4.0vw, 16.5px); line-height: 1.5; }
+  .fluid-h4      { font-size: clamp(15px, 4.4vw, 18px);   line-height: 1.35; font-weight: 700; letter-spacing: -0.01em; }
+  .fluid-h3      { font-size: clamp(17px, 5.0vw, 21px);   line-height: 1.25; font-weight: 800; letter-spacing: -0.015em; }
+  .fluid-h2      { font-size: clamp(21px, 6.2vw, 27px);   line-height: 1.15; font-weight: 800; letter-spacing: -0.02em; }
+  .fluid-h1      { font-size: clamp(26px, 7.6vw, 34px);   line-height: 1.08; font-weight: 900; letter-spacing: -0.022em; }
+  .fluid-hero    { font-size: clamp(30px, 9.2vw, 44px);   line-height: 1.02; font-weight: 900; letter-spacing: -0.028em; }
+
+  /* Fluid app shell — phone-shaped column, centered on wider viewports. */
+  .app-shell {
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+  }
+
+
+  .glass-surface {
+    background: hsl(var(--glass));
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.4);
+  }
+
+  .glass-nav {
+    background: hsl(var(--nav-blur));
+    border-top: 1px solid hsl(var(--glass-border));
+  }
+
+  .premium-gradient {
+    background: linear-gradient(135deg, hsl(42 85% 48%) 0%, hsl(38 90% 55%) 50%, hsl(42 85% 60%) 100%);
+  }
+
+  .text-premium {
+    background: linear-gradient(135deg, hsl(42 85% 50%), hsl(38 90% 60%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .light .text-premium {
+    background: linear-gradient(135deg, hsl(42 85% 35%), hsl(38 90% 42%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .golden-glow {
+    box-shadow: 0 0 20px -4px hsl(42 85% 52% / 0.3), 0 0 60px -8px hsl(38 100% 62% / 0.15);
+  }
+
+  .golden-border {
+    border: 1px solid hsl(42 85% 52% / 0.2);
+  }
+
+  .journey-ink {
+    color: hsl(var(--journey-ink));
+  }
+
+  .journey-ink-75 {
+    color: hsl(var(--journey-ink) / 0.75);
+  }
+
+  .journey-muted {
+    color: hsl(var(--journey-muted));
+  }
+
+  .journey-muted-75 {
+    color: hsl(var(--journey-muted) / 0.75);
+  }
+
+  .journey-muted-80 {
+    color: hsl(var(--journey-muted) / 0.8);
+  }
+
+  .safe-top {
+    padding-top: max(env(safe-area-inset-top), 1.5rem);
+  }
+
+  .safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+  }
+
+  /* Premium loading skeleton */
+  .shimmer-skeleton {
+    background: hsl(222 25% 5%);
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-skeleton::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at 50% 40%,
+      hsl(42 30% 10% / 0.5) 0%,
+      transparent 65%
+    );
+    animation: shimmer-breathe 3.5s ease-in-out infinite;
+  }
+  .shimmer-skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      110deg,
+      transparent 0%,
+      transparent 35%,
+      hsl(42 50% 50% / 0.04) 42%,
+      hsl(42 60% 60% / 0.08) 50%,
+      hsl(42 50% 50% / 0.04) 58%,
+      transparent 65%,
+      transparent 100%
+    );
+    background-size: 250% 100%;
+    animation: shimmer-gold 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes shimmer-gold {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  @keyframes shimmer-breathe {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.6; }
+  }
+
+  /* Golden edge flash when image reveals */
+  .tile-reveal-glow {
+    position: relative;
+  }
+  .tile-reveal-glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px hsl(42 80% 55% / 0.3);
+    opacity: 0;
+    animation: tile-edge-flash 0.8s ease-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes tile-edge-flash {
+    0% {
+      opacity: 1;
+      box-shadow: inset 0 0 0 2px hsl(42 80% 55% / 0.5), 0 0 20px 4px hsl(42 80% 55% / 0.15);
+    }
+    100% {
+      opacity: 0;
+      box-shadow: inset 0 0 0 0px hsl(42 80% 55% / 0), 0 0 0px 0px hsl(42 80% 55% / 0);
+    }
+  }
+
+  /* Golden pulse dots loader */
+  .golden-pulse-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .golden-pulse-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, hsl(220 75% 55%), hsl(42 85% 55%));
+    animation: pulse-dot 1.4s ease-in-out infinite;
+    box-shadow: 0 0 8px hsl(220 75% 55% / 0.4);
+  }
+  .golden-pulse-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .golden-pulse-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse-dot {
+    0%, 80%, 100% { transform: scale(0.4); opacity: 0.3; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Wallpaper tag badges */
+  .tag-trending {
+    background: linear-gradient(135deg, hsl(220 75% 45%), hsl(42 85% 55%));
+  }
+  .tag-hot {
+    background: linear-gradient(135deg, hsl(0 80% 50%), hsl(220 75% 50%));
+  }
+  .tag-new {
+    background: linear-gradient(135deg, hsl(160 70% 40%), hsl(140 60% 50%));
+  }
+
+  /* Skeleton card for masonry grid */
+  .skeleton-card {
+    border-radius: 1.25rem;
+    overflow: hidden;
+  }
+  .skeleton-card .skeleton-img {
+    width: 100%;
+    background: hsl(var(--secondary) / 0.5);
+  }
+  .skeleton-card .skeleton-img::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: linear-gradient(
+      110deg,
+      transparent 0%,
+      transparent 40%,
+      hsl(var(--muted) / 0.3) 50%,
+      transparent 60%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  /* Ken Burns animation variants */
+  @keyframes ken-burns {
+    0% { transform: scale(1) translate(0, 0); }
+    50% { transform: scale(1.12) translate(-1.5%, -1%); }
+    100% { transform: scale(1) translate(0, 0); }
+  }
+  @keyframes ken-burns-alt {
+    0% { transform: scale(1.06) translate(1%, 0.5%); }
+    50% { transform: scale(1) translate(-0.5%, -1%); }
+    100% { transform: scale(1.06) translate(1%, 0.5%); }
+  }
+  @keyframes ken-burns-zoom {
+    0% { transform: scale(1) translate(0, 1%); }
+    40% { transform: scale(1.15) translate(-1%, -1.5%); }
+    100% { transform: scale(1) translate(0, 1%); }
+  }
+  .animate-ken-burns {
+    animation: ken-burns 7s ease-in-out infinite;
+  }
+  .animate-ken-burns-alt {
+    animation: ken-burns-alt 9s ease-in-out infinite;
+  }
+  .animate-ken-burns-zoom {
+    animation: ken-burns-zoom 10s ease-in-out infinite;
+  }
+
+  /* Sprite sheet animation */
+  @keyframes sprite-play {
+    from { background-position: 0 0; }
+    to { background-position: 0 100%; }
+  }
+
+  /* Hide native video controls */
+  video::-webkit-media-controls {
+    display: none !important;
+  }
+  video::-webkit-media-controls-enclosure {
+    display: none !important;
+  }
+  video::-webkit-media-controls-panel {
+    display: none !important;
+  }
+  video::-webkit-media-controls-play-button {
+    display: none !important;
+  }
+  video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+    -webkit-appearance: none;
+  }
+}
+
+/* Daily verse horizontal scroll */
+@keyframes verse-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-verse-scroll {
+  display: inline-block;
+  animation: verse-scroll 20s linear infinite;
+  padding-right: 4rem;
+}
+.animate-verse-scroll:hover {
+  animation-play-state: paused;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer-slide {
+  from { transform: translateX(-100%) skewX(-12deg); }
+  to { transform: translateX(200%) skewX(-12deg); }
+}
+
+@keyframes shimmerSlide {
+  0% { background-position: 200% 50%; }
+  100% { background-position: -200% 50%; }
+}
+
+@keyframes railAuraPulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.75; transform: scale(1.02); }
+}
+
+@keyframes railSweep {
+  0% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+  10% { opacity: 0.55; }
+  60% { opacity: 0.55; }
+  100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
+}
+
+@keyframes newBadgeBob {
+  0%, 100% { transform: translate(0, 0) rotate(-8deg); }
+  50% { transform: translate(0, -3px) rotate(-8deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 4s linear infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer-slide 2s ease-in-out infinite;
+}
+
+/* Wallpaper card particles */
+@keyframes onb-wp-explode {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--peak-opacity, 0.9);
+    transform: translate(-50%, -50%) scale(1.3) rotate(var(--rot, 5deg));
+  }
+  35% {
+    opacity: var(--peak-opacity, 0.8);
+  }
+  100% {
+    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) scale(0.3) rotate(var(--rot-end, -15deg));
+    opacity: 0;
+  }
+}
+
+.onb-wp-card {
+  animation-name: onb-wp-explode;
+}
+
+@keyframes onb-burst {
+  0% {
+    transform: translate(-50%, -50%) translateZ(0) scale(1);
+    opacity: var(--peak-opacity, 0.7);
+  }
+  100% {
+    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) translateZ(0) scale(0);
+    opacity: 0;
+  }
+}
+
+.onb-particle-burst {
+  animation-name: onb-burst;
+}
+
+@keyframes onb-drift {
+  0% {
+    transform: translate(-50%, -50%) translateZ(0) scale(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: var(--peak-opacity, 0.3);
+    transform: translate(-50%, -50%) translateZ(0) scale(1);
+  }
+  100% {
+    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) translateZ(0) scale(0.3);
+    opacity: 0;
+  }
+}
+
+.onb-particle-drift {
+  animation-name: onb-drift;
+  animation-iteration-count: infinite;
+}
+
+@keyframes onb-sparks {
+  0% {
+    transform: translate(-50%, -50%) translateZ(0) scale(1.5);
+    opacity: var(--peak-opacity, 1);
+  }
+  50% {
+    opacity: var(--peak-opacity, 0.8);
+  }
+  100% {
+    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) translateZ(0) scale(0);
+    opacity: 0;
+  }
+}
+
+.onb-particle-sparks {
+  animation-name: onb-sparks;
+}
+
+@keyframes onb-shake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-3px, -2px) rotate(-0.3deg); }
+  20% { transform: translate(4px, 1px) rotate(0.4deg); }
+  30% { transform: translate(-2px, 3px) rotate(-0.2deg); }
+  40% { transform: translate(3px, -3px) rotate(0.3deg); }
+  50% { transform: translate(-4px, 1px) rotate(-0.4deg); }
+  60% { transform: translate(2px, -2px) rotate(0.2deg); }
+  70% { transform: translate(-3px, 3px) rotate(-0.3deg); }
+  80% { transform: translate(4px, -1px) rotate(0.4deg); }
+  90% { transform: translate(-1px, 2px) rotate(-0.1deg); }
+}
+
+.onb-shake {
+  animation: onb-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* ── Prayer screen ambient layers (sacred & cinematic, layered subtly) ── */
+@keyframes prayer-kenburns {
+  0% { transform: scale(1.06) translate(0, 0); }
+  50% { transform: scale(1.12) translate(-1.2%, -0.8%); }
+  100% { transform: scale(1.06) translate(0, 0); }
+}
+.prayer-kenburns { animation: prayer-kenburns 32s ease-in-out infinite; }
+
+@keyframes prayer-rays {
+  0%, 100% { opacity: 0.35; transform: rotate(0deg) scale(1); }
+  50% { opacity: 0.55; transform: rotate(8deg) scale(1.05); }
+}
+.prayer-rays { animation: prayer-rays 14s ease-in-out infinite; transform-origin: 50% 0%; }
+
+@keyframes prayer-aura {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 0.75; transform: scale(1.04); }
+}
+.prayer-aura { animation: prayer-aura 6s ease-in-out infinite; }
+
+@keyframes prayer-ember {
+  0% { transform: translateY(20px) translateX(0) scale(0.6); opacity: 0; }
+  15% { opacity: 0.7; }
+  85% { opacity: 0.5; }
+  100% { transform: translateY(-110vh) translateX(var(--drift, 20px)) scale(1); opacity: 0; }
+}
+.prayer-ember { animation: prayer-ember linear infinite; }
+
+@keyframes prayer-breathe {
+  0%, 100% { transform: scale(0.85); opacity: 0.55; }
+  50% { transform: scale(1.25); opacity: 1; }
+}
+.prayer-breathe { animation: prayer-breathe 7s ease-in-out infinite; }
+
+
+
+
+/* =========================================================================
+   Low-end device throttling.
+   Tagged from main.tsx when deviceMemory <= 3GB, cores <= 4, or the user
+   has prefers-reduced-motion. Goal: kill GPU/render-thread back-pressure
+   that was causing HardwareRenderer.nSyncAndDrawFrame ANRs on Itel A90,
+   Redmi 13C and similar entry-level Android devices.
+   Strategy: stop the most expensive *infinite* effects (ken-burns scaling,
+   prayer aura/rays/embers, shimmer sweeps, scrolling marquees) while
+   keeping short one-shot transitions for feedback.
+   ========================================================================= */
+.low-end-device .animate-ken-burns,
+.low-end-device .animate-ken-burns-alt,
+.low-end-device .animate-ken-burns-zoom,
+.low-end-device .animate-verse-scroll,
+.low-end-device .animate-spin-slow,
+.low-end-device .animate-shimmer,
+.low-end-device .animate-pulse,
+.low-end-device .animate-ping,
+.low-end-device .shimmer-skeleton::before,
+.low-end-device .shimmer-skeleton::after,
+.low-end-device .prayer-kenburns,
+.low-end-device .prayer-rays,
+.low-end-device .prayer-aura,
+.low-end-device .prayer-ember,
+.low-end-device .prayer-breathe,
+.low-end-device .prayer-shimmer {
+  animation: none !important;
+}
+
+/* Drop blur/filter passes too — they're the single biggest GPU cost on
+   low-RAM Mali / Adreno 6xx parts and compound with infinite animations. */
+.low-end-device .prayer-aura,
+.low-end-device .prayer-rays,
+.low-end-device .prayer-shimmer {
+  filter: none !important;
+  backdrop-filter: none !important;
+  opacity: 0.85;
+}
+
+.low-end-device .glass-surface,
+.low-end-device .glass-nav,
+.startup-safe-mode .glass-surface,
+.startup-safe-mode .glass-nav,
+.startup-safe-mode [style*="backdrop-filter"],
+.startup-safe-mode [style*="backdropFilter"],
+.low-end-device [style*="backdrop-filter"],
+.low-end-device [style*="backdropFilter"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.startup-safe-mode *,
+.low-end-device * {
+  scroll-behavior: auto !important;
+}
+
+.startup-safe-mode *,
+.low-end-device * {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+.android-device *,
+.android-device *::before,
+.android-device *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.android-device [class*="blur-"],
+.android-device [style*="filter"] {
+  filter: none !important;
+}
+
+.android-device .animate-ken-burns,
+.android-device .animate-ken-burns-alt,
+.android-device .animate-ken-burns-zoom,
+.android-device .animate-verse-scroll,
+.android-device .animate-spin-slow,
+.android-device .animate-shimmer,
+.android-device .animate-pulse,
+.android-device .shimmer-skeleton::before,
+.android-device .shimmer-skeleton::after,
+.android-device .prayer-kenburns,
+.android-device .prayer-rays,
+.android-device .prayer-aura,
+.android-device .prayer-ember,
+.android-device .prayer-breathe {
+  animation: none !important;
+}
+
+/* Kill ALL native CSS infinite loops on Android — only one-shot animations
+   keep working. This eliminates the "animated CSS behind a <video>" combo
+   that pegs Adreno 3xx / Mali-G52 GPUs and triggers nSyncAndDrawFrame ANRs. */
+.android-device *,
+.android-device *::before,
+.android-device *::after {
+  animation-iteration-count: 1 !important;
+}
+
+/* mix-blend-mode forces off-screen compositing buffers per layer in
+   Chromium/WebView. On Mali (Redmi 13C, Itel A90) and Adreno 3xx this is
+   the single biggest driver of RenderThread stalls (draw_gl frames dominate
+   our ANR traces). Drop them on Android — visual difference on tiny mobile
+   screens is negligible; ANR budget savings are large. */
+.low-end-device * {
+  mix-blend-mode: normal !important;
+}
+
+/* Onboarding paint budget (Android).
+   Profiling the onboarding on a 6x-throttled WebView showed ~70% of every
+   frame in browser-internal style/paint work — not JS. The two worst offenders
+   were wide-blur text shadows on headlines sitting over full-screen imagery,
+   and slide subtrees repainting layer-by-layer during the cross-fade.
+   Cheap shadows + a promoted, contained layer per slide fixes both. */
+.android-device [data-onboarding="active"] > div {
+  contain: paint style;
+}
+
+.android-device [data-onboarding="active"] .onb-slide-layer {
+  will-change: opacity;
+  transform: translateZ(0);
+  contain: paint style;
+}
+
+/* Onboarding is authored in the midnight palette and ships that way in both
+   system themes: under .light we re-scope the tokens back to the dark set so
+   every slide renders exactly like dark mode. */
+.light .onb-slide-layer {
+  --onb-head-shadow: 0.6;
+  --background: 222 30% 5%;
+  --foreground: 40 20% 96%;
+  --card: 222 25% 8%;
+  --card-foreground: 40 20% 96%;
+  --popover: 222 25% 8%;
+  --popover-foreground: 40 20% 96%;
+  --primary: 42 85% 52%;
+  --secondary: 222 20% 10%;
+  --secondary-foreground: 40 15% 85%;
+  --muted: 222 15% 14%;
+  --muted-foreground: 40 10% 50%;
+  --accent: 220 75% 55%;
+  --border: 222 15% 15%;
+  --input: 222 20% 10%;
+  --ring: 42 85% 52%;
+  --glass: 222 20% 5% / 0.88;
+  --glass-border: 42 40% 30% / 0.15;
+  --nav-blur: 222 25% 4% / 0.94;
+  --tile-grad-soft: linear-gradient(165deg, hsl(222 24% 11%) 0%, hsl(222 28% 7%) 100%);
+}
+
+.android-device .will-change-transform,
+.android-device [style*="will-change"] {
+  will-change: auto !important;
+}
+
+
+
+
+/* Aggressive GPU throttling for low-end devices to prevent syncAndDrawFrame ANRs */
+.low-end-device * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.low-end-device .blur-sm,
+.low-end-device .blur-md,
+.low-end-device .blur-lg,
+.low-end-device .blur-xl,
+.low-end-device .blur-2xl,
+.low-end-device .blur-3xl,
+.startup-safe-mode [style*="filter"],
+.low-end-device [style*="filter"],
+.low-end-device [class*="blur-"] {
+  filter: none !important;
+}
+
+/* =============================================================================
+   ONBOARDING SLIDE 1 — "push storm"
+   Framer transforms are snapped on Android (reducedMotion) and CSS loops are
+   clamped to one iteration, so the storm is authored as named keyframes here
+   and explicitly re-allowed on .android-device. Transform/opacity only: four
+   cards + four dots + one glow is a trivial compositor cost even on Mali.
+   ========================================================================== */
+/* Calm parity with every other slide: fade + rise, 420ms, 70ms stagger, then
+   the unread count lands on the icon. No loops, no drift, no glow. */
+@keyframes onb-storm-in {
+  from { opacity: 0; transform: translate3d(0, -14px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes onb-storm-badge {
+  from { opacity: 0; transform: scale(0.3); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* The global low-end / startup / android clamps (`animation-duration: 0.001ms`)
+   would freeze this, so re-arm it with the highest specificity we use. */
+html.low-end-device .onb-storm-card,
+html.startup-safe-mode .onb-storm-card,
+html.android-device .onb-storm-card,
+.onb-storm-card {
+  animation: onb-storm-in 420ms cubic-bezier(0.22, 1, 0.36, 1) var(--storm-delay) both !important;
+}
+html.low-end-device .onb-storm-badge,
+html.startup-safe-mode .onb-storm-badge,
+html.android-device .onb-storm-badge,
+.onb-storm-badge {
+  animation: onb-storm-badge 360ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--storm-delay) + 240ms) both !important;
+}

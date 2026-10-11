@@ -1,0 +1,10 @@
+Storage Buckets:
+- wallpapers (public)
+- reels (public)
+- narrations (public)
+
+Storage Policies: bucket policies are set on each bucket.
+Most actual image/video files live on R2, not in Supabase Storage.
+Only a few upscale previews and narration files are in Storage.
+
+To migrate: recreate the 3 buckets as public, then mirror files.

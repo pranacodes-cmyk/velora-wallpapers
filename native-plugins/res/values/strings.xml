@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Prayly</string>
+    <string name="title_activity_main">Prayly</string>
+    <string name="package_name">com.jesuswallpaperbible.app</string>
+    <string name="custom_url_scheme">com.jesuswallpaperbible.app</string>
+    <string name="admob_app_id">ca-app-pub-2361456317095553~4673440469</string>
+    <string name="facebook_app_id">1327255305975486</string>
+    <string name="facebook_client_token">68bd7c7043902ccfc3342d7cbf4ec8e6</string>
+    <string name="fb_login_protocol_scheme">fb1327255305975486</string>
+</resources>

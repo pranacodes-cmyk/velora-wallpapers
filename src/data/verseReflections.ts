@@ -1,0 +1,1286 @@
+import type { DailyVerse } from "./dailyVerses";
+
+export interface VerseReflection { meaning: string; apply: string; }
+
+export const VERSE_REFLECTIONS: Record<string, VerseReflection> = {
+  "Jeremiah 29:11": {
+    "meaning": "God isn't reacting to your life as it happens; He has already looked ahead and paved a way for your flourishing. Even in seasons of waiting or exile, His intentions toward you are settled, kind, and focused on your ultimate good.",
+    "apply": "Take a deep breath and release the pressure to figure out your future, trusting that God has already designed a path for you."
+  },
+  "Psalm 23:1": {
+    "meaning": "Because you belong to the Good Shepherd, your needs are His personal responsibility. Even when life feels scarce, his presence ensures that the most essential parts of you are never neglected.",
+    "apply": "Release the urge to strive and simply let Jesus guide your next few steps today."
+  },
+  "Philippians 4:13": {
+    "meaning": "This isn't about achieving worldly success, but about having the supernatural endurance to face any circumstance. Whether you are in a season of plenty or a season of lack, Jesus provides the inner energy to remain steady.",
+    "apply": "Lean on His strength rather than your own willpower to get through this hour’s challenges."
+  },
+  "Proverbs 3:5": {
+    "meaning": "Your own logic is limited by what you can see, but God sees the full picture. Choosing to trust Him means letting His wisdom guide your heart even when your circumstances don't make sense to your natural mind.",
+    "apply": "When you hit an uncertainty today, swap your 'how' and 'why' questions for a simple prayer of trust."
+  },
+  "Joshua 1:9": {
+    "meaning": "You never have to summon the courage to go somewhere alone, because God is already there. His presence is a constant companion that travels with you into every unknown room and decision.",
+    "apply": "Walk into your next meeting or errand knowing you aren't navigating it by yourself."
+  },
+  "Psalm 27:1": {
+    "meaning": "When God’s presence lights up your path, the shadows that used to haunt you lose their power. If the Creator of the universe is your rescue and your safety, there simply isn't anyone or anything left to dread.",
+    "apply": "Walk into your next meeting or conversation with the quiet confidence of someone who is already completely safe."
+  },
+  "1 Peter 5:7": {
+    "meaning": "Jesus doesn't want you to just manage your stress; He wants you to hand it over to Him entirely. He has the broad shoulders to carry the weight that is currently making your heart feel heavy and tired.",
+    "apply": "Literally mimic the motion of throwing as you tell the Lord about your biggest worry this hour."
+  },
+  "Psalm 46:1": {
+    "meaning": "God isn't a distant observer of your struggles; He is a sturdy shelter you can run into right now. He is 'ever-present,' meaning He is already at the center of your trouble, ready to be your strength.",
+    "apply": "In moments of chaos today, pause for ten seconds to acknowledge the quiet, steady fortress of God’s presence."
+  },
+  "Isaiah 40:31": {
+    "meaning": "When you reach the end of your own strength, God offers you His. Waiting on Him isn't passive; it's an exchange where your exhaustion is traded for a supernatural momentum that defies your circumstances.",
+    "apply": "Surrender your tiredness to Him now and ask for His strength to lift your spirit."
+  },
+  "Romans 8:28": {
+    "meaning": "God is a master at weaving even the messy, confusing, and painful threads of your life into a beautiful tapestry. He isn't wasting a single moment of your story, but is actively shaping it for your ultimate benefit.",
+    "apply": "Surrender one specific worry to Him today, trusting that He is already working it toward something good."
+  },
+  "Proverbs 18:10": {
+    "meaning": "The character and presence of God act as a literal sanctuary for you. When the world feels chaotic or threatening, you have a standing invitation to hide yourself in His strength.",
+    "apply": "Whenever you feel overwhelmed this hour, picture yourself stepping into the safety of His name."
+  },
+  "Philippians 4:6": {
+    "meaning": "Anxiety is an invitation to intimacy rather than a burden to carry alone. God wants to hear the raw details of what is heavy on your heart, replacing your frantic thoughts with His direct attention.",
+    "apply": "Turn your most nagging thought into a simple sentence of prayer as you move into your next task."
+  },
+  "John 3:16": {
+    "meaning": "God's love is not a vague feeling, but a costly action taken specifically for you. He gave His most precious relationship so that you would never have to face life or death separated from Him.",
+    "apply": "Let the reality that you are worth the life of God's Son settle deep into your heart this hour."
+  },
+  "Psalm 46:10": {
+    "meaning": "This is a gentle command to drop your weapons and stop your striving. True knowledge of God’s sovereignty isn't found in frantic effort, but in the quiet space where you finally stop trying to be your own god.",
+    "apply": "Silence your phone for two minutes and simply acknowledge that He is the one in control."
+  },
+  "Exodus 14:14": {
+    "meaning": "You often feel like you have to defend yourself or solve every crisis by force, but God is your champion. He is moving on your behalf in ways you cannot see, handling the battles that are too big for you.",
+    "apply": "Stop trying to fix that one difficult situation today and let God take the lead."
+  },
+  "Matthew 11:28": {
+    "meaning": "Jesus isn't looking for a polished version of you; He wants the tired, authentic version. He offers a rest that goes deeper than sleep—a healing quietness for your soul that only comes from being near Him.",
+    "apply": "Mentally lay down your heaviest 'to-do' and ask Jesus to carry the weight while you work."
+  },
+  "Psalm 147:3": {
+    "meaning": "God doesn’t just look at your pain from a distance; He reaches into the shattered places of your soul to mend them. Like a gentle physician, He stays close until your hidden hurts begin to close and heal.",
+    "apply": "Tell Him exactly where it hurts right now, and let His presence be the bandage that holds you together."
+  },
+  "Psalm 37:4": {
+    "meaning": "When you find your greatest joy in simply being with God, your heart begins to beat in rhythm with His. In this closeness, He plants new, holy desires within you and delights in bringing them to life.",
+    "apply": "Spend a moment thanking God for who He is, rather than what He does, and see how your heart settles."
+  },
+  "Zephaniah 3:17": {
+    "meaning": "God isn't just tolerating you; He is actually delighted by your existence. When your mind feels noisy or anxious, He invites you to lean into His affection, letting His presence steady your breathing and hush your restless thoughts.",
+    "apply": "Take a deep breath and picture the Lord smiling over you, letting His peace settle the worries of your heart right now."
+  },
+  "Isaiah 54:17": {
+    "meaning": "This doesn't mean you won't face challenges, but it promises they won't have the final word. Every heavy situation or unkind word meant to tear you down will ultimately fail to defeat the life God is building in you.",
+    "apply": "Release the fear of what might go wrong, trusting that God’s shield is sturdier than any trouble."
+  },
+  "John 14:27": {
+    "meaning": "Jesus didn’t leave you with a fragile, temporary feeling, but with His own indestructible composure. His peace is a gift you already possess, regardless of how chaotic your circumstances might look on the surface.",
+    "apply": "When anxiety rises, whisper, 'I accept Your peace,' and let it anchor your mind."
+  },
+  "Nehemiah 8:10": {
+    "meaning": "When you feel depleted, God’s gladness becomes your fuel. Your stamina doesn't come from your own grit or a perfect mood, but from the deep, steady reality that God is happy to call you His own.",
+    "apply": "Stop trying to summon your own energy and let the simple fact of God's love lift your head."
+  },
+  "Matthew 18:20": {
+    "meaning": "Jesus is uniquely present when we step out of our isolation. Even in a small conversation or a brief prayer with a friend, He pulls up a chair and makes His home in our shared connection.",
+    "apply": "Look for Jesus in your next interaction with a fellow believer, knowing He is right there in the room."
+  },
+  "John 1:1": {
+    "meaning": "Before time began, Jesus was there—the living expression of God’s heart toward us. Everything you see around you was built through Him, proving that He is the solid foundation that holds your entire world together.",
+    "apply": "Rest in the truth that the one who holds the universe also holds the details of your afternoon."
+  },
+  "Romans 8:31": {
+    "meaning": "Because God has already decided to be on your side, no opposition or circumstance has the final word over your life. You are backed by the highest authority in the universe, making every fear fundamentally smaller than His favor toward you.",
+    "apply": "Take a deep breath and let your shoulders drop, knowing you don't have to defend yourself today."
+  },
+  "Hebrews 11:1": {
+    "meaning": "Faith is the quiet, steady anchor for your soul. It is the internal conviction that God’s promises are more real than the circumstances you can physically touch or see right now.",
+    "apply": "Take one step forward today, trusting that God’s invisible hand is firmer ground than the visible world."
+  },
+  "Numbers 6:24-25": {
+    "meaning": "These words are God’s affectionate leaning toward you, promising His protection and the delight of His smile. He isn't watching you with a critical eye, but with a face radiating warmth and specific, personal care for your well-being.",
+    "apply": "Imagine God’s face lighting up when you walk into a room, and carry that warmth into your next conversation."
+  },
+  "Isaiah 40:29": {
+    "meaning": "When you hit the wall of your own limitations, God meets you there with His inexhaustible energy. He doesn't wait for you to get strong; He pours His strength into your weakness the moment you admit you're tired.",
+    "apply": "Lean into God’s steady power for your next task rather than trying to white-knuckle it on your own."
+  },
+  "1 Corinthians 13:4": {
+    "meaning": "Love is more of a quiet direction than an explosive feeling. It chooses to wait without complaining and acts with a gentleness that doesn't need to be the center of attention or prove itself better than others.",
+    "apply": "When someone tests your limits this hour, respond with the slow-burning patience that Jesus shows you."
+  },
+  "Proverbs 3:6": {
+    "meaning": "When you invite God into the small details of your routines and the big pivots of your decisions, He thins out the weeds of confusion. He promises to guide your steps so you can walk with clarity and purpose.",
+    "apply": "Pause before your next task and simply say, 'Lord, be in this with me.'"
+  },
+  "Psalm 51:10": {
+    "meaning": "You don’t have to fix your own heart before coming to God; He is the artisan who crafts a fresh start inside you. This is a request for a spiritual deep-clean that only He can perform.",
+    "apply": "Ask Him to take the lead on your inner world today, trusting Him to steady your spirit."
+  },
+  "Psalm 34:18": {
+    "meaning": "When your world falls apart, God doesn't distance Himself to give you space; He moves in closer. He is uniquely present in the silence of your grief and the heavy weight of your disappointment, offering a rescue that starts in the heart.",
+    "apply": "If you feel low, don't try to hide it; let the Father sit with you in the quiet."
+  },
+  "John 16:33": {
+    "meaning": "Jesus is honest about the fact that life is often painful and difficult. Yet, He promises that His victory is greater than any crisis, giving you a reason to be brave in the middle of it.",
+    "apply": "Face your current challenge with courage, remembering that Jesus has already won the battle for you."
+  },
+  "Isaiah 40:8": {
+    "meaning": "The seasons change, trends fade, and even our own strength wavers under pressure. Amidst all this shifting sand, God’s promises remain the only unmovable reality you can truly build your life upon.",
+    "apply": "Identify one temporary stress today and choose to pivot your focus toward a specific, unchanging promise from scripture instead."
+  },
+  "Matthew 6:33": {
+    "meaning": "When you align your heart with God's priorities, the chaotic scramble of daily needs begins to settle. He cares deeply about your necessities and takes responsibility for them when you put his kingdom at the center.",
+    "apply": "Pause your to-do list for a moment and ask God to show you how to seek his goodness in your very next task."
+  },
+  "Psalm 27:14": {
+    "meaning": "Waiting on God isn't passive; it's an act of trust that builds spiritual muscle. As you look to Him instead of rushing for a solution, He steadies your nerves and anchors your heart.",
+    "apply": "Let go of the need for immediate answers and simply rest in His presence for a few moments."
+  },
+  "Psalm 118:24": {
+    "meaning": "Every morning is a fresh act of creation, deliberately shaped by God for his glory and your good. Joy isn't a feeling you wait for; it is a choice to welcome the life God is giving you right now.",
+    "apply": "Find one small, ordinary detail in your current environment and thank God for it as a gift specifically for today."
+  },
+  "Psalm 145:8": {
+    "meaning": "God isn't a distant judge waiting for you to fail; he is a Father leaning in with kindness. He is patient with your process and his love for you is deep, unshakable, and remarkably generous.",
+    "apply": "When you feel the urge to be hard on yourself today, remember God’s gentle patience toward you and breathe out that same grace."
+  },
+  "Isaiah 41:10": {
+    "meaning": "You never have to face a daunting situation alone because the Creator of the universe is standing right beside you. He is holding you steady with His own hands, making His strength your own.",
+    "apply": "Straighten your shoulders and remember that the God of all grace is walking into this next hour with you."
+  },
+  "Psalm 150:6": {
+    "meaning": "Your very breath is a gift from the Creator, intended to be returned to him in a cycle of gratitude. Every living moment is an opportunity to acknowledge the source of your life with a thankful heart.",
+    "apply": "Simply notice the rhythm of your breathing for a moment and offer a silent word of praise for the life within you."
+  },
+  "2 Corinthians 5:17": {
+    "meaning": "When you joined your life to Jesus, the old version of you was replaced by someone entirely fresh. You aren't just a patched-up version of your past; you are a brand-new masterpiece in the making.",
+    "apply": "Step into your next conversation knowing you aren't defined by old mistakes, but by the new life Christ is breathing into you right now."
+  },
+  "Luke 1:37": {
+    "meaning": "God’s power isn't limited by your expectations or the laws of nature. What looks like a dead end to you is simply a canvas where He can demonstrate His limitless ability to act.",
+    "apply": "Identify the one situation today that feels 'impossible' and quietly hand the steering wheel over to the God of the miraculous."
+  },
+  "Matthew 5:8": {
+    "meaning": "Choosing to clear away the clutter of hidden motives allows you to see God's hand moving in your everyday life. A sincere heart acts like a window that lets His light shine through clearly.",
+    "apply": "In your next task, ask Jesus to help you act from a place of simple, honest love rather than for the approval of others."
+  },
+  "Psalm 107:1": {
+    "meaning": "God’s goodness isn't a temporary mood; it is His permanent character. Even when your circumstances shift like the wind, His committed love remains the one constant foundation that will never give way.",
+    "apply": "Take a deep breath and name one specific way the Lord has been kind to you since you woke up this morning."
+  },
+  "Philippians 1:6": {
+    "meaning": "God isn't a distracted creator who leaves projects half-finished. If He has started a transformation in your heart, He is personally committed to seeing it through to the end, even on the days you feel stagnant.",
+    "apply": "Trust that God is working behind the scenes of your life today, even in the quiet moments."
+  },
+  "James 4:8": {
+    "meaning": "God isn't hiding from you or waiting for you to be perfect before He shows up. The very moment you turn your attention toward Him, you’ll find He is already moving toward you with open arms.",
+    "apply": "Offer God a simple, horizontal prayer right now and notice His presence meeting you exactly where you are."
+  },
+  "Lamentations 3:22": {
+    "meaning": "Even when life feels like it’s falling apart, God’s steady love keeps you from being overwhelmed. His mercy doesn't run dry or expire; it is fresh and enough for exactly what you face today.",
+    "apply": "Take a deep breath and trust that His grace will be waiting for you in the very next moment."
+  },
+  "John 14:6": {
+    "meaning": "Jesus doesn't just point you toward a destination; He is the road itself. In a world full of confusing options, He offers Himself as the absolute truth you can lean on and the vibrant life you were made for.",
+    "apply": "Instead of searching for a complex solution, simply ask Jesus to be your guide through your very next decision."
+  },
+  "2 Corinthians 12:9": {
+    "meaning": "God’s favor isn’t a reward for your strength; it is a gift that fills your gaps. When you feel thin, tired, or inadequate, His presence becomes most visible, showing that He can do through you what you cannot do alone.",
+    "apply": "Surrender your need to be perfect today and ask Jesus to let His strength rest on your specific struggles."
+  },
+  "Psalm 37:5": {
+    "meaning": "When you roll the weight of your decisions and your future onto God, you are no longer carrying the burden of the outcome. Trusting Him means believing that He is already moving behind the scenes on your behalf.",
+    "apply": "Hand over the one thing you are overthinking right now and watch for how He begins to move."
+  },
+  "2 Thessalonians 3:3": {
+    "meaning": "While people and circumstances may shift, the Lord remains your constant ground. He is actively building a spiritual fortress around your heart and giving you the internal resolve to stand firm against whatever tries to shake you.",
+    "apply": "Walk through your next task with the quiet confidence that you are mentally and spiritually shielded by His faithfulness."
+  },
+  "1 Corinthians 16:14": {
+    "meaning": "Love isn't just a feeling reserved for special moments; it is intended to be the atmosphere of your entire life. From the smallest errand to the biggest decision, let kindness and selflessness be the underlying motive for every action today.",
+    "apply": "Before you start your next task, ask Jesus to help you do it with a heart of genuine care for others."
+  },
+  "Matthew 5:14": {
+    "meaning": "Because Christ lives in you, your life naturally radiates hope and warmth to those around you. You don't have to manufacture your own glow; you simply have to exist authentically as a child of the King.",
+    "apply": "Look for a way to offer a word of encouragement that lights up someone else's difficult afternoon."
+  },
+  "Psalm 147:5": {
+    "meaning": "There is no mystery too complex for your Father and no problem too deep for His wisdom. He understands the nuances of your life better than you do, and His power is always used for His goodness.",
+    "apply": "Rest in the fact that you don't need to have all the answers because you belong to the One who does."
+  },
+  "Psalm 34:17": {
+    "meaning": "God is never too busy with the universe to hear the whisper of your heart. He is intimately attentive to your pain, listening not just to your words, but to the weight behind them.",
+    "apply": "Take a moment to tell the Lord exactly how you feel, knowing He is leaning in to listen."
+  },
+  "Ephesians 4:32": {
+    "meaning": "You have been given a bottomless well of mercy from God, and He invites you to share that same grace with others. Forgiveness is the quiet way we keep our own hearts soft and free from bitterness.",
+    "apply": "Choose to let go of a minor frustration and offer a gentle word where a harsh one might be expected."
+  },
+  "Hebrews 13:5": {
+    "meaning": "God is promising that His presence is an absolute constant in your life, not a conditional guest. Even when your feelings or circumstances suggest you are drifting alone, He remains anchored right beside you, refuses to walk away.",
+    "apply": "Pause for a moment and consciously tell yourself, 'I am not doing this alone; He is here.'"
+  },
+  "Psalm 34:8": {
+    "meaning": "God doesn't want you to just learn about His goodness; He wants you to experience it personally. Like a meal that satisfies your hunger, His kindness is meant to be felt, known, and enjoyed in your real life.",
+    "apply": "Look for one small, tangible evidence of God’s kindness in the world around you over the next sixty minutes."
+  },
+  "2 Timothy 1:7": {
+    "meaning": "Anxiety doesn't come from God’s hand; it’s an intruder. He has breathed His own Spirit into you, giving you a heart that is steady, a mind that is clear, and a love that can face anything.",
+    "apply": "Whenever fear knocks this hour, remind yourself that it doesn't belong here and lean into the power Jesus gave you."
+  },
+  "Jeremiah 17:7": {
+    "meaning": "A life rooted in God doesn't just survive; it thrives regardless of the environment. When you anchor your confidence in His character rather than your own performance, you find a steady, unshakeable joy.",
+    "apply": "Hand over one specific worry to Him right now and let His capability be your confidence."
+  },
+  "Isaiah 26:3": {
+    "meaning": "Peace isn't the absence of chaos, but the result of a mind that stays focused on God's character. When you stop looping your problems and start remembering His faithfulness, your heart levels out.",
+    "apply": "Every time your mind wanders to a stressor, gently pull it back to a truth about God."
+  },
+  "Psalm 37:23": {
+    "meaning": "God is intimately involved in the rhythm of your day. He isn't just watching from a distance; He is carefully arranging your path and taking delight in every steady step you take toward Him.",
+    "apply": "Trust that your schedule is in His hands and look for His fingerprints on your next meeting."
+  },
+  "Psalm 34:4": {
+    "meaning": "God isn't distant or silent when you are gripped by worry. When you reach out to Him with your anxieties, He doesn't just listen—He actively works to pull you out of the shadows of fear.",
+    "apply": "Say a simple, honest prayer about the one thing currently weighing on your heart."
+  },
+  "1 Peter 4:8": {
+    "meaning": "Love is the most powerful force for healing in our relationships. Rather than keeping a tally of wrongs, a deep, Christ-like love chooses to forgive and shield others, preventing conflict from taking root.",
+    "apply": "Choose to respond with extra patience or a kind word the next time someone irritates you."
+  },
+  "Matthew 5:16": {
+    "meaning": "Your kindness and integrity are like a lamp in a dark room, showing people what God’s love actually looks like. When you live authentically, you point everyone around you toward the Father without saying a word.",
+    "apply": "Look for one small way to be helpful or kind today, letting God’s warmth flow through your actions."
+  },
+  "Psalm 30:5": {
+    "meaning": "Pain is real and heavy, but it isn't your permanent home. Even in the middle of a dark season, God is already preparing a dawn where his grace will feel like a fresh start and a deep, relieved breath.",
+    "apply": "If things feel heavy right now, exhale and trust that God is bringing you toward a brighter morning."
+  },
+  "Colossians 3:2": {
+    "meaning": "Your attention is a finite resource that shapes your peace. When you intentionally shift your gaze from temporary stresses to Jesus’ eternal reality, your perspective on everything else begins to change for the better.",
+    "apply": "When you feel overwhelmed this hour, pause and remind yourself of the lasting hope you have in Christ."
+  },
+  "Psalm 18:2": {
+    "meaning": "When the world feels shaky or chaotic, God is the solid ground beneath your feet. He is not a distant concept, but a safe place where you can hide, rest, and find the strength to stand firm.",
+    "apply": "Lean your emotional weight on his strength this hour, trusting that he is your immovable support."
+  },
+  "James 1:2": {
+    "meaning": "The hard things you are facing aren't wasted; they are the soil where a stronger, deeper faith grows. You can find a strange kind of peace knowing that God is using even these pressures to shape your heart.",
+    "apply": "Ask Jesus to help you see a current struggle as an opportunity for him to strengthen your character."
+  },
+  "James 1:17": {
+    "meaning": "Every small mercy, from a warm cup of coffee to a meaningful conversation, is a deliberate kiss from heaven. God loves to provide for you, and he never changes his mind about being generous toward his children.",
+    "apply": "Notice one simple, good thing in your immediate surroundings and give God a quick whisper of thanks."
+  },
+  "1 Thessalonians 5:16-18": {
+    "meaning": "Gratitude isn't about ignoring your problems; it's about staying connected to God through every high and low. By inviting him into your constant thoughts, you find a rhythm of peace that the world can't touch.",
+    "apply": "Try turning your current inner monologue into a quiet conversation with God as you go about your work."
+  },
+  "Psalm 23:3": {
+    "meaning": "When your inner world feels depleted, God brings you back to life. He doesn't just give you a map; He personally guides your steps toward choices that reflect His goodness and protect your heart.",
+    "apply": "Before your next task, ask the Good Shepherd to settle your spirit and direct your very next move."
+  },
+  "1 John 3:1": {
+    "meaning": "God hasn't just offered you a measured amount of affection; He has poured out His love with reckless generosity. You are not a project or a servant to Him, but a deeply cherished child.",
+    "apply": "Walk into your next meeting or task with the quiet confidence of someone who is profoundly loved."
+  },
+  "Psalm 19:1": {
+    "meaning": "The world around you is a vast canvas where God is constantly signing His name. Every sunrise and shifting cloud is a silent, beautiful sermon about His power and His presence.",
+    "apply": "Look out a window or step outside for a moment to notice a detail of creation that speaks of His care."
+  },
+  "Romans 12:2": {
+    "meaning": "The world tries to press you into its own anxious and competitive mold, but God invites you to a deeper change. He is renewing your mind from the inside out, helping you see life through His lens of love.",
+    "apply": "When you feel the pressure to keep up with the world, ask Jesus to show you His better way instead."
+  },
+  "Psalm 18:30": {
+    "meaning": "God's timing and methods never contain errors or oversights. Even when the path feels confusing, you can trust that His character is solid and His promises have been tested and found true.",
+    "apply": "Surrender one thing you are trying to 'fix' today into the hands of the One whose way is perfect."
+  },
+  "Matthew 19:26": {
+    "meaning": "When you hit a dead end, you are simply seeing the limits of human strength. God operates outside of those boundaries, making a way where your logic says there isn't one.",
+    "apply": "Hand over that 'impossible' situation to the One who isn't limited by what you see."
+  },
+  "Galatians 6:9": {
+    "meaning": "Kindness and faithfulness can be exhausting, especially when you don't see immediate results. God sees every quiet act of obedience and promises that your labor isn't wasted; a season of fruitfulness is coming.",
+    "apply": "Choose to do one small, kind thing for someone else this hour, even if you feel tired."
+  },
+  "Psalm 91:1": {
+    "meaning": "Staying close to God isn't about moving to a physical location, but resting your heart in His presence. His greatness acts like a protective shadow, cooling the heat of your anxieties.",
+    "apply": "Imagine yourself standing in the shade of His strength whenever the pressure of your schedule starts to rise."
+  },
+  "Psalm 145:9": {
+    "meaning": "God’s kindness isn't reserved for a few; it is a flood that touches every corner of creation. He looks at everything He has formed, including you, with a heart defined by deep, protective mercy.",
+    "apply": "Look for one small evidence of God’s kindness in the world around you this afternoon."
+  },
+  "Galatians 5:22": {
+    "meaning": "These beautiful qualities aren't things you have to manufacture on your own. They are the natural overflow of God’s Spirit living and breathing within you as you walk through your day with Him.",
+    "apply": "Ask the Holy Spirit to grow a specific seed of peace or kindness in your next conversation."
+  },
+  "Psalm 139:14": {
+    "meaning": "You aren't a mistake or a byproduct of chance; you are a deliberate masterpiece. God woven your personality, your body, and your soul together with intentionality and profound affection.",
+    "apply": "Replace a self-critical thought with a simple thank you to the One who designed you."
+  },
+  "Proverbs 3:26": {
+    "meaning": "Your security doesn't come from your own cleverness or ability to avoid trouble. It comes from the Lord, who stands beside you as your steady confidence, watching your step so you don’t stumble.",
+    "apply": "Walk into your next meeting or task knowing that God is keeping your footing secure."
+  },
+  "Psalm 23:2": {
+    "meaning": "Jesus knows when your soul is weary and needs a break from the noise. He gently directs you toward places of rest and stillness where your spirit can finally catch its breath.",
+    "apply": "Give yourself permission to sit in silence with Him for two minutes before starting your next task."
+  },
+  "Deuteronomy 6:5": {
+    "meaning": "God isn't looking for religious performance; He wants your whole heart. This is an invitation to bring every emotion, every desire, and every part of your identity into a relationship of love with Him.",
+    "apply": "Offer God a small, honest piece of your heart as you go about your work today."
+  },
+  "Psalm 126:5": {
+    "meaning": "Your current sorrow is not the end of the story, but a seed being planted. God honors the weight of your struggle and promises that the pain you carry now will eventually bloom into joy.",
+    "apply": "Entrust your hidden hurts to God, believing that He is working on a beautiful harvest for you."
+  },
+  "Galatians 2:20": {
+    "meaning": "Your old life, with its constant pressure to prove yourself, is over. Now, Jesus is actually living His life through your body and personality, offering you His strength and peace as if they were your own.",
+    "apply": "Step into your next conversation knowing it isn’t all on you; let Jesus carry the weight of the moment."
+  },
+  "Psalm 24:1": {
+    "meaning": "Every square inch of this world and every person you encounter belongs to God. Nothing is outside of His ownership or care, which means you are standing on holy ground, no matter where you are today.",
+    "apply": "Look at your surroundings with fresh eyes, recognizing that everything you see is held in God's hands."
+  },
+  "Hebrews 10:23": {
+    "meaning": "Your confidence doesn't depend on how tightly you can grip onto God, but on how securely He holds onto His promises. You can exhale because the One who called you is incapable of breaking His word.",
+    "apply": "When doubt flickers, remind yourself that God’s faithfulness is a finished fact, not a feeling."
+  },
+  "Psalm 32:8": {
+    "meaning": "God isn't distant or vague about your life; He is a personal tutor who watches you with a loving eye. He promises to whisper direction into your confusion and show you the very next step to take.",
+    "apply": "In your next decision, take a quiet breath and ask the Spirit to nudge your heart according to His wisdom."
+  },
+  "Matthew 5:6": {
+    "meaning": "If you feel a deep, aching dissatisfaction with the way things are, take heart—that spiritual hunger is the gateway to being satisfied by God Himself. He promises to fill the emptiness of those who crave His goodness.",
+    "apply": "Swap your temporary distractions for a moment of prayer, trusting that only Jesus can truly satisfy your soul."
+  },
+  "Psalm 119:105": {
+    "meaning": "God doesn't usually reveal the whole map at once, but He always gives you enough light to see exactly where to put your foot next. His truth cuts through the fog of your current situation.",
+    "apply": "Stop worrying about the distant future and simply ask God for the clarity to handle the next sixty minutes."
+  },
+  "1 Thessalonians 5:11": {
+    "meaning": "You weren't meant to survive the day on your own, and neither were the people around you. God uses your words of kindness to literally strengthen the foundation of someone else's heart.",
+    "apply": "Send a quick message or offer a sincere compliment to someone today to help lift their spirit."
+  },
+  "Psalm 126:3": {
+    "meaning": "Joy isn't something you have to manufacture out of thin air; it is the natural byproduct of looking back and seeing how God has already come through for you. He has a track record of goodness.",
+    "apply": "Pause to name one specific thing God has done for you recently and let it fuel your gratitude."
+  },
+  "2 Corinthians 5:7": {
+    "meaning": "True clarity doesn't come from seeing the whole road ahead, but from trusting the One who is leading the way. You can move forward with confidence even when your circumstances look uncertain or confusing.",
+    "apply": "Take the next small step in front of you, trusting God’s heart more than your own sight."
+  },
+  "Isaiah 60:1": {
+    "meaning": "Your life is no longer defined by shadows; God has poured His own radiant presence onto you. It is time to stand up and let His hope be visible in your countenance and actions.",
+    "apply": "Let a smile or a kind word reflect the light God has already placed within you today."
+  },
+  "John 11:25": {
+    "meaning": "Jesus doesn't just give life; He is life itself, over-powering the finality of death. When you belong to Him, your story doesn't end in a grave, but in an eternal, vibrant walking with Him.",
+    "apply": "Trust Jesus with a situation that feels 'dead' or hopeless, knowing He has the final word."
+  },
+  "Ecclesiastes 3:11": {
+    "meaning": "God is a master of timing, weaving even the messy or confusing seasons into a tapestry of goodness. He sees the finished masterpiece while we only see the loose threads of today.",
+    "apply": "Release your grip on your schedule and ask Jesus to help you see the small beauty in this moment."
+  },
+  "Psalm 145:18": {
+    "meaning": "The moment you whisper a sincere prayer, the Creator of the universe is already there. He doesn't distance Himself based on your performance, but draws close to your honest, reaching heart.",
+    "apply": "Offer a simple, honest sentence to God right now, knowing He is listening with full attention."
+  },
+  "James 4:10": {
+    "meaning": "True strength starts with letting go of the need to control or impress. When you lower yourself in quiet dependence on God, He takes responsibility for honoring you and carrying you through.",
+    "apply": "Admit one area of weakness to God and let Him be your strength in the coming hour."
+  },
+  "Proverbs 17:22": {
+    "meaning": "Joy is a powerful force for healing that God has tucked into your days. Choosing to find something to be glad about can actually strengthen your body and refresh your weary soul.",
+    "apply": "Look for one reason to laugh or give thanks, letting it be a refreshing medicine for your heart."
+  },
+  "Psalm 146:9": {
+    "meaning": "God keeps a special, protective eye on those who feel out of place or alone. He is the active provider for everyone who lacks a safety net, ensuring you are never truly abandoned.",
+    "apply": "Look for a moment today to trust that God is filling the gaps in your own security."
+  },
+  "Matthew 5:9": {
+    "meaning": "When you step into conflict to bring restoration, you are acting just like your Father. Creating peace isn't just about being quiet; it’s the active work of a child of God.",
+    "apply": "In your next conversation, choose a word that de-escalates tension and builds a bridge instead."
+  },
+  "Psalm 97:1": {
+    "meaning": "No matter how chaotic the news or your surroundings feel, God is currently on the throne. His authority is a reason for global joy because His rule is marked by goodness.",
+    "apply": "Take a deep breath and let the reality of His sovereignty quiet your inner restlessness."
+  },
+  "John 14:1": {
+    "meaning": "Jesus speaks directly to your anxiety, asking you to shift your weight from your worries onto Him. Trusting Him is the specific medicine for a heart that feels tossed around by life.",
+    "apply": "When a worry surfaces this hour, consciously hand it over to Jesus by name."
+  },
+  "Psalm 91:4": {
+    "meaning": "God offers you a fierce, mother-hen kind of protection, shielding you with His own presence. You don't have to be strong; you just have to stay close to Him to be safe.",
+    "apply": "Picture yourself tucked safely under His care as you move through your current tasks."
+  },
+  "Isaiah 25:1": {
+    "meaning": "When life feels unpredictable, you can anchor yourself in God’s unchanging character. Choosing to lift His name above your circumstances reminds your soul that He has always been faithful to His promises.",
+    "apply": "Pause for a moment and whisper a simple 'thank you' for one specific way God has been good to you today."
+  },
+  "Matthew 5:44": {
+    "meaning": "Jesus calls you to a radical kind of love that doesn't depend on how others treat you. Praying for those who hurt you breaks the power of resentment and aligns your heart with His.",
+    "apply": "Offer a short, sincere prayer for someone who has frustrated you this week."
+  },
+  "Psalm 37:39": {
+    "meaning": "Your safety and deliverance don't depend on your own strength or cleverness. God Himself is the fortress you run into when the world feels shaky, offering you a rescue that is certain and complete.",
+    "apply": "Release the pressure to save yourself today and rest in the quiet security of His protection."
+  },
+  "Hebrews 4:12": {
+    "meaning": "Scripture isn't a static text from the past; it is a breathing force that speaks directly into your current situation. It reaches into the hidden corners of your heart to bring clarity, truth, and healing exactly where you need it.",
+    "apply": "As you go through your day, ask the Holy Spirit to bring a specific truth to mind that guides your next decision."
+  },
+  "Acts 17:28": {
+    "meaning": "God isn't a distant observer; He is the very atmosphere of your existence. Every breath you take and every step you make happens within His sustaining presence, proving how intimately connected He is to your every moment.",
+    "apply": "Take a deep breath and acknowledge that you are moving through this hour wrapped in His constant care."
+  },
+  "Hebrews 13:2": {
+    "meaning": "Every person you encounter is a soul God deeply cares for, and sometimes, a simple act of kindness toward a stranger carries a divine significance you can’t see. Your openness allows God’s grace to flow through you.",
+    "apply": "Look for one person outside your inner circle this hour and offer them a genuine smile or a helpful word."
+  },
+  "John 1:5": {
+    "meaning": "The hope found in Jesus is resilient and unstoppable. No matter how heavy or thick the shadows of life may seem, they lack the power to extinguish the light He has placed within you.",
+    "apply": "If things feel heavy, remember that Christ’s light within you is stronger than any shadow surrounding you."
+  },
+  "Proverbs 17:17": {
+    "meaning": "True friendship is a steady anchor that doesn't slip when the weather turns cold. God provides people in your life specifically to stand beside you in the mess, mirroring His own unwavering loyalty.",
+    "apply": "Send a quick text to a friend today just to let them know you are grateful for their presence."
+  },
+  "Ephesians 2:10": {
+    "meaning": "You are a deliberate masterpiece, carefully crafted by the Father’s hand. He didn't just save you to sit still; He designed you with unique gifts meant to bring beauty and goodness into the world around you.",
+    "apply": "Approach your work today as an opportunity to reflect God’s creativity and kindness to those around you."
+  },
+  "Psalm 127:1": {
+    "meaning": "You can work yourself to exhaustion, but true security and success only come when God is at the center of your efforts. Without His hand over your plans, your striving is just empty noise.",
+    "apply": "Pause your busywork for a moment and invite Jesus to take the lead on your hardest task today."
+  },
+  "Matthew 28:19": {
+    "meaning": "Jesus is inviting you into His great rescue mission, asking you to share the life He’s given you with everyone you meet. You aren't just meant to follow Him, but to help others find their way home to Him too.",
+    "apply": "Look for one small opportunity to reflect Christ’s love in a conversation during your next hour."
+  },
+  "Psalm 127:3": {
+    "meaning": "The little ones in your life aren't burdens or distractions from your real work; they are sacred gifts chosen specifically for you. They are evidence of God’s kindness and trust in your care.",
+    "apply": "Offer a quick prayer of thanks for a child you know, and treat your next interaction with them as a holy moment."
+  },
+  "Psalm 28:7": {
+    "meaning": "When you feel vulnerable or weak, God steps in as both your inner power and your outer protection. You can rest because He is the wall between you and the things that worry you.",
+    "apply": "Take a deep breath and consciously hand your anxiety to the One who stands guard over your heart."
+  },
+  "Ephesians 4:2": {
+    "meaning": "Love isn't just a feeling, but a choice to be soft-hearted and patient when people are difficult. It means making space for others' imperfections, just as Jesus makes room for yours.",
+    "apply": "Choose to respond with a gentle word the next time you feel a flash of irritation or impatience."
+  },
+  "Psalm 16:7": {
+    "meaning": "God doesn't stop speaking when you close your eyes; He guides your deep intuition and thoughts even while you rest. He is the quiet voice of wisdom that settles your soul in the stillness.",
+    "apply": "Trust that God is working in your subconscious, and ask Him to direct your thoughts as you move through your day."
+  },
+  "John 7:38": {
+    "meaning": "Faith in Jesus turns your soul into a spring of never-ending life. You don't have to live on empty anymore; His Spirit provides a constant, refreshing flow that spills out to touch everyone around you.",
+    "apply": "Acknowledge the Holy Spirit’s presence within you and let His peace overflow into your current environment."
+  },
+  "Psalm 84:11": {
+    "meaning": "God is both the warmth that helps you grow and the barrier that keeps you safe. He isn't holding out on you; He delights in pouring out His goodness and dignity upon your life.",
+    "apply": "Step out of the shadows today, trusting that God is currently shining His favor and protection over your path."
+  },
+  "Proverbs 3:3": {
+    "meaning": "Kindness and integrity aren't just clothes you put on for show; they are meant to be woven into the very fabric of your identity. Let them be so close to you that they become your natural response.",
+    "apply": "In your next conversation, choose to speak with a loyalty and gentleness that feels as natural as breathing."
+  },
+  "1 John 1:9": {
+    "meaning": "When you bring your failures into the light, you don't find a judge waiting to punish you, but a Father ready to clear your name. His justice was satisfied at the cross, making your forgiveness a certainty.",
+    "apply": "Take a moment to name a specific regret to Jesus, then move forward as someone completely unburdened."
+  },
+  "Revelation 21:4": {
+    "meaning": "Your current pain has an expiration date. God is not just observing your grief from a distance; He is the one who will personally tend to your wounds and end the cycle of loss forever.",
+    "apply": "Acknowledge one thing that feels heavy today, and remind your soul that its healing is already guaranteed."
+  },
+  "James 1:22": {
+    "meaning": "Faith is meant to be a movement, not just a feeling. Reading Scripture without acting on it is like looking in a mirror and immediately forgetting what you look like; the real transformation happens in the doing.",
+    "apply": "Pick one small command of Jesus you read recently and put it into physical action before this hour ends."
+  },
+  "Psalm 139:17": {
+    "meaning": "The Creator of the universe hasn't just noticed you; He is constantly thinking of you with deep affection. His thoughts toward you are more numerous and detailed than you could ever imagine or count.",
+    "apply": "Replace a self-critical thought with the reality that God is looking at you right now with infinite kindness."
+  },
+  "Ezekiel 36:26": {
+    "meaning": "God isn't interested in just patching up your old habits; He wants to give you a soft, responsive heart that actually beats for Him. He replaces your cold indifference with a living, breathing spirit.",
+    "apply": "Ask the Holy Spirit to soften any area of your heart that has felt cynical or hardened lately."
+  },
+  "Matthew 10:39": {
+    "meaning": "Holding tight to your own agenda actually makes you miss out on the life you were made for. True vitality is found when you stop trying to control your story and hand the pen to Jesus.",
+    "apply": "Surrender a specific plan or worry today, trusting that Jesus has a much better version of life for you."
+  },
+  "Psalm 23:6": {
+    "meaning": "God’s goodness isn't just following you; it is actively pursuing you. No matter where you wander or how you feel today, His stubborn, faithful love is right on your heels, refusing to let you go.",
+    "apply": "Take a deep breath and trust that God's kindness is catching up to you in this very moment."
+  },
+  "1 Corinthians 3:9": {
+    "meaning": "You aren't just a random worker; you are a partner with the Creator. Whether He is planting new life in your heart or building something strong in your character, you are His most precious project.",
+    "apply": "Ask Jesus to show you one way He is building something beautiful in your life today."
+  },
+  "Deuteronomy 33:27": {
+    "meaning": "When you feel like you are falling or failing, remember that the ground beneath you is actually God’s own strength. He is a safe place to land and a constant support that will never give way.",
+    "apply": "Lean back spiritually and picture the everlasting arms holding you through your next task."
+  },
+  "Psalm 100:4": {
+    "meaning": "Gratitude is the doorway into the presence of the King. Recognizing even the smallest gift He has given you clears the fog and lets you see that His doors are always wide open for you.",
+    "apply": "Name three small things you are grateful for as you walk into your next conversation."
+  },
+  "Romans 12:10": {
+    "meaning": "Christian community is about competing to see who can value the other more. When we stop protecting our own status and start celebrating others, we reflect the humble, sacrificial heart of Jesus.",
+    "apply": "Look for an opportunity to genuinely compliment or prefer someone else's needs over your own today."
+  },
+  "Psalm 23:2-3": {
+    "meaning": "The Good Shepherd knows you weren't meant to run on empty. He intentionally draws you away from the noise and the rush to a place where your spirit can finally breathe and be restored.",
+    "apply": "Give yourself permission to sit in silence for two minutes, letting Jesus refresh your tired mind."
+  },
+  "Philippians 3:14": {
+    "meaning": "Your life has a specific direction and an ultimate reward that outshines any temporary struggle. Even if you stumble, you are heading toward a high calling that is anchored in the love of Christ.",
+    "apply": "Focus your heart on the joy ahead rather than the frustrations of the past hour."
+  },
+  "John 10:10": {
+    "meaning": "The world often tries to drain your joy, but Jesus came to pour it back in until it overflows. He doesn't just offer survival; He offers a vibrant, connected, and meaningful existence starting right now.",
+    "apply": "Reject a thought of scarcity today and embrace the abundance of life Jesus has placed in you."
+  },
+  "John 1:16": {
+    "meaning": "Jesus is an inexhaustible spring. Today’s grace isn't a finite resource that runs out; as soon as you use one measure of His kindness, another is already rushing in to take its place.",
+    "apply": "When you feel depleted, breathe in and trust that His supply of favor will outlast your deepest need."
+  },
+  "Psalm 86:11": {
+    "meaning": "You aren't just asking for information, but for a transformed heart. You are inviting God to align your wandering thoughts so you can walk through your day leaning entirely on His steady character.",
+    "apply": "In your next decision, pause and ask the Spirit to narrow your focus onto His faithful path."
+  },
+  "John 15:13": {
+    "meaning": "Jesus redefined love not as a feeling, but as a sacrifice. He looks at you and sees someone worth dying for, showing that true friendship is found in giving yourself away for another’s good.",
+    "apply": "Look for one small way to set aside your own preferences to serve a friend this afternoon."
+  },
+  "Ephesians 6:11": {
+    "meaning": "You don't have to face spiritual battles with your own willpower. God provides His own character—His truth, peace, and righteousness—as a spiritual suit of armor to keep you standing tall and secure.",
+    "apply": "Consciously 'wear' God’s peace like a shield before you enter your next difficult conversation."
+  },
+  "Philippians 4:19": {
+    "meaning": "Your bank account or your energy levels aren't the final word on your well-being. God promises to bridge the gap between your limited resources and your actual needs using His unlimited glory.",
+    "apply": "Release the math of your worries to Him, trusting that His riches are more than enough for your day."
+  },
+  "Proverbs 19:21": {
+    "meaning": "You may have a dozen different scenarios playing out in your head, but God’s loving intent is the only one that truly holds weight. His purpose acts as a safety net beneath all your shifting plans.",
+    "apply": "Hold your 'to-do' list loosely today, finding peace in the fact that His better plan is unfolding."
+  },
+  "Hebrews 13:6": {
+    "meaning": "When the Creator of the universe stands by your side to help, the opinions and threats of people lose their power over you. You are held by a strength that no person on earth can overcome.",
+    "apply": "Release your need for human approval today, trusting that God’s presence is your ultimate security."
+  },
+  "Colossians 2:6": {
+    "meaning": "The same simple faith you had when you first trusted Jesus is the same way you walk with Him today. Christianity isn't a performance; it is a continuous, daily life of leaning into His presence.",
+    "apply": "Take your next step today with the same humble, open-hearted trust you felt when you first believed."
+  },
+  "Psalm 119:133": {
+    "meaning": "Left to your own devices, your feet might stray, but God’s Word acts as a steadying hand. You are asking Him to take the lead so that local distractions or old habits don't get the final say.",
+    "apply": "Pause before your next task and ask the Spirit to steady your pace and guide your reactions."
+  },
+  "Daniel 2:21": {
+    "meaning": "True insight isn't something you have to manufacture on your own. God is the source of all clarity, and He loves to share His perspective with those who are willing to listen and learn.",
+    "apply": "If you feel stuck on a problem, simply ask the Father for a spark of His divine wisdom."
+  },
+  "Jeremiah 33:3": {
+    "meaning": "God isn't hiding His heart from you; He is waiting for you to reach out. He has insights about your life and His kingdom that you haven't even imagined yet, and He invites you into that conversation.",
+    "apply": "Turn your biggest question into a move toward prayer, expecting Him to meet you in the mystery."
+  },
+  "Romans 8:6": {
+    "meaning": "Setting your thoughts on the Holy Spirit isn't just a religious exercise; it’s the secret to finding actual rest. When He directs your focus, the inner noise settles into a deep, quiet confidence.",
+    "apply": "Breathe deeply and hand your current worries over to the Spirit, choosing His peace over your own frantic thoughts."
+  },
+  "Exodus 23:25": {
+    "meaning": "When you put God first and honor Him, He transforms the simple, everyday parts of your life into a place of provision. Even your meals become a reminder of His kindness and a tangible sign of His protection.",
+    "apply": "Pause before your next snack or drink to thank Him for sustaining both your soul and your body."
+  },
+  "Psalm 27:13": {
+    "meaning": "Hope isn't just for the afterlife; it is for right now. God’s kindness is active and visible in your current circumstances, waiting to be found in the land where you currently walk and breathe.",
+    "apply": "Look for one small, tangible evidence of God's favor in your surroundings during the next hour."
+  },
+  "Hebrews 12:2": {
+    "meaning": "Life is filled with distractions that pull you off course, but Jesus is the one who started your journey and the one who will complete it. Keeping your focus on Him keeps your heart steady.",
+    "apply": "When your mind starts to race, take a deep breath and quietly whisper the name of Jesus."
+  },
+  "John 1:14": {
+    "meaning": "God didn't stay distant or abstract; He moved into your neighborhood. By becoming human, Jesus walked where you walk and felt what you feel, proving that He truly understands your life.",
+    "apply": "Carry the comfort that Jesus is not far away, but is present with you in every conversation today."
+  },
+  "Psalm 100:3": {
+    "meaning": "You don't have to carry the weight of belonging to yourself. You are a designed masterpiece, created by a God who claims you as His own and takes full responsibility for your care.",
+    "apply": "Rest in the relief that you are His property and His priority, letting go of the need to perform."
+  },
+  "Colossians 3:23": {
+    "meaning": "Every task, no matter how small or repetitive, is a sacred opportunity to offer something to God. Your routine work is transformed into worship when you do it for the One who loves you.",
+    "apply": "Approach your next task—no matter how mundane—as a personal gift you are preparing for Jesus."
+  },
+  "Micah 6:8": {
+    "meaning": "God isn't looking for complicated religious rituals; He wants your heart to mirror His. He values how you treat those who are vulnerable and how much delight you take in showing grace to others.",
+    "apply": "Choose the path of kindness in your next interaction, even if it’s more difficult than being right."
+  },
+  "Psalm 139:13": {
+    "meaning": "You were never an accident or a coincidence. Before you were born, God was intimately involved in the fine details of your personality and body, crafting you with deep intention and love.",
+    "apply": "Treat yourself with grace today, knowing you are a deliberate work of God’s own hands."
+  },
+  "Ephesians 6:14": {
+    "meaning": "Before you take a single step into the world's chaos, wrap yourself in God’s honesty. Truth isn't just a concept; it’s the structural support that keeps your heart secure and your footing steady when life tries to pull you apart.",
+    "apply": "Identify one true thing God says about you today and let it be the anchor for your confidence."
+  },
+  "Romans 8:35": {
+    "meaning": "No failure, no fear, and no circumstance can create a distance between you and Jesus. His love isn't a fragile sentiment that breaks under pressure; it is an unbreakable bond that holds you fast regardless of what you face.",
+    "apply": "Take a deep breath and release the fear that you could somehow drift out of His reach."
+  },
+  "1 John 4:4": {
+    "meaning": "You belong to the Creator, which means the heavy things weighing on the world don't have the final word over you. The Resurrected Life living inside you is infinitely more capable than any shadow or struggle standing in your way.",
+    "apply": "Face your biggest worry this hour with the quiet reminder that God's power in you is greater."
+  },
+  "Romans 8:16": {
+    "meaning": "Deep within your soul, God’s own Spirit is whispering a constant affirmation: you belong. This isn't a feeling you have to conjure up, but a divine legal reality that your heart can rest in every moment.",
+    "apply": "When you feel lonely or displaced, listen for the Spirit’s quiet assurance that you are deeply wanted."
+  },
+  "Proverbs 2:6": {
+    "meaning": "True insight isn't something you have to hunt for or manufacture on your own. God is the source of all clarity, and He delights in speaking the exact wisdom you need directly into your specific situation.",
+    "apply": "Pause before your next decision and ask the Father to speak His clarity into the confusion."
+  },
+  "Zechariah 4:6": {
+    "meaning": "The breakthroughs you are waiting for won't come through sheer willpower or frantic striving. They happen through the quiet, unstoppable momentum of God's Spirit working in ways that human effort never could.",
+    "apply": "Stop pushing so hard against that closed door and ask the Spirit to lead the way instead."
+  },
+  "Philippians 4:7": {
+    "meaning": "God’s peace is like a sentinel standing guard at the door of your mind. It doesn't always make logical sense given your circumstances, but it settles over you to protect your heart from being overwhelmed.",
+    "apply": "Entrust your 'what-ifs' to God and allow His inexplicable calm to shield your thoughts today."
+  },
+  "John 10:27": {
+    "meaning": "Jesus doesn’t just call out to a crowd; He knows your specific name and the rhythm of your heart. You aren't lost in the herd; you are recognized, heard, and personally invited to walk alongside Him today.",
+    "apply": "Pause for a moment and listen for the quiet, steady nudge of the Good Shepherd guiding your next decision."
+  },
+  "Ecclesiastes 3:1": {
+    "meaning": "Life isn't a chaotic scramble, but a series of purposeful seasons held in God’s hands. Whether you are in a time of waiting, working, or grieving, your current moment has its own holy place in His timeline.",
+    "apply": "Release the urge to hurry through this hour and ask God what beauty is meant to grow in this specific season."
+  },
+  "Isaiah 43:18-19": {
+    "meaning": "God is moving forward, and He invites you to look ahead with Him. While the past shaped you, it doesn't have to define your future; there is a fresh work of grace springing up right where you are.",
+    "apply": "Let go of one regret from yesterday and keep your eyes open for the small, new ways God is providing for you today."
+  },
+  "Psalm 34:7": {
+    "meaning": "You are never truly vulnerable or alone, even when life feels exposed. God’s presence surrounds you like a protective circle, standing guard over your soul through every seen and unseen battle.",
+    "apply": "Rest your shoulders and breathe deeply, knowing you are shadowed by a Heavenly Defender who never sleeps."
+  },
+  "2 Corinthians 3:17": {
+    "meaning": "Where God’s Spirit lives, the heavy chains of shame, perfectionism, and fear simply fall away. You don't have to perform or hide anymore; His presence gives you the breath of fresh air you’ve been seeking.",
+    "apply": "Take a deep breath and give yourself permission to walk through this hour with a light, liberated heart."
+  },
+  "Philippians 4:8": {
+    "meaning": "Your mind is a sacred space, and what you choose to dwell on shapes your entire day. By focusing on what is honorable and kind, you align your thoughts with the peace of heaven instead of the noise of the world.",
+    "apply": "When a stressful thought arises, intentionally replace it with one thing you know to be absolutely true and good."
+  },
+  "John 3:17": {
+    "meaning": "Jesus didn't come to point a finger at your failures, but to reach out His hand and bring you home. His mission was never about judgment—it was always, and will always be, about your rescue and restoration.",
+    "apply": "Approach God with confidence this hour, knowing His face toward you is lit with love, not a frown of disapproval."
+  },
+  "Isaiah 52:7": {
+    "meaning": "When you share hope, your very presence becomes a source of beauty and relief to others. God celebrates the messenger because the news of His restoration is the most precious gift a weary world can receive.",
+    "apply": "Look for one opportunity this afternoon to share a word of hope or a story of God’s goodness with someone who feels discouraged."
+  },
+  "Psalm 121:2": {
+    "meaning": "The same God who meticulously crafted the galaxies and carved out the mountains is personally attentive to your needs. Your support doesn't come from your own stamina, but from the Creator who never tires.",
+    "apply": "Take a deep breath and consciously hand over your biggest worry to the Maker of heaven and earth right now."
+  },
+  "Philippians 1:21": {
+    "meaning": "Paul is showing you that when Jesus is your ultimate purpose, you can't lose. Whether you are serving Him here or resting with Him there, your life is secure and your future is bright.",
+    "apply": "Ask Jesus to be the center of your motivations today, trusting that He is your greatest reward in every season."
+  },
+  "Proverbs 22:6": {
+    "meaning": "By investing God's wisdom into a child’s heart early on, you are planting seeds that stay with them forever. Even if they wander, the foundation of truth you’ve built becomes a compass for their eventual return.",
+    "apply": "Offer a short prayer for a child in your life, asking God to make the truths you’ve shared take deep, permanent root."
+  },
+  "Numbers 14:18": {
+    "meaning": "God isn't waiting for you to fail so He can punish you; He is incredibly patient and eager to pour out His mercy. His nature is defined by a love that is vast enough to cover every mistake.",
+    "apply": "Let go of any lingering guilt and rest in the warmth of a Father who is slow to anger and rich in kindness."
+  },
+  "Hebrews 12:14": {
+    "meaning": "Living for God involves two active pursuits: working hard to resolve conflict with others and keeping your own heart set apart for Him. It’s a call to kindness that reflects His purity.",
+    "apply": "Before your next conversation, decide to lead with a spirit of peace rather than a need to be right."
+  },
+  "John 15:7": {
+    "meaning": "When you live in close, daily friendship with Jesus, His desires naturally become your own. As His words shape your heart, your prayers begin to align perfectly with His beautiful will for your life.",
+    "apply": "Pick one promise from Scripture to carry in your mind this hour, letting it shape how you talk to God."
+  },
+  "Psalm 103:2": {
+    "meaning": "It is so easy to focus on what’s missing, but your soul finds rest when it chooses to remember God’s kindness. Recalling His specific blessings guards you against bitterness and fuels your joy.",
+    "apply": "Silently list three small things God has done for you this week and give Him a quick word of thanks."
+  },
+  "Psalm 121:1": {
+    "meaning": "When you feel small against the towering challenges of life, this is your reminder to look higher. Your rescue doesn't come from the scenery or your own strength, but from the Creator who stands above it all.",
+    "apply": "Take a deep breath and look up, consciously shifting your gaze from the problem to the Presence that sustains you."
+  },
+  "Hebrews 12:1": {
+    "meaning": "Your life isn't a random scramble; it is a purposeful path designed specifically for you. Even when the pace feels grueling, you have the steady endurance of Jesus within you to keep moving forward, one step at a time.",
+    "apply": "Focus only on the single mile you are in right now, trusting Jesus to provide the rhythm for your stride."
+  },
+  "John 15:5": {
+    "meaning": "You aren't meant to manufacture your own energy or goodness. Just as a branch simply holds onto the vine to grow, your only job is to stay connected to Jesus and let His life flow through you naturally.",
+    "apply": "Stop trying to force results and simply spend a few quiet moments resting in your connection to Him."
+  },
+  "Hebrews 11:6": {
+    "meaning": "God isn't looking for perfect performance; He is looking for your heart to simply trust that He is there and that He is good. Faith is the hand you reach out to receive His love.",
+    "apply": "In your next decision, choose to act as if God is exactly who He says He is."
+  },
+  "Lamentations 3:24": {
+    "meaning": "When everything else is stripped away, God remains your inheritance and your enough. You don't have to scramble for security because you already possess the one Treasure that can never be lost.",
+    "apply": "Quiet your restless heart by telling yourself, 'The Lord is all I truly need today.'"
+  },
+  "John 1:3": {
+    "meaning": "Every atom of the universe and every detail of your day exists because Jesus willed it so. He is not a distant observer, but the Architect of your reality who is intimately involved in everything He made.",
+    "apply": "Notice one small detail of creation around you and thank the Word who spoke it into being."
+  },
+  "1 John 4:7": {
+    "meaning": "Kindness isn't something you have to conjure up on your own. Because you are deeply loved by God, you have a wellspring of affection to draw from when you move toward the people in your life.",
+    "apply": "Let a recent experience of God’s mercy toward you turn into a gentle word for someone else today."
+  },
+  "Jeremiah 1:5": {
+    "meaning": "Your life isn't an accident or a random event. Long before you were a thought to your parents, you were a priority to God, intimately known and intentionally crafted for a purpose that started before time began.",
+    "apply": "Rest in the security of being fully known and deeply wanted by your Creator today."
+  },
+  "1 John 4:16": {
+    "meaning": "Love isn't just something God does; it is who He is at His very core. When you treat others with genuine care and sacrificial love, you are actually making a home for God within your own life.",
+    "apply": "Look for one opportunity to mirror God’s affection toward someone else in your next conversation."
+  },
+  "Psalm 9:10": {
+    "meaning": "When you truly get to know God's character, you realize He is fundamentally reliable. He doesn't ignore those who reach out to Him; His track record is one of absolute faithfulness throughout every generation.",
+    "apply": "Hand over one specific worry to Him right now, trusting His perfect history of goodness."
+  },
+  "Colossians 3:12": {
+    "meaning": "You are deeply loved and hand-picked by God. Because of that secure identity, you can choose to put on kindness and empathy as intentionally as you put on your favorite coat this morning.",
+    "apply": "Approach your next conversation with a specific intention to lead with genuine kindness."
+  },
+  "Matthew 6:24": {
+    "meaning": "Your heart only has one throne, and it will always be occupied by whatever you value most. Trying to find security in wealth while following Jesus creates a tension that eventually pulls your peace apart.",
+    "apply": "Ask Jesus to be your only Boss and Provider as you handle your finances today."
+  },
+  "Deuteronomy 31:8": {
+    "meaning": "The path ahead of you might feel lonely or uncertain, but God has already walked it. He is scouting the way, clearing the brush, and remaining right by your side through every unknown turn.",
+    "apply": "Take a deep breath and step into your next meeting knowing you aren't walking in alone."
+  },
+  "Proverbs 22:9": {
+    "meaning": "Generosity is a spiritual circle: as you open your hands to help those with less, your own spirit expands. God delights in filling the lives of those who view their resources as tools for kindness.",
+    "apply": "Share something you have—whether a meal, a resource, or your time—with someone in need."
+  },
+  "Psalm 139:23": {
+    "meaning": "God doesn't observe you from a distance; He is intimately familiar with the things that keep you awake. Inviting Him into your inner world isn't about giving He information, but about letting His presence soothe your deepest anxieties.",
+    "apply": "Breathe deeply and name your biggest worry to Jesus, handing Him the keys to your heart’s quiet rooms."
+  },
+  "Psalm 55:22": {
+    "meaning": "You weren't designed to carry the heavy weight of tomorrow on your own shoulders. When you throw your burdens onto God, He doesn't just take the load—He holds you up so you don't stumble under the pressure.",
+    "apply": "Physically open your hands right now as a sign that you are releasing your heaviest burden to Him."
+  },
+  "Psalm 100:1-2": {
+    "meaning": "True worship isn't a chore; it’s the natural overflow of a heart that recognizes God’s goodness. You are invited to step into His presence with a smile, knowing you are deeply welcomed and loved.",
+    "apply": "Hum a favorite song or whisper a quick 'thank you' to God as you go about your work."
+  },
+  "Exodus 17:15": {
+    "meaning": "In the middle of your daily battles, God stands over you as a victory flag. He is your identity and your protection, signaling to the world that you belong to Him and He has already won the day.",
+    "apply": "When you feel overwhelmed, remember that you are standing on the winning side because Jesus is with you."
+  },
+  "Galatians 6:2": {
+    "meaning": "We aren't meant to be solitary islands of strength. By helping a friend carry their grief or stress, you are literally putting the sacrificial love of Jesus into practice and making the world feel a little lighter.",
+    "apply": "Send a quick text to a friend today to ask how you can specifically pray for or help them."
+  },
+  "Matthew 7:7": {
+    "meaning": "God is a generous Father who loves the sound of your voice. He encourages a persistent, active relationship where you bring your needs to Him, trusting that He is ready to open doors you haven't even seen yet.",
+    "apply": "Be bold in your prayers this hour, asking God for exactly what is on your mind."
+  },
+  "John 8:32": {
+    "meaning": "Real freedom isn't doing whatever you want—it’s knowing the person of Jesus. When you anchor yourself in his reality, the lies that used to bind you, like shame or fear, lose their power over your life.",
+    "apply": "Replace one self-critical thought today with the truth that you are fully forgiven and loved by God."
+  },
+  "Exodus 34:6": {
+    "meaning": "When God describes Himself, He starts with his heart: He is patient and incredibly kind. He isn't waiting for a reason to be frustrated with you; He is leaning in with grace and keeping his temper in check.",
+    "apply": "Take a deep breath and let the pressure to be perfect fade away under His patient gaze today."
+  },
+  "Matthew 28:20": {
+    "meaning": "Jesus didn't just save you; He moved in with you. These words are a promise that you will never face a single minute—no matter how mundane or difficult—without His actual, living presence right beside you.",
+    "apply": "Pause for a moment to acknowledge that Jesus is in the room with you right now."
+  },
+  "1 Peter 2:9": {
+    "meaning": "You aren't a nameless face in a crowd. God has specifically picked you out, given you a sacred purpose, and called you his own peculiar treasure so you can show the world what He is like.",
+    "apply": "Walk with your head held high, knowing your identity is rooted in God's specific choice of you."
+  },
+  "Psalm 23:4": {
+    "meaning": "God doesn’t always teleport you over the shadows, but He promises to walk through them with you. Even when life feels heavy or scary, His presence acts as a shield that makes fear unnecessary.",
+    "apply": "If you feel a shadow today, reach out and remember the Shepherd is within arm's length."
+  },
+  "Psalm 25:4": {
+    "meaning": "This is a vulnerable prayer for God to show you the subtle way He wants you to live. It acknowledges that His perspective is better than yours and asks for a personal tutorial in wisdom.",
+    "apply": "Ask the Holy Spirit to give you eyes to see a better way to respond to your next challenge."
+  },
+  "1 Samuel 16:7": {
+    "meaning": "People judge you based on your performance or your appearance, but God looks deeper into who you truly are. He sees your intentions, your struggles, and your quiet love, and that is what He values.",
+    "apply": "Stop worrying about how you appear to others and find rest in being fully known by God."
+  },
+  "Psalm 56:11": {
+    "meaning": "When you put your weight on God’s character, the opinions and threats of other people lose their power over you. Your life is held by something far more permanent than any human influence.",
+    "apply": "Let your confidence come from God’s protection rather than the approval of those around you."
+  },
+  "Romans 1:7": {
+    "meaning": "God isn't looking at you with a critical eye, but with a heart of favor. Through Jesus, His steady peace is now the atmosphere you live in, regardless of how chaotic your day feels.",
+    "apply": "Take a deep breath and accept this gift of peace as your starting point for the next hour."
+  },
+  "2 Timothy 1:9": {
+    "meaning": "You didn't earn your way into God's family; He chose you and rescued you because He loves you. Now, He invites you to live in a way that reflects His beautiful, set-apart character in the ordinary moments.",
+    "apply": "Ask Jesus to show you one small way you can represent His kindness in your next conversation."
+  },
+  "Psalm 113:3": {
+    "meaning": "Every hour of your day, from your first morning coffee to the moment you turn out the lights, is an opportunity to recognize God’s presence. His worthiness doesn't change based on your mood or your to-do list.",
+    "apply": "Look out the nearest window and let the light remind you that God is present and worthy of your attention right now."
+  },
+  "Psalm 34:19": {
+    "meaning": "Being a person of faith doesn't mean life will be easy or pain-free. It means that when the waves hit, you aren't drowning alone—the Lord is actively working to pull you through to the other side.",
+    "apply": "Release your current worry to Him, trusting that He is already moving to sustain and deliver you."
+  },
+  "James 1:5": {
+    "meaning": "God doesn't get frustrated when you don't have all the answers. Instead of guessing your way through life, you can approach Him and receive His clear, generous direction without fear of judgment.",
+    "apply": "Before making your next decision, simply ask, 'Lord, what is the wise way forward here?'"
+  },
+  "Psalm 91:2": {
+    "meaning": "You have a safe place to run when the world feels loud and overwhelming. Declaring that God is your fortress shifts your perspective from the size of your problems to the strength of your Protector.",
+    "apply": "Visualize yourself stepping into God's protective care, letting go of the need to defend yourself today."
+  },
+  "Proverbs 30:5": {
+    "meaning": "In a world full of shifting opinions and half-truths, God’s promises are completely reliable. His words are not just information; they are a literal shield that protects your heart from fear and deception.",
+    "apply": "Carry one promise from Scripture in your pocket or mind as a guard against stressful thoughts today."
+  },
+  "Ephesians 2:8": {
+    "meaning": "Your standing with God isn't a mountain you've climbed or a reward you've earned. It is a breathtaking gift, handed to you by a loving Father who simply asks you to reach out and receive it through trust.",
+    "apply": "Step through your day without the weight of proving yourself, resting in the quiet joy of being fully accepted."
+  },
+  "Psalm 147:4": {
+    "meaning": "The God who manages the vast, burning furnaces of the galaxies cares enough to name every single one. If He is that attentive to the stars, He is intimately mindful of every detail of your life.",
+    "apply": "Pause to remember that the Creator of the universe knows your name and is looking at you with love right now."
+  },
+  "Psalm 145:17": {
+    "meaning": "Everything God does is saturated with integrity and kindness. Even when His timing feels slow or His path feels winding, His character remains solid and His intentions toward you are entirely good.",
+    "apply": "Lean into the steady hands of a God who cannot fail you and will never act out of character."
+  },
+  "Job 19:25": {
+    "meaning": "Even when everything is stripped away, you have a living Advocate who has already won. The story of your life doesn't end in the dust; it ends with the triumphant return of the One who bought you back.",
+    "apply": "Carry this stubborn hope into your challenges today, knowing your Defender is alive and active."
+  },
+  "1 Thessalonians 5:24": {
+    "meaning": "The burden of your spiritual growth doesn't rest solely on your shoulders. The same God who invited you into this life is personally committed to completing the work He started in your heart.",
+    "apply": "Release your anxiety about the future and trust Jesus to finish what He has begun in you."
+  },
+  "Romans 11:33": {
+    "meaning": "God’s mind is a vast ocean of wisdom that goes deeper than your greatest questions or darkest fears. When you can’t trace His hand or understand His plan, you can still trust the shoreless wealth of His heart.",
+    "apply": "Let go of the need to figure everything out and find rest in God’s perfect, unsearchable brilliance."
+  },
+  "Isaiah 53:4": {
+    "meaning": "Jesus didn't just watch your suffering from a distance; He stepped into it and made it His own. He carried the weight of your grief and the sting of your pain so that you would never have to bear them alone.",
+    "apply": "Hand Him the heavy ache you’ve been carrying today, knowing He truly understands how it feels."
+  },
+  "Psalm 119:165": {
+    "meaning": "When you align your heart with God's rhythms and truth, you find an internal stability that the world can't shake. His Word acts as a steady ground beneath your feet, keeping you upright even when the path gets rocky.",
+    "apply": "Take a deep breath and let God's steady truth quiet the noise and stabilize your steps today."
+  },
+  "Philippians 3:20": {
+    "meaning": "Your true home isn't found in your current zip code; it is an eternal city where Jesus reigns. Right now, you are a citizen of heaven living abroad, waiting for the King to come and bring you home.",
+    "apply": "When you feel like an outsider today, remember your permanent residency is secured by Christ."
+  },
+  "James 4:6": {
+    "meaning": "Pride acts as a barrier, making you resistant to the very help you need. However, when you let go of the need to be right or self-sufficient, God pours His refreshing, unmerited grace into the open space you've made.",
+    "apply": "Take a breath and let your guard down, inviting God to help you in your weakness."
+  },
+  "Psalm 16:11": {
+    "meaning": "God isn't hiding the way forward; He is actively lighting the path right in front of your feet. Real satisfaction doesn't come from reaching a destination, but from the deep, steady joy found simply by walking beside Him.",
+    "apply": "Ask the Holy Spirit to show you the next small, faithful step you should take today."
+  },
+  "Psalm 118:22": {
+    "meaning": "The world often overlooks what God chooses to use. Jesus was cast aside by the powerful, yet He became the foundation of everything—showing us that being misunderstood by others doesn't diminish your value in God's plan.",
+    "apply": "Trust that God is building something beautiful even through the moments you feel overlooked."
+  },
+  "1 Corinthians 15:57": {
+    "meaning": "You don't have to fight your way to victory because Jesus has already crossed the finish line for you. He has conquered the power of death and failure, turning your greatest struggles into a story of His triumph.",
+    "apply": "Approach your tasks today with the confidence of someone who has already won in Christ."
+  },
+  "2 Timothy 4:7": {
+    "meaning": "Faithfulness isn't about being perfect; it's about staying in the race until the end. Even when the pace is slow or the terrain is rough, holding onto your trust in Jesus is the most important success you will ever achieve.",
+    "apply": "Refuse to quit today, knowing that every moment of endurance is seen and honored by God."
+  },
+  "Psalm 138:8": {
+    "meaning": "You don't have to worry about missing your destiny or failing your potential. God has taken personal responsibility for the details of your life, and He is too committed to you to let His work go unfinished.",
+    "apply": "Trust that God is working behind the scenes of your current frustration to bring about His perfect plan."
+  },
+  "Philippians 2:14": {
+    "meaning": "Your quiet contentment is a powerful light in a noisy, complaining world. When you choose peace over friction, you protect your heart from bitterness and show others the gentle character of Jesus living inside you.",
+    "apply": "In your next conversation, choose a word of gratitude instead of a complaint."
+  },
+  "Matthew 6:21": {
+    "meaning": "Your heart naturally follows whatever you value most. Instead of trying to force your feelings to change, invest your time, money, and focus into the things of God, and your affections will eventually catch up.",
+    "apply": "Identify one thing you treasure today and offer it as a gift back to Jesus."
+  },
+  "Isaiah 54:10": {
+    "meaning": "The most permanent things in nature, like massive mountains, can crumble, but God’s commitment to you is even more solid. His kindness toward you isn’t a fleeting mood; it is an unshakeable, foundational reality.",
+    "apply": "Take a deep breath and rest in the truth that God’s love is the only thing that cannot fail you today."
+  },
+  "2 Corinthians 5:21": {
+    "meaning": "Jesus took on the weight and consequence of your mistakes so that you could wear His perfect standing before God. It was a holy exchange: He took your debt, and He gave you His peace.",
+    "apply": "Walk with confidence this hour, knowing you are completely right with God because of what Jesus did."
+  },
+  "Psalm 47:1": {
+    "meaning": "God is the sovereign King over everything, and His goodness is worth making some noise about. Praise isn't just a quiet thought; it’s a physical, joyful response to the realization that He is on the throne.",
+    "apply": "Let a quiet 'thank you' or an inner shout of joy mark your next conversation."
+  },
+  "Ephesians 4:26": {
+    "meaning": "Anger itself isn't the problem, but holding onto it gives bitterness a place to grow. God invites you to address your hurts quickly so they don't have the chance to harden your heart overnight.",
+    "apply": "If you are holding a grudge, ask Jesus to help you release it before the day ends."
+  },
+  "Proverbs 15:1": {
+    "meaning": "You have the power to de-escalate a tense moment just by choosing your tone. A soft, humble word acts like water on a fire, while a sharp comeback only feeds the flames.",
+    "apply": "Choose a soft tone in your next interaction, even if you feel the urge to be sharp."
+  },
+  "Psalm 68:6": {
+    "meaning": "God is deeply attentive to your isolation and your chains. He doesn't just watch from a distance; He actively builds communities for the solitary and breaks the heavy cycles that keep you bound.",
+    "apply": "Reach out to one person today, trusting that God uses us to be 'family' for one another."
+  },
+  "1 John 1:7": {
+    "meaning": "As you walk in the light and honesty of God's presence, the sacrifice of Jesus goes to work, constantly washing away the stains of your past and present. You are being made clean in real-time.",
+    "apply": "Leave your guilt behind and step forward into this hour with a clean conscience."
+  },
+  "Romans 15:13": {
+    "meaning": "God doesn’t just give hope; He is the source of it. When you lean into Him, He crowds out your anxieties with a deep-seated quiet and a happiness that isn't tied to your circumstances.",
+    "apply": "Take a deep breath and invite the Holy Spirit to replenish your internal reservoir of peace right now."
+  },
+  "Romans 8:38": {
+    "meaning": "The love God has for you is ironclad and unbreakable. No mistake you make, no tragedy you face, and no power in this world can ever sever the connection He has forged with you.",
+    "apply": "Walk through your next hour with the quiet confidence that you are completely and permanently loved."
+  },
+  "Proverbs 4:23": {
+    "meaning": "Your inner life is the fountainhead for everything you do and say. By being careful about what you let take root in your soul, you direct the very flow and quality of your future.",
+    "apply": "Identify one nagging thought or worry today and gently hand it over to Jesus’ care."
+  },
+  "Psalm 6:9": {
+    "meaning": "Your honest cries are never lost in the noise. God isn't just listening to your formal prayers; He hears the ache in your heart and welcomes your vulnerability with open arms.",
+    "apply": "Be completely honest with God about how you feel, knowing He is already listening with compassion."
+  },
+  "Romans 6:23": {
+    "meaning": "Doing life on our own terms leads to a spiritual dead end, but God offers a beautiful alternative. He hands you the gift of a never-ending relationship with Him that starts this very second.",
+    "apply": "Pause to thank Jesus for the life and freedom He has freely given you today."
+  },
+  "Galatians 6:8": {
+    "meaning": "The small choices you make to honor God are like seeds planted in a garden. Over time, those quiet moments of faithfulness grow into a life rich with spiritual vitality and purpose.",
+    "apply": "Choose one small, kind action this hour that honors the Spirit living within you."
+  },
+  "Psalm 8:1": {
+    "meaning": "God's signature is written across the vastness of the sky and the intricate details of the earth. His name isn't just a title, but a display of His power and beauty that surrounds you right now.",
+    "apply": "Pause for a moment and look at something created—a tree, a cloud, or your own hand—and thank God for His incredible artistry."
+  },
+  "Matthew 6:6": {
+    "meaning": "Prayer isn't a performance for others; it is a direct, intimate conversation between you and your Father. He cares deeply about what you say when no one else is watching or listening.",
+    "apply": "Find a quiet space or a mental sanctuary today to share one honest thought with God in total privacy."
+  },
+  "Colossians 1:17": {
+    "meaning": "Jesus existed before your problems began, and He is the silent force keeping your life from falling apart. He is the glue in the middle of your chaos, sustaining every breath you take.",
+    "apply": "Release the pressure to keep everything together yourself, and trust Jesus to hold the details of your afternoon."
+  },
+  "1 Peter 1:24-25": {
+    "meaning": "The things that stress us out today are often temporary, like fading flowers. In a world of constant change, God’s promises are the only solid ground that will never shift or disappear.",
+    "apply": "When you feel overwhelmed by changing circumstances, whisper one promise from Scripture that you know will stay true forever."
+  },
+  "Psalm 103:1": {
+    "meaning": "Worship is the choice to wake up your heart and focus every part of your being on God’s goodness. It’s an invitation to take all your emotions and energy and point them toward His kindness.",
+    "apply": "Offer up a simple, whispered 'thank you' for one specific grace you've noticed this morning."
+  },
+  "Isaiah 55:6": {
+    "meaning": "God isn't hiding from you, but He invites you to actively lean in. This is a gentle reminder that He is accessible right now, ready to listen and respond the moment you turn His way.",
+    "apply": "Reach out to God in this moment as if He is sitting right beside you, because He is."
+  },
+  "Psalm 100:5": {
+    "meaning": "God’s kindness isn't based on your performance or your mood. It is an unchanging reality that stretches from the ancient past into your furthest future, never running dry or giving up on you.",
+    "apply": "Let the certainty of God’s kindness be the safety net beneath every decision you make today."
+  },
+  "Romans 5:1": {
+    "meaning": "Because of what Jesus did, the war between you and God is over. You don't have to earn His approval or fear His rejection anymore; you are officially at rest in His family.",
+    "apply": "Carry a sense of quiet stillness in your heart today, knowing you have nothing left to prove to Heaven."
+  },
+  "Genesis 28:15": {
+    "meaning": "God doesn’t just watch from a distance; He is an active companion who stays by your side in every transition and every unknown place. You are never wandering alone because His commitment to you is personal and permanent.",
+    "apply": "Carry the confidence that God's eye is on you and His hand is holding you as you walk through your next task."
+  },
+  "1 Chronicles 16:11": {
+    "meaning": "Instead of relying on your own fluctuating energy, you are invited to lean into God's inexhaustible power. Seeking His face means looking for His presence in your daily routine until it becomes the home your heart returns to.",
+    "apply": "In your next conversation, take a silent breath to ask for His strength and focus your heart on Him."
+  },
+  "Psalm 62:1": {
+    "meaning": "Deep stillness isn't found in a quiet room, but in the certainty that God is your rescuer. When your soul feels frantic, you can settle into the truth that your safety and future are already secured by Him.",
+    "apply": "Pause for sixty seconds to let your soul settle into the quiet peace of His care."
+  },
+  "Ephesians 5:8": {
+    "meaning": "Your identity has been completely transformed from someone lost in the shadows to someone who carries the very light of Jesus. You don't just see the light; you have become a reflection of it in a dark world.",
+    "apply": "Look for one way to show the kindness and clarity of Christ's light to someone you encounter today."
+  },
+  "Psalm 90:12": {
+    "meaning": "Wisdom begins when you recognize how precious and brief your time on earth is. It’s an invitation to stop drifting and start living with the intentionality that comes from knowing every moment is a gift from God.",
+    "apply": "Choose to give your full, loving attention to your current task, honoring the time God has given you."
+  },
+  "Psalm 121:3": {
+    "meaning": "God is the guardian who never tires and never blinks. Even when you feel unsteady or exhausted, He is alert and focused, making sure your foundation holds firm through the stresses of the day.",
+    "apply": "Release the burden of having to 'hold it all together' and trust His tireless watch over your life."
+  },
+  "Jeremiah 29:13": {
+    "meaning": "God isn't hiding from you; He is waiting to be found by a heart that is ready to listen. When you stop being distracted and pursue Him with sincerity, you will find Him right there with you.",
+    "apply": "Turn off your distractions for a few moments and talk to God with total honesty."
+  },
+  "James 1:12": {
+    "meaning": "Your endurance through hard seasons isn't for nothing; it is sharpening your soul for a royal reward. God sees every time you choose to stay faithful when you want to give up, and He's preparing a crown of life.",
+    "apply": "Ask Jesus for the strength to take just the next step with your eyes fixed on His promise."
+  },
+  "Psalm 121:7": {
+    "meaning": "God isn't just watching the universe; He is personally attentive to the preservation of your soul. He stands as a shield between you and the weight of the world, ensuring that nothing touches you without His filtering grace.",
+    "apply": "Step into your next task with shoulders relaxed, knowing your life is held in His absolute care."
+  },
+  "1 Peter 4:10": {
+    "meaning": "The unique abilities and personality traits you possess aren't yours to hoard; they are tools God gave you to love the people around you. You are a channel through which His kindness reaches others.",
+    "apply": "Look for one small way to use a natural talent to make someone else's burden lighter today."
+  },
+  "Romans 14:8": {
+    "meaning": "Your whole existence belongs to Jesus, which removes the pressure to perform. Whether you are accomplishing great things or simply resting, your value is anchored in being His, regardless of your earthly circumstances.",
+    "apply": "Pause and tell Jesus, 'I am yours,' letting that truth simplify every decision you face today."
+  },
+  "1 Peter 2:2": {
+    "meaning": "Just as a baby instinctively needs milk to survive, your soul has a primary hunger for God's truth. Making space for His Word isn't a chore; it is the essential nourishment that helps you mature and thrive.",
+    "apply": "Take five minutes to sit with a single verse, letting it settle into your heart like a deep breath."
+  },
+  "Psalm 92:12": {
+    "meaning": "Palm trees thrive in harsh environments because their roots go deep into hidden water. When you stay rooted in God's presence, you will remain vibrant and strong, even when your surroundings feel dry or difficult.",
+    "apply": "Quiet your mind for a moment to reconnect with the Spirit, drawing strength from your inner well."
+  },
+  "Psalm 107:9": {
+    "meaning": "God is the only one who can touch the deep, quiet ache of your unsatisfied desires. He doesn't just offer temporary fixes; He meets your soul’s deepest cravings with His goodness and presence.",
+    "apply": "Instead of reaching for a distraction, tell God exactly what your heart is longing for right now."
+  },
+  "Psalm 103:13": {
+    "meaning": "God looks at you with the tenderness of a loving parent who understands your weaknesses and celebrates your growth. He isn't hovering to find fault, but to offer comfort and steady your steps.",
+    "apply": "Approach your mistakes today with the confidence that God's first response toward you is always compassion."
+  },
+  "Hebrews 13:8": {
+    "meaning": "In a world where everything shifts and fades, Jesus remains the solid ground beneath your feet. The same mercy He showed in the Gospels and the same faithfulness He gave your ancestors is available to you this very minute.",
+    "apply": "Rest in the certainty that the Jesus who loved you yesterday is exactly the same today."
+  },
+  "2 Peter 1:3": {
+    "meaning": "You aren't missing any secret ingredient to live a life that honors God. Through your relationship with Him, you already possess every spiritual resource necessary to handle today’s challenges with grace and integrity.",
+    "apply": "Instead of looking for more strength, ask God to show you the resources He has already provided."
+  },
+  "Ephesians 6:10": {
+    "meaning": "You don't have to manufacture your own resilience or grit. This is an invitation to lean your entire weight against God’s limitless strength, letting His power carry the heavy lifting while you simply remain in Him.",
+    "apply": "Exchange your own striving for His peace by acknowledging you can't do this alone."
+  },
+  "Psalm 143:8": {
+    "meaning": "Every sunrise is a fresh opportunity to recalibrate your soul to the rhythm of God’s grace. Before the noise of the world reaches your ears, let His constant, reliable love be the first thing you acknowledge.",
+    "apply": "Let your first thought in every new situation today be a quiet 'thank you' for His presence."
+  },
+  "Psalm 46:5": {
+    "meaning": "God isn't watching you from a distance; He is dwelling right in the center of your life. Because He is present, you possess an internal stability that can withstand any external storm or sudden change.",
+    "apply": "Breathe deeply and remember that the Creator of the universe is supporting you right now."
+  },
+  "Romans 8:1": {
+    "meaning": "The court is adjourned and the verdict is clear: you are not defined by your past mistakes or current struggles. In Jesus, you are completely free from the weight of shame and the fear of rejection.",
+    "apply": "Refuse to listen to any voice of shame today, choosing instead to walk in God's total acceptance."
+  },
+  "Romans 5:8": {
+    "meaning": "God didn’t wait for you to get your act together before He decided you were worth dying for. His love is proven not by your perfection, but by His sacrifice while you were still lost.",
+    "apply": "Rest in the fact that you are already fully loved, exactly as you are right now."
+  },
+  "Romans 10:9": {
+    "meaning": "Salvation isn't a complex ritual; it’s a sincere alignment of your voice and your soul. When you trust that Jesus is the ultimate authority, you are brought into a new, secure life with Him.",
+    "apply": "Take a moment to quietly tell Him he is the center of your life today."
+  },
+  "Ephesians 5:19": {
+    "meaning": "Your words possess the power to shift the atmosphere around you. When you share God’s goodness through encouragement and song, you invite the Holy Spirit to move in your relationships.",
+    "apply": "Offer a word of genuine, Christ-centered encouragement to the next person you speak with."
+  },
+  "James 4:7": {
+    "meaning": "Inner peace comes from choosing God's leadership over your own impulses. When you align your will with His, the darkness loses its grip and has no choice but to back away.",
+    "apply": "Gently say 'yes' to God’s way in a small choice you face this afternoon."
+  },
+  "Colossians 3:15": {
+    "meaning": "Jesus doesn't just offer an occasional feeling of calm; He offers a peace that acts as an umpire in your heart, settling every inner conflict and quieting your restless thoughts.",
+    "apply": "Before making your next decision, pause and let Christ’s peace be the final word."
+  },
+  "Luke 6:38": {
+    "meaning": "When you live with an open hand, you tap into the generous rhythm of God’s kingdom. He delights in pouring back into your life more than you could ever manage to give away.",
+    "apply": "Look for one small way to be surprisingly generous to someone in the next hour."
+  },
+  "Psalm 119:64": {
+    "meaning": "God’s affection isn’t hidden; it’s woven into the very fabric of the world around you. Because He loves you so deeply, His instructions aren't burdens—they are the roadmap to a beautiful life.",
+    "apply": "Notice one detail in nature today and ask God to show you His heart through it."
+  },
+  "3 John 1:2": {
+    "meaning": "God cares about the whole you—your body, your mind, and your spirit. He doesn't just want your soul to thrive; He desires for your physical and emotional life to be characterized by His wholeness.",
+    "apply": "Take a deep breath and offer a quick prayer for your own physical and mental well-being."
+  },
+  "Romans 12:12": {
+    "meaning": "Life oscillates between highs and lows, but your anchor remains the same. You can lean into a future hope, hold steady when things hurt, and keep a constant conversation going with your Creator.",
+    "apply": "When you feel a moment of stress today, turn it into a ten-second prayer of trust."
+  },
+  "1 Corinthians 10:31": {
+    "meaning": "The most ordinary tasks of your day are actually sacred opportunities. Whether you are at a desk or a dinner table, you can reflect God’s beauty simply by how you show up.",
+    "apply": "Turn your next mundane task into a quiet act of worship for God alone."
+  },
+  "Ecclesiastes 4:9": {
+    "meaning": "God never intended for you to carry the weight of life alone. He designed us for partnership and community, knowing that our efforts are multiplied and our burdens halved when we walk together.",
+    "apply": "Send a quick text of appreciation to a friend who helps you carry the load."
+  },
+  "Hebrews 8:12": {
+    "meaning": "God isn’t just looking past your mistakes; He is intentionally erasing the record. Through Jesus, your history has been settled, and He refuses to hold your old wounds or failures against you in this new relationship.",
+    "apply": "Breathe out the heaviness of yesterday, knowing God has chosen to let go of what you are still holding onto."
+  },
+  "Psalm 16:6": {
+    "meaning": "God has carefully marked out the territory of your life, providing exactly what you need to flourish. Even when things feel restricted, these limits are actually a hedge of protection and a gift of peace from His hand.",
+    "apply": "Look at your current circumstances as a chosen garden where God is already growing something beautiful."
+  },
+  "Psalm 84:10": {
+    "meaning": "A single moment spent in the presence of God is more nourishing than a lifetime of chasing success or comfort. To be even the lowest servant in His house is more honorable than reigning anywhere else.",
+    "apply": "Trade the frantic pursuit of 'more' for one quiet minute of conversation with your Father."
+  },
+  "Romans 12:21": {
+    "meaning": "Evil wins when it turns you into an angry, bitter person, making you like the very thing that hurt you. True victory is staying soft and kind, using the quiet power of goodness to disarm the darkness around you.",
+    "apply": "Respond to a frustration today with an unexpected act of patience or a gentle word."
+  },
+  "Revelation 22:20": {
+    "meaning": "This is Jesus’ final promise to you: He is not a distant memory, but a coming reality. Everything that is broken is on a countdown to being fixed, and He is closer now than He has ever been before.",
+    "apply": "Carry the quiet hope that today’s struggles are temporary because the King is on His way."
+  },
+  "Psalm 103:8": {
+    "meaning": "God isn't waiting for you to trip up so He can scold you; He is leaning toward you with a heart full of mercy. He is incredibly patient, willing to wait through your stumbles because His love is vast and unchanging.",
+    "apply": "Approach God without fear today, trusting that He is far more kind than you often imagine."
+  },
+  "Psalm 16:8": {
+    "meaning": "Stability doesn’t come from a perfect life, but from a persistent focus. When you keep God in your immediate field of vision, He stands close enough to catch you, ensuring that no storm can knock you off your feet.",
+    "apply": "Picture Jesus walking right beside you as you navigate your tasks and conversations this hour."
+  },
+  "Proverbs 27:17": {
+    "meaning": "God uses the people in your life to refine your character. Just as friction creates a sharper blade, the honest conversations and presence of a true friend help remove your dull edges and make you more like Christ.",
+    "apply": "Invite a trusted friend to speak truth into your life today, and listen with an open heart."
+  },
+  "John 3:30": {
+    "meaning": "Your life finds its true purpose when Jesus takes center stage while your ego moves to the background. It is a joyful surrender where His reputation becomes more important to you than your own status or comfort.",
+    "apply": "In your next conversation, look for a way to point the credit toward God rather than yourself."
+  },
+  "1 Timothy 2:5": {
+    "meaning": "You don't have to bridge the gap to God on your own. Jesus became one of us to take your hand and lead you directly to the Father, acting as the perfect bridge who understands both your humanity and God’s holiness.",
+    "apply": "Take a breath and speak to God directly right now, knowing Jesus has cleared the way for you."
+  },
+  "Luke 6:31": {
+    "meaning": "This is the simplest rhythm for a holy life: treat every person you meet with the same kindness, patience, and dignity you crave for yourself. It turns every interaction into an opportunity for grace.",
+    "apply": "Before you respond to a difficult colleague or family member, ask what kindness you would want in their shoes."
+  },
+  "Matthew 5:4": {
+    "meaning": "God does not ignore your tears; He promises to meet you right in the center of your ache. Your sadness isn't a sign of failure, but a place where you are uniquely invited to experience the warmth of His presence.",
+    "apply": "Be honest with God about one thing that hurts today, and allow Him to sit with you in it."
+  },
+  "Psalm 149:4": {
+    "meaning": "God doesn't just tolerate you; He actually takes pleasure in who you are. He loves to lift up those who recognize their need for Him, replacing their weariness with the quiet victory of His favor.",
+    "apply": "Walk through this hour with your head held high, knowing your Father finds genuine joy in you."
+  },
+  "1 John 3:18": {
+    "meaning": "Love isn't a feeling you wait for or a nice phrase you say; it is a choice you make with your hands and your time. Real love shows up in the quiet, practical ways you serve others without expecting anything back.",
+    "apply": "Find one small, practical task you can do for someone else today without saying a word about it."
+  },
+  "Hebrews 10:24": {
+    "meaning": "You were never meant to follow Jesus in isolation. We are called to be intentional observers of one another, constantly looking for creative ways to stir up the kindness and courage hidden in our friends' hearts.",
+    "apply": "Send a quick text to a friend specifically encouraging a gift or strength you see in them."
+  },
+  "2 Corinthians 4:17": {
+    "meaning": "The heavy burdens you carry right now aren't the end of your story; God is using these difficult moments to shape a weight of beauty and peace in you that will last forever.",
+    "apply": "Take a deep breath and tell Jesus that you trust Him with the weight of today."
+  },
+  "Psalm 98:1": {
+    "meaning": "God is constantly moving in fresh, creative ways to rescue and restore His world, and your life is a melody of His ongoing work.",
+    "apply": "Identify one small, marvelous thing God did this morning and offer Him a quick word of thanks."
+  },
+  "Nahum 1:7": {
+    "meaning": "When the world feels unstable, God remains a sturdy, safe place where you are fully known and deeply protected.",
+    "apply": "In your next stressful moment, imagine stepping into the quiet safety of God’s presence."
+  },
+  "Revelation 3:20": {
+    "meaning": "Jesus is not distant or forceful; He is right here, gently requesting a place in your ordinary day because He wants to sit and talk with you.",
+    "apply": "Slow down for a moment and invite Jesus into your next task as a friend."
+  },
+  "Proverbs 16:3": {
+    "meaning": "When you hand over your to-do list and your ambitions to God, He aligns your heart with His purposes and makes your path clear.",
+    "apply": "Whatever you are working on right now, verbally give it back to God."
+  },
+  "Psalm 19:14": {
+    "meaning": "Your inner thoughts are just as important to God as your outward words; this is a prayer for your whole self to be in harmony with His love.",
+    "apply": "Check in with your thoughts throughout this hour and steer them back toward kindness."
+  },
+  "Mark 16:6": {
+    "meaning": "The grave is empty and death has lost its sting, proving that no situation in your life is too broken for God to bring back to life.",
+    "apply": "Walk through this hour with the quiet confidence of someone who serves a living King."
+  },
+  "Psalm 51:1": {
+    "meaning": "God’s willingness to forgive you isn't based on your performance, but on the relentless, steady nature of His own heart toward you.",
+    "apply": "Let go of any lingering guilt today, knowing His mercy is wider than your mistakes."
+  },
+  "Isaiah 41:13": {
+    "meaning": "God isn't just watching you from a distance; He is reaching out to steady your hand. He walks beside you through every nervous moment, holding you close so you don’t have to face the unknown alone.",
+    "apply": "Let go of your grip on worry and feel His hand holding yours as you walk into your next task."
+  },
+  "Psalm 139:5": {
+    "meaning": "You are completely surrounded by God’s presence, protected from behind and led from the front. He has closed the gap between you, resting His gentle hand on your shoulder as a constant reminder that you are safe.",
+    "apply": "Take a deep breath and rest in the quiet reality that God is shielding you on every side."
+  },
+  "Psalm 48:14": {
+    "meaning": "God has committed Himself to you for a lifetime and beyond. He isn't just a temporary help, but a faithful guide who knows every twist in your journey and promises to lead you all the way home.",
+    "apply": "Trust that you don't need to know the whole map today, because your Guide is already there."
+  },
+  "1 Corinthians 13:13": {
+    "meaning": "When everything else fades or shifts, these three pillars remain. While faith and hope are essential for this life, love is the very heartbeat of God that will last into eternity.",
+    "apply": "Look for one small way to lead with love in your next conversation, leaving a lasting impact."
+  },
+  "Psalm 73:25": {
+    "meaning": "This is a beautiful realization that while the world offers many distractions, only God truly satisfies the human heart. He is the ultimate treasure that makes everything else pale in comparison.",
+    "apply": "Quietly acknowledge to Jesus that He is more than enough for whatever you are facing right now."
+  },
+  "Psalm 133:1": {
+    "meaning": "There is a unique, refreshing beauty found when we choose to live in harmony with others. When we prioritize kindness and connection, we reflect the very heart of God’s kingdom here on earth.",
+    "apply": "Extend an extra measure of grace or a warm word to someone you encounter this afternoon."
+  },
+  "Numbers 6:24-26": {
+    "meaning": "This is God’s deep desire for your life: to guard your heart and look upon you with a smile. He isn't frowning at you; He is radiating warmth and peace over your entire being.",
+    "apply": "Carry the warmth of God’s smile with you, letting His peace settle your nerves."
+  },
+  "Revelation 21:6": {
+    "meaning": "Jesus is the author of your story and its final word. He held the world together before you were born, and He will be standing there, faithful as ever, when your current troubles finally reach their end.",
+    "apply": "Release your grip on the outcome today, knowing that the One who started this journey is waiting at the finish line."
+  },
+  "Psalm 73:26": {
+    "meaning": "Your energy and your resolve will eventually hit a wall, and that’s okay. When you reach the end of your own resources, you find that God is a bedrock that doesn't crack and a heartbeat that never grows weary.",
+    "apply": "Be honest about your tiredness right now and let His steady strength carry the weight of your afternoon."
+  },
+  "Psalm 37:7": {
+    "meaning": "This is an invitation to stop your internal engine from revving. Waiting on God isn't passive wasting of time; it’s a settled confidence that He is moving even when you are motionless.",
+    "apply": "Take a slow, deep breath and let the urgency of your to-do list bow to the timing of your Father."
+  },
+  "Ephesians 3:20": {
+    "meaning": "God’s capacity to bless and restore you is far larger than the ceiling of your own imagination. He isn't limited by what you think is possible; He works in the realm of the miraculous and the 'more than.'",
+    "apply": "Ask God for something bold today, then watch for the creative ways He chooses to respond."
+  }
+};
+
+export function getReflectionFor(verse: Pick<DailyVerse, "reference">): VerseReflection | undefined {
+  return VERSE_REFLECTIONS[verse.reference];
+}

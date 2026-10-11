@@ -1,0 +1,5 @@
+-- Delete broken static wallpapers uploaded with wrong R2 keys
+DELETE FROM wallpapers WHERE title IN ('Red Rose Bloom','Blue Rose Glow','Yellow Daffodil','Lavender Bouquet','Moonlit Rose Garden','Pink Peony','White Lily','Cherry Blossom Branch','Sunflower','Purple Orchid','Rose Gold Petals','Red Tulip','Astronaut Earth Sunrise','Golden Nebula','Floating Near Earth','Spiral Galaxy','Saturn Rings','Spacewalk','Deep Space Stars','Supernova','Mars Landscape','Meteor Shower','Moon Surface','Pillars Nebula','Cloud Sitter','Cosmic Fall','Floating Islands','Aurora Cliff','Galaxy Silhouette','Neon Rain','Underwater Dream','Mountain Meditation','Bioluminescent Forest','Aurora Lake','Lightning Ocean','Moonlit Waterfall','Autumn Path','Frozen Lake','Volcano Eruption','Cherry Tree Night') AND image_url LIKE '%image-proxy/static/static-%';
+
+-- Delete broken live wallpapers (Samurai Snow Moon duplicates)
+DELETE FROM live_wallpapers WHERE video_url LIKE '%/live/live-samurai-%';

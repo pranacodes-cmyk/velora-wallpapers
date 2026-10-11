@@ -1,0 +1,100 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace = "com.jesuswallpaperbible.app"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.jesuswallpaperbible.app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    
+    // LOVABLE_SIGNING_CONFIG
+    signingConfigs {
+        release {
+            storeFile file(System.getenv("ANDROID_KEYSTORE_PATH") ?: "release.keystore")
+            storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            keyAlias System.getenv("ANDROID_KEY_ALIAS")
+            keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+        }
+    }
+    buildTypes {
+        release {
+            // Bitmap optimization (Play Console recommendation): losslessly
+            // re-compress bundled PNGs in release builds.
+            crunchPngs true
+            signingConfig signingConfigs.release
+            // R8 full mode + resource shrinking — strips unused Capacitor plugin
+            // code, dead Kotlin/Java, and unreferenced drawables/strings. Typically
+            // shaves another 3-6 MB off the APK/AAB on top of the asset cleanup.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            ndk {
+                debugSymbolLevel 'SYMBOL_TABLE'
+            }
+        }
+    }
+    // App Bundle config: per-language + per-density + per-ABI splits so Play
+    // Store delivers only what each device needs (huge install-size win).
+    bundle {
+        language { enableSplit = true }
+        density { enableSplit = true }
+        abi { enableSplit = true }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation "androidx.webkit:webkit:$androidxWebkitVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+
+    // Vungle (Liftoff Monetize) mediation adapter for AdMob.
+    // Pulls in the Vungle SDK transitively. Required so AdMob can serve
+    // Vungle bids configured in the Mediation dashboard.
+    implementation 'com.google.ads.mediation:vungle:7.7.3.0'
+
+    // Pangle (ByteDance) mediation was removed on purpose — it shipped a
+    // ~15 MB Vulkan validation layer and strict device requirements.
+
+
+    // Meta (Facebook) SDK — explicit pin so AppEventsLogger.activateApp is available
+    // in MainActivity for bulletproof cold-start install attribution.
+    implementation 'com.facebook.android:facebook-android-sdk:18.0.3'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.2.0'
+
+    // Direct Google Play Billing read for fresh paywall price labels.
+    implementation 'com.android.billingclient:billing:8.0.0'
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}
