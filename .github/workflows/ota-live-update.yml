@@ -1,0 +1,178 @@
+name: OTA Live Update
+
+# Ship a web-only fix (JS/CSS/assets) to already-installed apps — no Play
+# Store release, no user action. Installed apps download the bundle in the
+# background and apply it on the next cold start.
+#
+# Required secrets:
+#   OTA_RELEASE_KEY                    – admin key for the ota-release function
+#   GOOGLE_PLAY_SERVICE_ACCOUNT_JSON   – only for auto-detecting the live
+#                                        store versionName (same secret the
+#                                        Play release workflow uses)
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: What to do
+        required: true
+        default: publish
+        type: choice
+        options:
+          - publish
+          - rollout
+          - deactivate
+          - list
+      native_version:
+        description: 'Store versionName this bundle targets (empty = auto-detect from Play)'
+        required: false
+        default: ''
+      version:
+        description: 'Bundle version x.y.z (empty on publish = native patch +1). Required for rollout/deactivate.'
+        required: false
+        default: ''
+      rollout:
+        description: Rollout percentage (publish / rollout)
+        required: true
+        default: '20'
+      notes:
+        description: Release notes
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ota-live-update
+  cancel-in-progress: false
+
+jobs:
+  ota:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Guard secrets
+        env:
+          OTA_RELEASE_KEY: ${{ secrets.OTA_RELEASE_KEY }}
+        run: |
+          if [ -z "$OTA_RELEASE_KEY" ]; then
+            echo "❌ OTA_RELEASE_KEY secret is missing."
+            echo "   Add it in: GitHub → Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+          echo "✅ OTA_RELEASE_KEY present."
+
+      # ── list / rollout / deactivate need no build ───────────────────────
+      - name: List bundles
+        if: ${{ inputs.action == 'list' }}
+        env:
+          OTA_RELEASE_KEY: ${{ secrets.OTA_RELEASE_KEY }}
+        run: node scripts/release-ota.mjs --list
+
+      - name: Change rollout
+        if: ${{ inputs.action == 'rollout' }}
+        env:
+          OTA_RELEASE_KEY: ${{ secrets.OTA_RELEASE_KEY }}
+        run: |
+          if [ -z "${{ inputs.version }}" ]; then echo "❌ version input required"; exit 1; fi
+          node scripts/release-ota.mjs --set-rollout "${{ inputs.version }}" --rollout "${{ inputs.rollout }}"
+
+      - name: Deactivate (rollback)
+        if: ${{ inputs.action == 'deactivate' }}
+        env:
+          OTA_RELEASE_KEY: ${{ secrets.OTA_RELEASE_KEY }}
+        run: |
+          if [ -z "${{ inputs.version }}" ]; then echo "❌ version input required"; exit 1; fi
+          node scripts/release-ota.mjs --deactivate "${{ inputs.version }}"
+
+      # ── publish ─────────────────────────────────────────────────────────
+      - name: Write Play Store service account JSON
+        if: ${{ inputs.action == 'publish' && inputs.native_version == '' }}
+        env:
+          GOOGLE_PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          PLAY_STORE_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          PLAY_JSON="${GOOGLE_PLAY_JSON:-$PLAY_STORE_JSON}"
+          if [ -z "$PLAY_JSON" ]; then
+            echo "❌ No Play service account secret, and no native_version input."
+            echo "   Either add the secret or pass native_version manually."
+            exit 1
+          fi
+          printf '%s' "$PLAY_JSON" > /tmp/play-service-account.json
+          node -e "JSON.parse(require('fs').readFileSync('/tmp/play-service-account.json','utf8'))"
+
+      - name: Resolve native + bundle version
+        id: v
+        if: ${{ inputs.action == 'publish' }}
+        run: |
+          NATIVE="${{ inputs.native_version }}"
+          if [ -z "$NATIVE" ]; then
+            npm install --no-save --silent googleapis@144 >/dev/null 2>&1 || true
+            node scripts/play-latest-version.cjs > /tmp/play.out || true
+            cat /tmp/play.out
+            NATIVE=$(grep -oE 'name=[0-9]+\.[0-9]+\.[0-9]+' /tmp/play.out | head -n1 | cut -d= -f2)
+          fi
+          if [ -z "$NATIVE" ]; then
+            echo "❌ Could not determine the live store versionName. Pass native_version manually."
+            exit 1
+          fi
+
+          BUNDLE="${{ inputs.version }}"
+          if [ -z "$BUNDLE" ]; then
+            MAJOR=$(echo "$NATIVE" | cut -d. -f1)
+            MINOR=$(echo "$NATIVE" | cut -d. -f2)
+            PATCH=$(echo "$NATIVE" | cut -d. -f3)
+            BUNDLE="$MAJOR.$MINOR.$(( PATCH + 1 ))"
+          fi
+          echo "native=$NATIVE" >> $GITHUB_OUTPUT
+          echo "bundle=$BUNDLE" >> $GITHUB_OUTPUT
+          echo "Store build (native): $NATIVE  →  OTA bundle: $BUNDLE"
+
+      - name: Install dependencies
+        if: ${{ inputs.action == 'publish' }}
+        run: bun install --frozen-lockfile
+
+      - name: Build web bundle
+        if: ${{ inputs.action == 'publish' }}
+        run: bun run build
+
+      - name: Publish OTA bundle
+        if: ${{ inputs.action == 'publish' }}
+        env:
+          OTA_RELEASE_KEY: ${{ secrets.OTA_RELEASE_KEY }}
+        run: |
+          node scripts/release-ota.mjs \
+            --skip-build \
+            --native "${{ steps.v.outputs.native }}" \
+            --version "${{ steps.v.outputs.bundle }}" \
+            --rollout "${{ inputs.rollout }}" \
+            --notes "${{ inputs.notes }}"
+
+      - name: Verify the endpoint serves it
+        if: ${{ inputs.action == 'publish' }}
+        run: |
+          RESP=$(curl -sS -X POST \
+            "https://jbwhlogvldhsnxtpxwih.supabase.co/functions/v1/ota-update" \
+            -H 'Content-Type: application/json' \
+            -d "{\"platform\":\"android\",\"device_id\":\"ci-verify-${{ github.run_id }}\",\"version_name\":\"${{ steps.v.outputs.native }}\",\"version_build\":\"${{ steps.v.outputs.native }}\",\"defaultChannel\":\"production\"}")
+          echo "ota-update says: $RESP"
+          if [ "${{ inputs.rollout }}" = "100" ] && ! echo "$RESP" | grep -q '"url"'; then
+            echo "❌ Bundle published but the endpoint is not serving it at 100% rollout."
+            exit 1
+          fi
+          echo "✅ Endpoint check done (partial rollouts may legitimately skip this CI device bucket)."

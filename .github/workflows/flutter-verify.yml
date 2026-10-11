@@ -1,0 +1,77 @@
+name: Flutter Visual Verify (screenshots, no APK)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'flutter_app/**'
+      - '.github/workflows/flutter-verify.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flutter-verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screens:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flutter_app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Cache Flutter pub
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            flutter_app/.dart_tool
+          key: flutter-pub-${{ runner.os }}-${{ hashFiles('flutter_app/pubspec.lock') }}
+          restore-keys: flutter-pub-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze (compile-level check)
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: Generate web platform files
+        run: |
+          if [ ! -d web ]; then
+            flutter create . --platforms=web --org com.jesuswallpaperbible --project-name prayly
+          fi
+
+      - name: Build web
+        run: flutter build web --release --no-tree-shake-icons
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Serve build and capture screens
+        run: |
+          python3 -m http.server 8000 --directory build/web &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:8000/ && break; sleep 1; done
+          python3 tool/shots.py
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-screens-${{ github.run_number }}
+          path: flutter_app/shots
+          retention-days: 7

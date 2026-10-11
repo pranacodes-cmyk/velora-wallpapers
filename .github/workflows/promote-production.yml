@@ -1,0 +1,97 @@
+name: Promote internal release to production
+
+on:
+  workflow_dispatch:
+    inputs:
+      status:
+        description: Release status on production
+        required: true
+        default: completed
+        type: choice
+        options:
+          - completed
+          - draft
+
+permissions:
+  contents: read
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Write Play Store service account JSON
+        env:
+          GOOGLE_PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          PLAY_STORE_UPLOAD_TOKEN: ${{ secrets.PLAY_STORE_UPLOAD_TOKEN }}
+        run: |
+          PLAY_JSON="${GOOGLE_PLAY_JSON:-$PLAY_STORE_UPLOAD_TOKEN}"
+          if [ -z "$PLAY_JSON" ]; then
+            echo "❌ Play credentials missing."
+            exit 1
+          fi
+          printf '%s' "$PLAY_JSON" > /tmp/play-service-account.json
+          node -e "JSON.parse(require('fs').readFileSync('/tmp/play-service-account.json','utf8'))" \
+            || { echo "❌ Service account JSON is not valid JSON."; exit 1; }
+
+      - name: Promote latest internal release to production
+        env:
+          RELEASE_STATUS: ${{ inputs.status }}
+        run: |
+          npm install --no-save --silent googleapis@144 >/dev/null 2>&1
+          node - <<'EOF'
+          const { google } = require('googleapis');
+          const PACKAGE = 'com.jesuswallpaperbible.app';
+
+          async function main() {
+            const auth = new google.auth.GoogleAuth({
+              keyFile: '/tmp/play-service-account.json',
+              scopes: ['https://www.googleapis.com/auth/androidpublisher'],
+            });
+            const publisher = google.androidpublisher({ version: 'v3', auth });
+            const edit = await publisher.edits.insert({ packageName: PACKAGE });
+            const editId = edit.data.id;
+
+            const tracks = await publisher.edits.tracks.list({ packageName: PACKAGE, editId });
+            const internal = (tracks.data.tracks || []).find((t) => t.track === 'internal');
+            if (!internal || !(internal.releases || []).length) {
+              throw new Error('No internal release found to promote.');
+            }
+            // Pick the internal release with the highest versionCode.
+            let best = null;
+            let bestCode = -1;
+            for (const r of internal.releases) {
+              const code = Math.max(...(r.versionCodes || []).map(Number));
+              if (code > bestCode) { bestCode = code; best = r; }
+            }
+            console.log(`Promoting internal release: name=${best.name} codes=${best.versionCodes}`);
+
+            await publisher.edits.tracks.update({
+              packageName: PACKAGE,
+              editId,
+              track: 'production',
+              requestBody: {
+                track: 'production',
+                releases: [{
+                  name: best.name,
+                  versionCodes: best.versionCodes.map(String),
+                  status: process.env.RELEASE_STATUS || 'completed',
+                }],
+              },
+            });
+
+            await publisher.edits.commit({ packageName: PACKAGE, editId });
+            console.log('✅ Promoted to production track.');
+          }
+
+          main().catch((err) => { console.error('❌', err?.message || err); process.exit(1); });
+          EOF

@@ -1,0 +1,80 @@
+name: Publish Flutter content OTA
+
+# Pushes the Flutter app's JSON content (prayers, devotionals, journeys,
+# parallax scenes, verse packs, all translations) to our own storage so
+# installed apps pick it up on next launch — no Play release needed.
+#
+# Required repo secret: OTA_SERVICE_KEY (backend service role key).
+
+on:
+  workflow_dispatch:
+    inputs:
+      bundle:
+        description: "Bundle number (must be higher than the last published one)"
+        required: true
+      min_app_build:
+        description: "Minimum app build required (0 = no forced store update)"
+        required: false
+        default: "0"
+      urgent:
+        description: "Urgent: apply on this very launch (true/false)"
+        required: false
+        default: "false"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build manifest + upload content
+        env:
+          SUPABASE_URL: https://jbwhlogvldhsnxtpxwih.supabase.co
+          SERVICE_KEY: ${{ secrets.OTA_SERVICE_KEY }}
+          BUNDLE: ${{ github.event.inputs.bundle }}
+          MIN_BUILD: ${{ github.event.inputs.min_app_build }}
+          URGENT: ${{ github.event.inputs.urgent }}
+        run: |
+          set -euo pipefail
+          cd flutter_app
+          FILES=$(find assets/data assets/translations -type f -name '*.json' | sort)
+          echo "Publishing bundle $BUNDLE"
+
+          MANIFEST=$(python3 - <<'PY'
+          import json, os, subprocess, hashlib
+          files = subprocess.check_output(
+              "find assets/data assets/translations -type f -name '*.json' | sort",
+              shell=True, text=True).split()
+          out = {}
+          for f in files:
+              with open(f, 'rb') as fh:
+                  out[f] = {"sha256": hashlib.sha256(fh.read()).hexdigest()}
+          print(json.dumps({
+              "bundle": int(os.environ["BUNDLE"]),
+              "minAppBuild": int(os.environ.get("MIN_BUILD") or 0),
+              "urgent": os.environ.get("URGENT") == "true",
+              "storeUrl": "https://play.google.com/store/apps/details?id=com.jesuswallpaperbible.app",
+              "files": out,
+          }))
+          PY
+          )
+
+          upload() { # $1 = local file, $2 = storage path
+            curl -sS -f -X POST \
+              "$SUPABASE_URL/storage/v1/object/ota/$2" \
+              -H "Authorization: Bearer $SERVICE_KEY" \
+              -H "apikey: $SERVICE_KEY" \
+              -H "x-upsert: true" \
+              -H "Content-Type: application/json" \
+              --data-binary "@$1" > /dev/null
+            echo "uploaded $2"
+          }
+
+          for f in $FILES; do
+            upload "$f" "$BUNDLE/$f"
+          done
+
+          # Manifest goes last: until it lands, no client sees the new bundle.
+          printf '%s' "$MANIFEST" > /tmp/manifest.json
+          upload /tmp/manifest.json "manifest.json"
+          echo "OTA bundle $BUNDLE published."

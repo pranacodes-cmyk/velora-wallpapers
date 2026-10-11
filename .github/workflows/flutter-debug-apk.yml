@@ -1,0 +1,107 @@
+name: Flutter Debug APK (test the native app)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Build type
+        required: true
+        default: 'debug-arm64'
+        type: choice
+        options:
+          - 'debug-arm64'
+          - 'debug'
+          - 'release'
+
+permissions:
+  contents: read
+
+jobs:
+  flutter-apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flutter_app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Cache Flutter pub
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            flutter_app/.dart_tool
+          key: flutter-pub-${{ runner.os }}-${{ hashFiles('flutter_app/pubspec.lock') }}
+          restore-keys: flutter-pub-${{ runner.os }}-
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: flutter-gradle-${{ runner.os }}-${{ hashFiles('flutter_app/android/**/*.gradle*', 'flutter_app/android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: flutter-gradle-${{ runner.os }}-
+
+      - name: Generate Android platform files
+        run: |
+          if [ ! -d android ]; then
+            flutter create --platforms=android --org com.jesuswallpaperbible --project-name prayly .
+          fi
+          # Keep the Play Store package name locked.
+          sed -i 's/applicationId "com.jesuswallpaperbible.prayly"/applicationId "com.jesuswallpaperbible.app"/' android/app/build.gradle* || true
+          sed -i 's/namespace "com.jesuswallpaperbible.prayly"/namespace "com.jesuswallpaperbible.app"/' android/app/build.gradle* || true
+          sed -i 's/applicationId = "com.jesuswallpaperbible.prayly"/applicationId = "com.jesuswallpaperbible.app"/' android/app/build.gradle* || true
+          sed -i 's/namespace = "com.jesuswallpaperbible.prayly"/namespace = "com.jesuswallpaperbible.app"/' android/app/build.gradle* || true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos || true
+
+      - name: Decode signing key
+        if: ${{ inputs.mode == 'release' }}
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d > android/app/release.keystore
+          cat > android/key.properties <<EOF
+          storeFile=release.keystore
+          storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          EOF
+
+      - name: Build APK
+        run: |
+          if [ "${{ inputs.mode }}" = "release" ]; then
+            flutter build apk --release
+          elif [ "${{ inputs.mode }}" = "debug-arm64" ]; then
+            flutter build apk --debug --target-platform android-arm64
+          else
+            flutter build apk --debug
+          fi
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: prayly-flutter-${{ inputs.mode }}-${{ github.run_number }}
+          path: flutter_app/build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error
+          retention-days: 14

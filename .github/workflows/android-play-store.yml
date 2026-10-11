@@ -1,0 +1,311 @@
+name: Android Play Store Release
+
+on:
+  # Manual-only. No auto-release on push.
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: App version name (leave empty to auto-bump patch)
+        required: false
+        default: ''
+      track:
+        description: Google Play track
+        required: true
+        default: internal
+        type: choice
+        options:
+          - internal
+      upload_to_play:
+        description: Auto-upload AAB to Google Play as draft (false = artifact only)
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      build_apk:
+        description: Also build an installable APK for device testing
+        required: true
+        default: 'signed-release'
+        type: choice
+        options:
+          - 'none'
+          - 'signed-release'
+          - 'debug'
+
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
+          submodules: false
+          lfs: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # Service account is needed BEFORE computing the version, so we can ask
+      # Play what the current highest version is and go exactly one above it.
+      - name: Write Play Store service account JSON
+        env:
+          GOOGLE_PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          PLAY_STORE_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          PLAY_JSON="${GOOGLE_PLAY_JSON:-$PLAY_STORE_JSON}"
+          if [ -z "$PLAY_JSON" ]; then
+            echo "❌ Google Play service account JSON secret is empty or not set."
+            echo "   Add it as GOOGLE_PLAY_SERVICE_ACCOUNT_JSON in: GitHub → Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+          printf '%s' "$PLAY_JSON" > /tmp/play-service-account.json
+          node -e "JSON.parse(require('fs').readFileSync('/tmp/play-service-account.json','utf8'))" \
+            || { echo "❌ Service account JSON is not valid JSON."; exit 1; }
+          echo "✅ Service account JSON written and validated."
+
+      - name: Read latest version from Google Play
+        id: play
+        run: |
+          npm install --no-save --silent googleapis@144 >/dev/null 2>&1 || true
+          node scripts/play-latest-version.cjs >> $GITHUB_OUTPUT || true
+          echo "--- detected on Play ---"
+          cat $GITHUB_OUTPUT || true
+
+      - name: Compute version
+        id: version
+        run: |
+          PLAY_CODE="${{ steps.play.outputs.code }}"
+          PLAY_NAME="${{ steps.play.outputs.name }}"
+
+          # versionCode: exactly one above whatever Play already has.
+          # The floor only applies when the Play lookup fails, so a successful
+          # lookup always wins and produces Play's highest + 1.
+          if [ -n "$PLAY_CODE" ] && [ "$PLAY_CODE" -gt 0 ] 2>/dev/null; then
+            VERSION_CODE=$(( PLAY_CODE + 1 ))
+          else
+            echo "❌ Could not read the current versionCode from Google Play."
+            echo "   Refusing to guess — a guessed code could be lower than the live build."
+            echo "   Check the GOOGLE_PLAY_SERVICE_ACCOUNT_JSON secret and re-run."
+            exit 1
+          fi
+
+          if [ -n "${{ inputs.version_name }}" ]; then
+            VERSION_NAME="${{ inputs.version_name }}"
+          else
+            # versionName: take Play's latest (e.g. 1.0.1149) and +1 the patch.
+            BASE_NAME=$(printf '%s' "$PLAY_NAME" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
+            if [ -n "$BASE_NAME" ]; then
+              MAJOR=$(echo "$BASE_NAME" | cut -d. -f1)
+              MINOR=$(echo "$BASE_NAME" | cut -d. -f2)
+              PATCH=$(echo "$BASE_NAME" | cut -d. -f3)
+              VERSION_NAME="$MAJOR.$MINOR.$(( PATCH + 1 ))"
+            else
+              MIN_VERSION_NAME_PATCH=1161
+              VERSION_NAME="1.0.$(( MIN_VERSION_NAME_PATCH + ${{ github.run_number }} ))"
+            fi
+          fi
+
+          # Hard floor: the newest live-update bundle shipped so far is
+          # 1.0.1158, and that store build carries the same JS. Anything at or
+          # below that would immediately be "updated" by an OTA bundle it
+          # already contains, so start at 1.0.1159.
+          if [ -z "${{ inputs.version_name }}" ]; then
+            FLOOR_PATCH=1161
+            MM=$(echo "$VERSION_NAME" | cut -d. -f1,2)
+            PATCH=$(echo "$VERSION_NAME" | cut -d. -f3)
+            if [ "$MM" = "1.0" ] && [ "$PATCH" -lt "$FLOOR_PATCH" ]; then
+              VERSION_NAME="1.0.$FLOOR_PATCH"
+              echo "Applied versionName floor -> $VERSION_NAME"
+            fi
+          fi
+
+
+          # Never build below the currently active live-update (OTA) bundle,
+          # otherwise fresh installs would immediately be patched by it.
+          # Ask the real endpoint with THIS versionName and keep bumping the
+          # patch until it stops offering a bundle (max 20 tries).
+          if [ -z "${{ inputs.version_name }}" ]; then
+            for i in $(seq 1 20); do
+              OTA_RESP=$(curl -sS -X POST \
+                "https://jbwhlogvldhsnxtpxwih.supabase.co/functions/v1/ota-update" \
+                -H 'Content-Type: application/json' \
+                -d "{\"platform\":\"android\",\"device_id\":\"ci-preflight\",\"version_name\":\"builtin\",\"version_build\":\"$VERSION_NAME\",\"defaultChannel\":\"production\"}" || true)
+              echo "ota-update($VERSION_NAME): $OTA_RESP"
+              case "$OTA_RESP" in
+                *'"url"'*) ;;
+                *) break ;;
+              esac
+              MM=$(echo "$VERSION_NAME" | cut -d. -f1,2)
+              PATCH=$(echo "$VERSION_NAME" | cut -d. -f3)
+              VERSION_NAME="$MM.$(( PATCH + 1 ))"
+              echo "OTA bundle still ahead -> bumping versionName to $VERSION_NAME"
+            done
+          fi
+
+          echo "name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "Play latest: name=$PLAY_NAME code=$PLAY_CODE"
+          echo "Using versionName=$VERSION_NAME versionCode=$VERSION_CODE"
+
+
+      # Guard: make sure no live-update bundle would be pushed onto this new
+      # build. A bundle older than the build's own JS would be a mismatch, so
+      # the release stops here instead of shipping one.
+      - name: Check live-update (OTA) alignment
+        run: |
+          RESP=$(curl -sS -X POST \
+            "https://jbwhlogvldhsnxtpxwih.supabase.co/functions/v1/ota-update" \
+            -H 'Content-Type: application/json' \
+            -d "{\"platform\":\"android\",\"device_id\":\"ci-preflight\",\"version_name\":\"builtin\",\"version_build\":\"${{ steps.version.outputs.name }}\",\"defaultChannel\":\"production\"}")
+          echo "ota-update says: $RESP"
+          if echo "$RESP" | grep -q '"url"'; then
+            echo "❌ A live-update bundle would be served to fresh installs of ${{ steps.version.outputs.name }}."
+            echo "   Deactivate it (node scripts/release-ota.mjs --deactivate <version>) or bump it above this versionName."
+            exit 1
+          fi
+          echo "✅ No stale live-update bundle targets ${{ steps.version.outputs.name }}."
+
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate Android project
+        run: bun run android:generate
+
+      - name: Decode signing key
+        run: |
+          mkdir -p android/app
+          # Strip all whitespace/newlines, then decode (tolerates pasted line breaks).
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d > android/app/release.keystore
+          if [ ! -s android/app/release.keystore ]; then
+            echo "❌ Decoded keystore is empty. Re-check ANDROID_KEYSTORE_BASE64 secret."
+            exit 1
+          fi
+          echo "✅ Keystore decoded ($(wc -c < android/app/release.keystore) bytes)"
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
+      # Fail fast (and clearly) when signing secrets are missing, instead of
+      # burning ~9 minutes and dying inside :app:signReleaseBundle.
+      - name: Verify signing secrets & alias
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          MISSING=0
+          for V in ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!V}" ]; then echo "❌ Secret $V is missing/empty."; MISSING=1; fi
+          done
+          if [ "$MISSING" = "1" ]; then
+            echo "   Add them in GitHub → Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          echo "--- aliases present in keystore ---"
+          keytool -list -keystore android/app/release.keystore \
+            -storepass "$ANDROID_KEYSTORE_PASSWORD" 2>/dev/null | grep -i 'PrivateKeyEntry' || true
+          if keytool -list -keystore android/app/release.keystore \
+               -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" >/dev/null 2>&1; then
+            echo "✅ Alias found in keystore."
+          else
+            echo "❌ Alias '$ANDROID_KEY_ALIAS' not found (or keystore password wrong)."
+            echo "   Use one of the PrivateKeyEntry aliases listed above as ANDROID_KEY_ALIAS."
+            exit 1
+          fi
+
+
+      - name: Build signed AAB
+        run: |
+          node scripts/prepare-android-release.cjs
+          cd android
+          ./gradlew bundleRelease
+        env:
+          ANDROID_VERSION_CODE: ${{ steps.version.outputs.code }}
+          ANDROID_VERSION_NAME: ${{ steps.version.outputs.name }}
+          ANDROID_KEYSTORE_PATH: release.keystore
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Verify no exact alarm permissions
+        if: false  # Disabled — USE_EXACT_ALARM is now declared in Play Console (alarm clock use case)
+        run: node scripts/verify-no-exact-alarms.cjs
+
+      # ── Always: publish the AAB as a downloadable artifact ──────────────
+      - name: Upload AAB as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-${{ steps.version.outputs.name }}-${{ steps.version.outputs.code }}
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 30
+
+      # ── Optional: installable APK for real-device testing ───────────────
+      - name: Build signed release APK
+        if: ${{ inputs.build_apk == 'signed-release' }}
+        run: |
+          cd android
+          ./gradlew assembleRelease
+        env:
+          ANDROID_VERSION_CODE: ${{ steps.version.outputs.code }}
+          ANDROID_VERSION_NAME: ${{ steps.version.outputs.name }}
+          ANDROID_KEYSTORE_PATH: release.keystore
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Build debug APK
+        if: ${{ inputs.build_apk == 'debug' }}
+        run: |
+          cd android
+          ./gradlew assembleDebug
+        env:
+          ANDROID_VERSION_CODE: ${{ steps.version.outputs.code }}
+          ANDROID_VERSION_NAME: ${{ steps.version.outputs.name }}
+
+      - name: Upload APK as workflow artifact
+        if: ${{ inputs.build_apk != 'none' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-apk-${{ inputs.build_apk }}-${{ steps.version.outputs.name }}-${{ steps.version.outputs.code }}
+          path: |
+            android/app/build/outputs/apk/release/*.apk
+            android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+
+
+      # ── Push straight to the internal test track (live, not draft) ──────
+      - name: Upload AAB to Google Play
+        if: ${{ inputs.upload_to_play == 'true' }}
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: /tmp/play-service-account.json
+          packageName: com.jesuswallpaperbible.app
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          track: ${{ inputs.track }}
+          releaseName: ${{ steps.version.outputs.name }}
+          status: completed
+
+

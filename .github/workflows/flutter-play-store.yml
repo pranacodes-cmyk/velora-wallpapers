@@ -1,0 +1,188 @@
+name: Flutter Play Store Release (signed AAB → internal track)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: Version name (leave empty to auto-bump from Play)
+        required: false
+        default: ''
+      track:
+        description: Google Play track
+        required: true
+        default: internal
+        type: choice
+        options:
+          - internal
+      upload_to_play:
+        description: Upload the AAB to Google Play
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+permissions:
+  contents: read
+
+jobs:
+  flutter-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/powershell || true
+          sudo docker image prune -a -f || true
+          sudo swapoff -a || true
+          sudo rm -f /swapfile || true
+          df -h /
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: flutter-release-gradle-${{ runner.os }}-${{ hashFiles('flutter_app/android/**/*.gradle*') }}
+          restore-keys: flutter-release-gradle-${{ runner.os }}-
+
+      # Play credentials are needed BEFORE the build so the version goes exactly
+      # one above whatever is already live on Play.
+      - name: Write Play Store service account JSON
+        env:
+          GOOGLE_PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          PLAY_STORE_UPLOAD_TOKEN: ${{ secrets.PLAY_STORE_UPLOAD_TOKEN }}
+        run: |
+          PLAY_JSON="${GOOGLE_PLAY_JSON:-$PLAY_STORE_UPLOAD_TOKEN}"
+          if [ -z "$PLAY_JSON" ]; then
+            echo "❌ Play upload credentials missing (GOOGLE_PLAY_SERVICE_ACCOUNT_JSON / PLAY_STORE_UPLOAD_TOKEN)."
+            exit 1
+          fi
+          printf '%s' "$PLAY_JSON" > /tmp/play-service-account.json
+          node -e "JSON.parse(require('fs').readFileSync('/tmp/play-service-account.json','utf8'))" \
+            || { echo "❌ Service account JSON is not valid JSON."; exit 1; }
+          echo "✅ Play service account ready."
+
+      - name: Read latest version from Google Play
+        id: play
+        run: |
+          npm install --no-save --silent googleapis@144 >/dev/null 2>&1 || true
+          node scripts/play-latest-version.cjs >> $GITHUB_OUTPUT || true
+
+      - name: Compute version
+        id: version
+        run: |
+          PLAY_CODE="${{ steps.play.outputs.code }}"
+          PLAY_NAME="${{ steps.play.outputs.name }}"
+          if [ -n "$PLAY_CODE" ] && [ "$PLAY_CODE" -gt 0 ] 2>/dev/null; then
+            VERSION_CODE=$(( PLAY_CODE + 1 ))
+          else
+            echo "❌ Could not read the current versionCode from Google Play — refusing to guess."
+            exit 1
+          fi
+          if [ -n "${{ inputs.version_name }}" ]; then
+            VERSION_NAME="${{ inputs.version_name }}"
+          else
+            BASE_NAME=$(printf '%s' "$PLAY_NAME" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
+            if [ -n "$BASE_NAME" ]; then
+              MAJOR=$(echo "$BASE_NAME" | cut -d. -f1)
+              MINOR=$(echo "$BASE_NAME" | cut -d. -f2)
+              PATCH=$(echo "$BASE_NAME" | cut -d. -f3)
+              VERSION_NAME="$MAJOR.$MINOR.$(( PATCH + 1 ))"
+            else
+              VERSION_NAME="1.0.$(( 1200 + ${{ github.run_number }} ))"
+            fi
+          fi
+          echo "name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "Play latest: name=$PLAY_NAME code=$PLAY_CODE"
+          echo "Building versionName=$VERSION_NAME versionCode=$VERSION_CODE"
+
+      - name: Install dependencies
+        working-directory: flutter_app
+        run: flutter pub get
+
+      - name: Decode signing key
+        working-directory: flutter_app
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          for V in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!V}" ]; then echo "❌ Secret $V is missing/empty."; exit 1; fi
+          done
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d > android/app/release.keystore
+          if [ ! -s android/app/release.keystore ]; then
+            echo "❌ Decoded keystore is empty."; exit 1
+          fi
+          cat > android/key.properties <<EOF
+          storeFile=release.keystore
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
+          EOF
+          echo "--- keystore aliases ---"
+          keytool -list -keystore android/app/release.keystore -storepass "$ANDROID_KEYSTORE_PASSWORD" 2>/dev/null | grep -i 'PrivateKeyEntry' || true
+          keytool -list -keystore android/app/release.keystore -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" >/dev/null 2>&1 \
+            || { echo "❌ Alias not found / wrong keystore password."; exit 1; }
+          echo "✅ Signing config ready."
+
+      - name: Build signed AAB (production keys)
+        working-directory: flutter_app
+        run: |
+          flutter build appbundle --release \
+            --build-name=${{ steps.version.outputs.name }} \
+            --build-number=${{ steps.version.outputs.code }}
+
+      - name: Verify release signing
+        working-directory: flutter_app
+        run: |
+          AAB=build/app/outputs/bundle/release/app-release.aab
+          ls -l "$AAB"
+          unzip -l "$AAB" | grep -i 'META-INF/.*\.\(RSA\|EC\|DSA\)' \
+            || { echo "❌ AAB is not signed with the release key."; exit 1; }
+          echo "✅ Release-signed bundle."
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prayly-flutter-aab-${{ steps.version.outputs.name }}-${{ steps.version.outputs.code }}
+          path: flutter_app/build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload AAB to Google Play (internal track)
+        if: ${{ inputs.upload_to_play == 'true' }}
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: /tmp/play-service-account.json
+          packageName: com.jesuswallpaperbible.app
+          releaseFiles: flutter_app/build/app/outputs/bundle/release/app-release.aab
+          track: ${{ inputs.track }}
+          releaseName: ${{ steps.version.outputs.name }}
+          status: completed
