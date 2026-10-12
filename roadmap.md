@@ -54,5 +54,5 @@
 - [x] Ask for notifications after the first paywall closes, add one localized Home retry, and localize overflow-safe prayer lock screens and paywall copy across all 8 languages.
 - [x] Refine paywall plan controls and typography, with polished in-app light-theme parity in web and Flutter.
 - [x] Remove Replay Welcome Tour from Settings in web and Flutter for the new Play Internal build.
-- [ ] Upload the latest signed Flutter build to Play Internal Testing, verify success, then restore the repository private.
-- [ ] Use the existing saved GitHub token release path rather than adding a new connector.
+- [x] Upload the latest signed Flutter build to Play Internal Testing, verify success, then restore the repository private.
+- [x] Use the existing saved GitHub token release path rather than adding a new connector.
