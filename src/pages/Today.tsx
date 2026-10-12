@@ -28,6 +28,9 @@ import { lazyPage } from "@/lib/lazy-page";
 const PremiumSheet = lazyPage(() =>
   import("@/components/PremiumSheet").then((m) => ({ default: m.PremiumSheet })),
 );
+const LifeCalendarPreview = lazyPage(() =>
+  import("@/components/LifeCalendarPreview").then((m) => ({ default: m.LifeCalendarPreview })),
+);
 const SearchOverlay = lazyPage(() =>
   import("@/components/SearchOverlay").then((m) => ({ default: m.SearchOverlay })),
 );
@@ -1042,6 +1045,7 @@ export default function Today() {
   const greeting = useGreeting();
   const { isPremium, unlock } = usePremium();
   const [showPremium, setShowPremium] = useState(false);
+  const [showLifeCalendar, setShowLifeCalendar] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showExit, setShowExit] = useState(false);
   const [showPrayerSetup, setShowPrayerSetup] = useState(false);
@@ -1091,21 +1095,14 @@ export default function Today() {
         <div className="flex items-center justify-between px-4 pt-3 pb-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <Button
-              asChild
               variant="ghost"
               size="icon"
               className="h-9 w-9 shrink-0 rounded-full border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary [&_svg]:size-5"
+              aria-label="Life Calendar"
+              title="Life Calendar"
+              onClick={() => { haptic("soft"); setShowLifeCalendar(true); }}
             >
-              <a
-                href="https://play.google.com/store/apps/details?id=com.mylifecalendar.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Life Calendar"
-                title="Life Calendar"
-                onClick={() => haptic("soft")}
-              >
-                <Gift strokeWidth={1.8} />
-              </a>
+              <Gift strokeWidth={1.8} />
             </Button>
             <div className="leading-none min-w-0">
               <div className="flex items-center gap-1.5">
@@ -1189,6 +1186,7 @@ export default function Today() {
       {/* Modals: mount ONLY on first open. React.lazy + conditional mount so
           none of these ~500-line trees are parsed on initial Today render. */}
       <Suspense fallback={null}>
+        {showLifeCalendar && <LifeCalendarPreview open={showLifeCalendar} onOpenChange={setShowLifeCalendar} />}
         {showPremium && (
           <PremiumSheet
             isOpen={showPremium}

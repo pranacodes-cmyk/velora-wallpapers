@@ -1,4 +1,5 @@
 # Project Architecture
+- Load the Life Calendar promotion on explicit gift tap using CDN-hosted official store screenshots; keep store launch behind Install and prefer Android market links with HTTPS fallback to avoid unexpected redirects.
 
 - Keep the full Bible reader in bottom navigation and Settings, without a duplicate Today button with shared book-wise compressed licensed texts, local verse-position preferences, likes and private notes; this avoids redundant Home entry points and bounds offline book-cache memory usage.
 - Keep trial transition colors scoped to the midnight onboarding palette and time its cancellable haptics to the switch/check beats; global light theme must never alter this handoff.

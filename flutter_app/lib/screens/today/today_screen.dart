@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import '../../core/app_tabs.dart';
@@ -16,6 +15,7 @@ import '../../core/services/user_profile.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/keep_alive.dart' as app_keep_alive;
 import '../../widgets/lucide.dart';
+import '../../widgets/life_calendar_preview.dart';
 import '../../state/app_providers.dart';
 import '../../widgets/premium_sheet.dart';
 import '../../widgets/screen_scaffold.dart';
@@ -146,10 +146,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                       icon: const Icon(Icons.card_giftcard_outlined, size: 20),
                       onPressed: () {
                         haptic(HapticStyle.soft);
-                        launchUrl(
-                          Uri.parse('https://play.google.com/store/apps/details?id=com.mylifecalendar.app'),
-                          mode: LaunchMode.externalApplication,
-                        );
+                        showLifeCalendarPreview(context, ref.read(languageProvider));
                       },
                     ),
                   ),

@@ -70,6 +70,6 @@
 - [x] Audit released bundle size, remove Vungle from both Android targets and exclude 25 redundant assets (2.992 MB compressed in released bundle); preserve subscriptions and offline Bible.
 - [x] Remove duplicate Flutter Home notification card.
 - [ ] Verify cleaned Flutter build size, native paywall and frame performance after an explicitly approved CI build; no native build requested for this audit.
-- [ ] Replace Home header cross shortcut with a Life Calendar gift link in web and Flutter.
-- [ ] Release latest changes to Play Internal Testing, monitor upload success and restore repository private.
-- [ ] Check iOS release readiness and upload if signing and store configuration are available.
+- [x] Gift tap opens Life Calendar wallpaper preview, app name and Install action in matching web/Flutter; web preview and exact Play listing verified, native store launch awaits approved device build.
+- [x] Cancel requested Play build before store upload and restore repository private; do not restart without approval.
+- [ ] iOS release blocked: native iOS project, Apple signing and App Store Connect credentials missing.
