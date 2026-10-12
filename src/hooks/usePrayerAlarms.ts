@@ -52,6 +52,16 @@ function save(c: PrayerAlarmsConfig) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(c)); } catch { /* ignore */ }
 }
 
+/** Arms the prayer bells from the onboarding Rhythm choice (explicit Continue tap). */
+export async function armPrayerAlarmsFromRhythm(slot: string) {
+  const times = DEFAULT_TIMES.filter((t, i) =>
+    slot === "both" || (slot === "morning" ? i === 0 : i === 1),
+  );
+  const merged: PrayerAlarmsConfig = { enabled: true, soundEnabled: true, times };
+  save(merged);
+  try { await PrayerAlarm.scheduleAll({ times, soundEnabled: true }); } catch { /* ignore */ }
+}
+
 export function getNextPrayer(times: PrayerTime[], now = new Date()): { time: PrayerTime; at: Date } | null {
   if (!times.length) return null;
   const today = now;

@@ -123,6 +123,7 @@ class AppColors {
   // Public dark-scope values used by the intentionally midnight onboarding
   // paywall while the rest of the app remains in the user's selected theme.
   static Color get darkBackground => _dBackground;
+  static Color get darkPrimary => _dPrimary;
   static Color get darkForeground => _dForeground;
   static Color get darkCard => _dCard;
   static Color get darkMuted => _dMuted;

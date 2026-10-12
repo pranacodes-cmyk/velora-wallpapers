@@ -1,6 +1,8 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useT } from "@/i18n";
+import { useEffect } from "react";
+import { haptic } from "@/utils/haptics";
 
 interface TrialReadyTransitionProps {
   visible: boolean;
@@ -9,6 +11,12 @@ interface TrialReadyTransitionProps {
 export function TrialReadyTransition({ visible }: TrialReadyTransitionProps) {
   const { t } = useT();
   const reduceMotion = useReducedMotion();
+  useEffect(() => {
+    if (!visible) return;
+    const flip = window.setTimeout(() => haptic("light"), 500);
+    const ready = window.setTimeout(() => haptic("medium"), 1020);
+    return () => { clearTimeout(flip); clearTimeout(ready); };
+  }, [visible]);
 
   if (!visible) return null;
 

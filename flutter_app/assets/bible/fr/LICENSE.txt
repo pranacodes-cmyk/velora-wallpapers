@@ -1,0 +1,3 @@
+Louis Segond 1910
+Public domain
+https://github.com/midvash/bible-data/tree/main/versions/fr/lsg

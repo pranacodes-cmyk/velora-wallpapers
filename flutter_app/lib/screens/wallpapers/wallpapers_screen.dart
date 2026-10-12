@@ -707,8 +707,8 @@ class _WallpapersScreenState extends ConsumerState<WallpapersScreen> {
   }
 
   Widget _grid() {
-    // Wallpapers is tab index 2 in the shell (Today 0 / PrayScreen 1 /
-    // Wallpapers 2 / Quiz 3) — only decode previews while it's foregrounded.
+    // Wallpapers is tab index 2 in the shell (Today 0 / Wallpapers 1 /
+    // Journeys 2 / Quiz 3) — only decode previews while it's foregrounded.
     final previewsEnabled =
         ref.watch(activeTabProvider) == AppTabs.wallpapers;
     late List<Widget> tiles;

@@ -134,7 +134,7 @@ class _StaticWallpaperTileState extends State<StaticWallpaperTile> {
                   imageUrl: w.imageUrl,
                   fit: BoxFit.cover,
                   memCacheWidth: 480,
-                  fadeInDuration: const Duration(milliseconds: 300),
+                  fadeInDuration: const Duration(milliseconds: 120),
                   placeholder: (_, _) => const _Shimmer(),
                   errorWidget: (_, _, _) => const _TileError(),
                 ),
@@ -256,7 +256,7 @@ class _LiveWallpaperTileState extends State<LiveWallpaperTile> {
                     // which is why the stills looked soft next to the web grid.
                     memCacheWidth: 720,
                     filterQuality: FilterQuality.medium,
-                    fadeInDuration: const Duration(milliseconds: 300),
+                    fadeInDuration: const Duration(milliseconds: 120),
                     placeholder: (_, _) => const _Shimmer(),
                     errorWidget: (_, _, _) => const _TileError(),
                   ),

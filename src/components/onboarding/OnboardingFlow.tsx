@@ -40,17 +40,14 @@ export const ONBOARDING_REPLAY_KEY = "cw_onboarding_replay_active";
 export const POST_ONBOARDING_FLOW_COMPLETE_EVENT = "prayly-post-onboarding-flow-complete";
 
 // Lazy-loaded late slides. Chunk is prefetched when the user reaches slide 1.
-const PrayerAlarmSlide = lazy(() =>
-  import("./PrayerAlarmSlide").then((m) => ({ default: m.PrayerAlarmSlide })),
-);
 const PrayerSlide = lazy(() =>
   import("./OnboardingLateSlides").then((m) => ({ default: m.PrayerSlide })),
 );
 const RhythmSlide = lazy(() =>
   import("./OnboardingLateSlides").then((m) => ({ default: m.RhythmSlide })),
 );
-const JourneysSlide = lazy(() =>
-  import("./OnboardingLateSlides").then((m) => ({ default: m.JourneysSlide })),
+const BibleSlide = lazy(() =>
+  import("./BibleSlide").then((m) => ({ default: m.BibleSlide })),
 );
 const SocialProofSlide = lazy(() =>
   import("./OnboardingLateSlides").then((m) => ({ default: m.SocialProofSlide })),
@@ -520,7 +517,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   // The old "what's your name" slide has been removed too: it served no feature
   // (name is optional everywhere and editable in Settings) and ~30% of users
   // dropped there. Focus is now the final step.
-  const totalSlides = 6;
+  const totalSlides = 5;
   const lastStep = totalSlides - 1;
   const isFinale = step >= lastStep;
 
@@ -531,6 +528,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const advanceRaw = () => {
     if (navLockedRef.current) return;
     if (step < lastStep) {
+      if (step === 2) {
+        // Rhythm choice (Morning / Evening / Both) is the alarm opt-in.
+        let slot = "both";
+        try { slot = localStorage.getItem("prayly_daily_reminder_slots_v1") || "both"; } catch { /* ignore */ }
+        void import("@/hooks/usePrayerAlarms").then((m) => m.armPrayerAlarmsFromRhythm(slot)).catch(() => {});
+      }
       navLockedRef.current = true;
       setStep((s) => s + 1);
       navUnlockTimerRef.current = window.setTimeout(() => {
@@ -777,9 +780,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
                 {step === 0 && <VerseSlide key="s3" active exiting={exiting} />}
                 {step === 1 && <PrayerSlide key="s4" active exiting={exiting} />}
                 {step === 2 && <RhythmSlide key="rh" active exiting={exiting} />}
-                {step === 3 && <PrayerAlarmSlide key="alarm" active exiting={exiting} />}
-                {step === 4 && <JourneysSlide key="s6" active exiting={exiting} />}
-                {step === 5 && <SocialProofSlide key="s5" active exiting={exiting} />}
+                {step === 3 && <BibleSlide key="bible" active exiting={exiting} />}
+                {step === 4 && <SocialProofSlide key="s5" active exiting={exiting} />}
               </AnimatePresence>
               </Suspense>
 

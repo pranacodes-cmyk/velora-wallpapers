@@ -1,3 +1,7 @@
+- [x] Implement localized Bible reader in web and Flutter with feed/chapter modes, typography, likes, sharing and private notes; web language switching and persistence verified.
+- [ ] Add licensed Indonesian Old Testament (current clearly labelled edition is New Testament only).
+- [x] Lock trial transition to onboarding colors and add timed haptics in web and Flutter.
+- [ ] Compile Flutter reader and verify typography/haptics on physical devices before an approved release.
 - [x] Move Shield to Settings, restore Journeys navigation, and replace its onboarding slide with classic alarm options and the original alarm sound for Free and Pro in web and Flutter.
 - [ ] Fix all Flutter localization-sensitive overflows across all 8 languages
 - [ ] Fix Flutter language switching so every screen updates immediately

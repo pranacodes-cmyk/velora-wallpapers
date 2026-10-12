@@ -191,5 +191,12 @@ const fr = {
   "onb.proof.r8Time": "hier",
   "onb.proof.r8Title": "Je retrouve la paix",
   "onb.proof.r8Body": "Mon esprit est plus calme. Moins de bruit, plus de Dieu — mes enfants le voient aussi.",
+  "onb.bible.kicker": "Sainte Bible",
+  "onb.bible.headlinePre": "Toute la Bible,",
+  "onb.bible.headlineGold": "pensée pour ton téléphone.",
+  "onb.bible.subcopy": "Fais défiler verset par verset ou lis des chapitres entiers. Enregistre, annote et partage ce qui te touche.",
+  "onb.bible.f1": "Lis dans ta langue",
+  "onb.bible.f2": "Modes fil et chapitre",
+  "onb.bible.f3": "Notes privées et j'aime",
 };
 export default fr;

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { haptic } from "@/utils/haptics";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Crown, ChevronRight, Shield, Share2, Star, Heart,
+  Crown, ChevronRight, Shield, Share2, Star, Heart, BookOpen,
   ExternalLink, Info, FileText, Mail, Sun, Moon, Monitor, Trash2, SlidersHorizontal, User, Check, X, RotateCcw, Image as ImageIcon,
   Sunrise,
 } from "lucide-react";
@@ -380,6 +380,7 @@ export default function Settings() {
         </SettingSection>
 
         <SettingSection title={t("settings.section.library")}>
+          <SettingRow icon={BookOpen} label={t("bible.read")} onClick={() => navigate("/bible")} />
 
           <SettingRow
             icon={Heart}

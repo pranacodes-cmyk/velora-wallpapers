@@ -8,13 +8,15 @@ import '../../core/services/meta_events.dart';
 import '../../core/services/haptics.dart';
 import '../../core/services/prefs.dart';
 import '../../state/app_providers.dart';
-import 'journeys_slide.dart';
+import 'bible_slide.dart';
 import 'rhythm_slide.dart';
 import 'language_slide.dart';
 import 'late_slides.dart';
 import 'onboarding_motion.dart';
 import 'onboarding_shared.dart';
-import 'prayer_alarm_slide.dart';
+import 'dart:async';
+import '../../core/services/daily_reminder_service.dart';
+import '../../core/services/prayer_alarm_service.dart';
 import 'verse_slide.dart';
 
 /// 1:1 port of the controller in `src/components/onboarding/OnboardingFlow.tsx`.
@@ -36,7 +38,7 @@ class OnboardingFlow extends ConsumerStatefulWidget {
 }
 
 class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
-  static const _totalSlides = 6;
+  static const _totalSlides = 5;
   static const _lastStep = _totalSlides - 1;
 
   bool _langPicked = Prefs.getString(Onb.langPickedKey) != null;
@@ -73,6 +75,15 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       return;
     }
     if (_step < _lastStep) {
+      if (_step == 2) {
+        // Rhythm choice (Morning / Evening / Both) is the alarm opt-in.
+        final slot = DailyReminder.slots;
+        final times = <PrayerTime>[
+          if (slot != 'evening') const PrayerTime(hour: 7, minute: 0, label: 'Morning Prayer'),
+          if (slot != 'morning') const PrayerTime(hour: 21, minute: 0, label: 'Evening Prayer'),
+        ];
+        unawaited(PrayerAlarms.enable(times: times, soundEnabled: true).catchError((_) {}));
+      }
       _lockNav();
       setState(() {
         _forward = true;
@@ -146,9 +157,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       case 2:
         return const RhythmSlide();
       case 3:
-        return const PrayerAlarmSlide();
-      case 4:
-        return const JourneysSlide();
+        return const BibleSlide();
       default:
         return const SocialProofSlide();
     }

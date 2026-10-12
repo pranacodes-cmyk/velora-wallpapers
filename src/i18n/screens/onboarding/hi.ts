@@ -191,5 +191,12 @@ const hi = {
   "onb.proof.r8Time": "कल",
   "onb.proof.r8Title": "मन को फिर शांति मिली",
   "onb.proof.r8Body": "मन शांत है। शोर कम, परमेश्वर ज़्यादा — बच्चे भी फ़र्क महसूस करते हैं।",
+  "onb.bible.kicker": "पवित्र बाइबल",
+  "onb.bible.headlinePre": "पूरी बाइबल,",
+  "onb.bible.headlineGold": "आपके फ़ोन के लिए।",
+  "onb.bible.subcopy": "फ़ीड की तरह एक-एक वचन स्वाइप करें या पूरे अध्याय पढ़ें। जो दिल को छुए, उसे सेव करें, नोट लिखें और शेयर करें।",
+  "onb.bible.f1": "अपनी भाषा में पढ़ें",
+  "onb.bible.f2": "फ़ीड और अध्याय मोड",
+  "onb.bible.f3": "निजी नोट्स और लाइक",
 };
 export default hi;

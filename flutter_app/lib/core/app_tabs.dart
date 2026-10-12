@@ -8,8 +8,8 @@ class AppTabs {
   const AppTabs._();
 
   static const int today = 0;
-  static const int journeys = 1;
-  static const int wallpapers = 2;
+  static const int bible = 2;
+  static const int wallpapers = 1;
   static const int quiz = 3;
 
   /// Number of tabs in the shell.

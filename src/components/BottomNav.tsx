@@ -7,8 +7,8 @@ import { useT } from "@/i18n";
 
 const tabs = [
   { path: "/", icon: Sun, labelKey: "nav.today", special: true },
-  { path: "/journeys", icon: BookOpen, labelKey: "nav.journeys" },
   { path: "/wallpapers", icon: ImageIcon, labelKey: "nav.wallpapers" },
+  { path: "/bible", icon: BookOpen, labelKey: "bible.title" },
   { path: "/quiz", icon: BrainCircuit, labelKey: "nav.quiz" },
 ] satisfies Array<{ path: string; icon: typeof Sun; labelKey: string; special?: boolean }>;
 

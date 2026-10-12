@@ -191,5 +191,12 @@ const id = {
   "onb.proof.r8Time": "kemarin",
   "onb.proof.r8Title": "Saya merasa tenang lagi",
   "onb.proof.r8Body": "Pikiran saya lebih tenang. Lebih sedikit bising, lebih banyak Tuhan — anak-anak pun merasakannya.",
+  "onb.bible.kicker": "Alkitab",
+  "onb.bible.headlinePre": "Firman Tuhan,",
+  "onb.bible.headlineGold": "dibuat untuk ponselmu.",
+  "onb.bible.subcopy": "Geser ayat demi ayat seperti feed, atau baca pasal lengkap. Simpan, catat, dan bagikan yang menyentuh hatimu.",
+  "onb.bible.f1": "Baca dalam bahasamu",
+  "onb.bible.f2": "Mode feed & pasal",
+  "onb.bible.f3": "Catatan pribadi & suka",
 };
 export default id;

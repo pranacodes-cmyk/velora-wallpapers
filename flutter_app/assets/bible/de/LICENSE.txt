@@ -1,0 +1,3 @@
+Lutherbibel 1912
+Public domain
+https://github.com/midvash/bible-data/tree/main/versions/de/luth1912

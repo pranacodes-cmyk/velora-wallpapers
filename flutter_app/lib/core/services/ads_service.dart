@@ -282,13 +282,14 @@ class AdsService {
   static Future<bool> tryShowInterstitial(
     String? label, {
     bool force = false,
+    bool onlyIfWarm = false,
   }) async {
     if (_isAdFree || kIsWeb) return false;
     if (!force && isCooldownActive) return false;
 
     _inFlight = true;
     try {
-      await _showInterstitial(label);
+      await _showInterstitial(label, onlyIfWarm: onlyIfWarm);
       _lastShownAt = DateTime.now();
       return true;
     } catch (_) {
@@ -303,11 +304,17 @@ class AdsService {
   static Future<void> showInterstitial([String? label]) =>
       _showInterstitial(label);
 
-  static Future<void> _showInterstitial(String? label) async {
+  static Future<void> _showInterstitial(String? label,
+      {bool onlyIfWarm = false}) async {
     if (_isAdFree || kIsWeb) return;
     await init();
 
     var ad = _warmInterstitial;
+    if (ad == null && onlyIfWarm) {
+      // Moment-based trigger (journey completion, reflection close): never
+      // cold-load — a late ad would pop up on an unrelated screen.
+      return;
+    }
     if (ad == null) {
       final loaded = Completer<InterstitialAd?>();
       try {

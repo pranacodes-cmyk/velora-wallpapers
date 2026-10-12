@@ -93,8 +93,11 @@ class _JourneyDayScreenState extends ConsumerState<JourneyDayScreen> {
     final isPremium = ref.read(premiumProvider);
     if (!isPremium) AdsService.primeInterstitial();
     if (wasFirst && _selectedDay == 1 && !isPremium) {
+      // Warm-only + mounted guard: a cold-loading ad must never pop up
+      // seconds later in the middle of reflection/quiz on another screen.
       Future.delayed(const Duration(milliseconds: 900), () {
-        AdsService.showInterstitial();
+        if (!mounted) return;
+        AdsService.tryShowInterstitial('journey_day1', onlyIfWarm: true);
       });
     }
     if (wasFirst && !isPremium) {

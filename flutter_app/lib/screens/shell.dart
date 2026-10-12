@@ -14,6 +14,7 @@ import '../widgets/bottom_nav_bar.dart';
 import '../widgets/exit_confirm_dialog.dart';
 import '../widgets/premium_sheet.dart';
 import 'bible_chat/bible_chat_screen.dart';
+import 'bible_reader/bible_reader_screen.dart';
 import 'journeys/journeys_screen.dart';
 import 'quiz/quiz_screen.dart';
 import 'pray_screen/pray_screen_screen.dart';
@@ -92,7 +93,9 @@ class _AppShellState extends ConsumerState<AppShell>
     } else if (route.startsWith('/quiz')) {
       ref.read(activeTabProvider.notifier).state = AppTabs.quiz;
     } else if (route.startsWith('/journeys')) {
-      ref.read(activeTabProvider.notifier).state = AppTabs.journeys;
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const JourneysScreen(showBackButton: true)));
+    } else if (route.startsWith('/bible')) {
+      ref.read(activeTabProvider.notifier).state = AppTabs.bible;
     } else if (route.startsWith('/companion')) {
       Navigator.of(context).push(
         MaterialPageRoute<void>(
@@ -150,12 +153,12 @@ class _AppShellState extends ConsumerState<AppShell>
               children: [
                 TickerMode(enabled: index == 0, child: const TodayScreen()),
                 TickerMode(
-                  enabled: index == 1,
-                  child: const JourneysScreen(showBackButton: false),
+                  enabled: index == AppTabs.wallpapers,
+                  child: const WallpapersScreen(),
                 ),
                 TickerMode(
-                  enabled: index == 2,
-                  child: const WallpapersScreen(),
+                  enabled: index == AppTabs.bible,
+                  child: const BibleReaderScreen(inTab: true),
                 ),
                 TickerMode(enabled: index == 3, child: const QuizScreen()),
               ],

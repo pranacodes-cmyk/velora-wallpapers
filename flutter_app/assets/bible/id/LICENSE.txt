@@ -1,0 +1,6 @@
+Unlocked Literal Bible · Perjanjian Baru
+CC BY-SA 4.0 · Door43 World Missions Community
+https://git.door43.org/Door43-Catalog/id_ulb
+Original work available at https://door43.org/. New Testament only. Verses absent from the source manuscripts are not filled with invented text.
+https://creativecommons.org/licenses/by-sa/4.0/
+Text extracted from USFM; notes and headings omitted; verse wording unchanged. This text adaptation is distributed under CC BY-SA 4.0.

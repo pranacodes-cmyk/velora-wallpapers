@@ -25,9 +25,11 @@ function withAppLink(text: string | undefined, url: string | undefined): {
   const finalUrl = url || APP_PLAY_STORE_URL;
   const baseText = (text || "").trim();
 
-  // Avoid duplicating the link if it's already present anywhere in the text/url.
-  const alreadyHasLink =
-    baseText.includes(APP_PLAY_STORE_URL) || finalUrl === APP_PLAY_STORE_URL;
+  // Only skip appending when the link is already IN THE TEXT. Android's
+  // share sheet delivers only the text payload to most apps (WhatsApp,
+  // Telegram, Messages) and drops the separate `url` field — so the link
+  // must live inside the text or it never reaches the recipient.
+  const alreadyHasLink = baseText.includes(APP_PLAY_STORE_URL);
 
   const finalText = alreadyHasLink
     ? baseText

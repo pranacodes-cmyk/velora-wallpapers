@@ -45,13 +45,13 @@ export function isAdCooldownActive(): boolean {
  */
 export async function tryShowInterstitial(
   label?: string,
-  opts: { force?: boolean } = {},
+  opts: { force?: boolean; onlyIfWarm?: boolean } = {},
 ): Promise<boolean> {
   if (!opts.force && isAdCooldownActive()) return false;
 
   inFlight = true;
   try {
-    await showInterstitialAd(label);
+    await showInterstitialAd(label, { onlyIfWarm: opts.onlyIfWarm });
     lastShownAt = Date.now();
     return true;
   } catch {

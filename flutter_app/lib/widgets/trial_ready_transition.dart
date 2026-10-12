@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:flutter/services.dart';
 
 import '../core/localization/app_localizations.dart';
 import '../core/theme/app_colors.dart';
@@ -17,6 +19,15 @@ class TrialReadyTransition extends StatefulWidget {
 
 class _TrialReadyTransitionState extends State<TrialReadyTransition>
     with SingleTickerProviderStateMixin {
+  Timer? _flipHaptic;
+  Timer? _readyHaptic;
+
+  @override
+  void initState() {
+    super.initState();
+    _flipHaptic = Timer(const Duration(milliseconds: 500), () { if (mounted) HapticFeedback.lightImpact(); });
+    _readyHaptic = Timer(const Duration(milliseconds: 1020), () { if (mounted) HapticFeedback.mediumImpact(); });
+  }
   late final AnimationController _c = AnimationController(
     vsync: this,
     // 0.18s fade + 0.6s switch + 0.5s delay knob (0.62s) + check + title
@@ -25,6 +36,8 @@ class _TrialReadyTransitionState extends State<TrialReadyTransition>
 
   @override
   void dispose() {
+    _flipHaptic?.cancel();
+    _readyHaptic?.cancel();
     _c.dispose();
     super.dispose();
   }
@@ -52,7 +65,7 @@ class _TrialReadyTransitionState extends State<TrialReadyTransition>
     final title = _seg(1120, 420, Curves.easeOut);
 
     return ColoredBox(
-      color: AppColors.background,
+      color: AppColors.darkBackground,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -76,12 +89,12 @@ class _TrialReadyTransitionState extends State<TrialReadyTransition>
                               height: 64, // h-16
                               decoration: BoxDecoration(
                                 color: Color.lerp(
-                                  AppColors.muted,
+                                  AppColors.darkMuted,
                                   AppColors.premiumGold,
                                   shell.value,
                                 ),
                                 borderRadius: BorderRadius.circular(999),
-                                border: Border.all(color: AppColors.border),
+                                border: Border.all(color: AppColors.darkBorder),
                                 boxShadow: [
                                   BoxShadow(
                                     color: AppColors.isLight
@@ -127,7 +140,7 @@ class _TrialReadyTransitionState extends State<TrialReadyTransition>
                                             child: LucideIcon(
                                               'check',
                                               size: 28,
-                                              color: AppColors.primary,
+                                              color: AppColors.darkPrimary,
                                             ),
                                           ),
                                         ),
@@ -151,7 +164,7 @@ class _TrialReadyTransitionState extends State<TrialReadyTransition>
                                 fontSize: 24,
                                 height: 1.1,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.foreground,
+                                color: AppColors.darkForeground,
                               ),
                             ),
                           ),

@@ -283,8 +283,16 @@ export async function showRewardedAd(loadingLabel?: string): Promise<boolean> {
 /**
  * Show an interstitial. If a warm ad is ready, it appears INSTANTLY.
  * Otherwise it prepares + shows, then warms the next one in the background.
+ *
+ * `opts.onlyIfWarm`: show ONLY if a warm ad is already ready — never
+ * cold-prepare. Use this for moment-based triggers (journey completion,
+ * reflection close) where a late-loading ad would pop up seconds later in
+ * the middle of a completely different screen.
  */
-export async function showInterstitialAd(loadingLabel?: string): Promise<void> {
+export async function showInterstitialAd(
+  loadingLabel?: string,
+  opts: { onlyIfWarm?: boolean } = {},
+): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   // Pro / ad-free users: silently no-op.
   if (isAdFreeUser()) return;
@@ -308,11 +316,17 @@ export async function showInterstitialAd(loadingLabel?: string): Promise<void> {
 
   await ensureInit();
 
-  // If we don't have a warm ad, prepare one inline (slower path).
+  // If we don't have a warm ad, prepare one inline (slower path) — unless
+  // the caller asked for warm-only, in which case we silently skip so the
+  // ad can never land late on an unrelated screen.
   if (
     interstitialState !== "ready" ||
     Date.now() - interstitialReadyAt > INTERSTITIAL_TTL_MS
   ) {
+    if (opts.onlyIfWarm) {
+      adLog("INT", "show: skipped — no warm ad (onlyIfWarm)");
+      return;
+    }
     interstitialState = "loading";
     adLog("INT", "show: preparing cold path — isTesting=false", { adId: AD_INTERSTITIAL, isTesting: false });
     emitStart();

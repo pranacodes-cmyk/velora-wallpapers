@@ -72,6 +72,14 @@ flutter:
     - assets/images/reminders/
     - assets/images/prayscreen/
     - assets/data/
+    - assets/bible/en/
+    - assets/bible/es/
+    - assets/bible/pt/
+    - assets/bible/fil/
+    - assets/bible/hi/
+    - assets/bible/id/
+    - assets/bible/fr/
+    - assets/bible/de/
   fonts:
     # Same families the web build uses: Inter for UI, Cormorant Garamond for
     # scripture. Bundled (not downloaded) so first paint matches exactly.

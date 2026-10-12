@@ -191,5 +191,12 @@ const en = {
   "onb.proof.r8Time": "yesterday",
   "onb.proof.r8Title": "I feel peace again",
   "onb.proof.r8Body": "My mind is quieter. Less noise, more God — my kids notice it too.",
+  "onb.bible.kicker": "Holy Bible",
+  "onb.bible.headlinePre": "The whole Bible,",
+  "onb.bible.headlineGold": "made for your phone.",
+  "onb.bible.subcopy": "Swipe verse by verse like a feed, or read full chapters. Save, note and share what speaks to you.",
+  "onb.bible.f1": "Read in your language",
+  "onb.bible.f2": "Feed & chapter modes",
+  "onb.bible.f3": "Private notes & likes",
 };
 export default en;

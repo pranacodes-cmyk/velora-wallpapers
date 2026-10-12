@@ -187,5 +187,12 @@ const de: Record<string, string> = {
   "onb.proof.r8Time": "gestern",
   "onb.proof.r8Title": "Ich finde wieder Frieden",
   "onb.proof.r8Body": "Mein Kopf ist ruhiger. Weniger Lärm, mehr Gott — meine Kinder merken es auch.",
+  "onb.bible.kicker": "Heilige Bibel",
+  "onb.bible.headlinePre": "Die ganze Bibel,",
+  "onb.bible.headlineGold": "gemacht für dein Handy.",
+  "onb.bible.subcopy": "Wische Vers für Vers wie durch einen Feed oder lies ganze Kapitel. Speichere, notiere und teile, was dich berührt.",
+  "onb.bible.f1": "Lies in deiner Sprache",
+  "onb.bible.f2": "Feed- & Kapitelmodus",
+  "onb.bible.f3": "Private Notizen & Likes",
 };
 export default de;

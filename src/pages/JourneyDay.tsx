@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Check, Smartphone, ArrowRight, Flame } from "lucide-react";
@@ -8,7 +8,8 @@ import { getRichDay } from "@/data/journeyRichContent";
 import { useJourneyProgress, isPremiumJourneyDay } from "@/hooks/useJourneyProgress";
 import { useStreak } from "@/hooks/useStreak";
 import { usePremium } from "@/hooks/usePremium";
-import { showInterstitialAd, primeInterstitial } from "@/services/ads";
+import { primeInterstitial } from "@/services/ads";
+import { tryShowInterstitial } from "@/services/ad-cooldown";
 import { haptic } from "@/utils/haptics";
 import { toast } from "sonner";
 import RichDayExperience from "@/components/journey/RichDayExperience";
@@ -94,6 +95,13 @@ export default function JourneyDay() {
     if (!isPremium) primeInterstitial().catch(() => {});
   }, [isPremium]);
 
+  // Pending completion-ad timer — cancelled on unmount so the ad can never
+  // fire after the user has already left this screen.
+  const journeyAdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (journeyAdTimerRef.current) clearTimeout(journeyAdTimerRef.current);
+  }, []);
+
   // Analytics — fires once per day mount
   useEffect(() => {
     if (!journey) return;
@@ -174,10 +182,14 @@ export default function JourneyDay() {
 
     // Fire interstitial AFTER the user lands on the celebration screen.
     // Slight delay lets the success haptic + check-in animation play first.
+    // onlyIfWarm: if no ad is pre-loaded, skip silently — a cold-prepare
+    // could finish seconds later and pop the ad mid-reflection/quiz on a
+    // totally different screen. Timer is cancelled if the user leaves.
     if (wasFirstCompletion && shouldShowJourneyAd(selectedDay, isPremium)) {
-      setTimeout(() => {
-        showInterstitialAd().catch(() => {});
+      const timer = setTimeout(() => {
+        tryShowInterstitial("journey_day1", { onlyIfWarm: true }).catch(() => {});
       }, 900);
+      journeyAdTimerRef.current = timer;
     }
 
     // Premium paywall — every day completion is a high-intent value moment.

@@ -34,6 +34,7 @@ const Journeys = lazyPage(() => import("./pages/Journeys"));
 const JourneyDay = lazyPage(() => import("./pages/JourneyDay"));
 const AlarmPreview = lazyPage(() => import("./pages/AlarmPreview"));
 const Companion = lazyPage(() => import("./pages/Companion"));
+const BibleReader = lazyPage(() => import("./pages/BibleReader"));
 const NotificationPreview = lazyPage(() => import("./pages/NotificationPreview"));
 const DebugLogs = lazyPage(() => import("./pages/DebugLogs"));
 const ParallaxPreview = lazyPage(() => import("./pages/ParallaxPreview"));
@@ -308,6 +309,7 @@ function AppShell() {
           <Route path="/journeys" element={<Journeys />} />
           <Route path="/journeys/:id" element={<JourneyDay />} />
           <Route path="/companion" element={<Companion />} />
+          <Route path="/bible" element={<BibleReader />} />
 
           <Route path="/settings" element={<Settings />} />
           {/* Internal preview/debug tooling — dev builds only. In production

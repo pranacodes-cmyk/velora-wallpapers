@@ -17,6 +17,7 @@ import '../../widgets/app_toast.dart';
 import '../../widgets/premium_sheet.dart';
 import '../../widgets/screen_scaffold.dart';
 import '../favorites/favorites_screen.dart';
+import '../bible_reader/bible_reader_screen.dart';
 import '../legal/privacy_policy_screen.dart';
 import '../legal/terms_screen.dart';
 import '../today/today_shared.dart';
@@ -814,6 +815,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
 
             // ---------------- My Library ----------------
+            _Section(
+              title: t('bible.title'),
+              child: _Row(icon: Icons.menu_book, iconColor: AppColors.primary, label: t('bible.read'), onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const BibleReaderScreen()))),
+            ),
             _Section(
               title: t('settings.section.library'),
               child: _Row(

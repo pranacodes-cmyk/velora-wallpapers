@@ -442,7 +442,7 @@ public class PrayerAlarmActivity extends Activity {
             android.content.Intent intent = new android.content.Intent(this, PrayerAlarmReceiver.class);
             intent.setAction("com.velora.prayer.FIRE");
             intent.putExtra("label", label);
-            intent.putExtra("sound", getIntent().getBooleanExtra("sound", false));
+            intent.putExtra("sound", true); // snoozed bell must stay audible
             intent.setData(android.net.Uri.parse("prayer://snooze"));
             int flags = android.app.PendingIntent.FLAG_UPDATE_CURRENT
                     | (Build.VERSION.SDK_INT >= 23 ? android.app.PendingIntent.FLAG_IMMUTABLE : 0);

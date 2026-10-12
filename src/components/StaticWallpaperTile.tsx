@@ -79,7 +79,7 @@ export const StaticWallpaperTile = forwardRef<HTMLDivElement, Props>(
       let cancelled = false;
       requestAnimationFrame(() => {
         if (cancelled) return;
-        const t = setTimeout(() => { if (!cancelled) setMinDelayDone(true); }, 1800);
+        const t = setTimeout(() => { if (!cancelled) setMinDelayDone(true); }, 0);
         cleanupRef.current = () => clearTimeout(t);
       });
       return () => { cancelled = true; cleanupRef.current?.(); };
@@ -97,7 +97,7 @@ export const StaticWallpaperTile = forwardRef<HTMLDivElement, Props>(
             observer.disconnect();
           }
         },
-        { rootMargin: "200px" }  // start loading 200px before entering viewport
+        { rootMargin: "900px" } // warm tiles well before they scroll in
       );
       observer.observe(el);
       return () => observer.disconnect();

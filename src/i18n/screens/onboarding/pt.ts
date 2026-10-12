@@ -191,5 +191,12 @@ const pt = {
   "onb.proof.r8Time": "ontem",
   "onb.proof.r8Title": "Voltei a sentir paz",
   "onb.proof.r8Body": "Minha mente está mais calma. Menos ruído, mais Deus — meus filhos também notam.",
+  "onb.bible.kicker": "Bíblia Sagrada",
+  "onb.bible.headlinePre": "A Bíblia inteira,",
+  "onb.bible.headlineGold": "feita para o seu celular.",
+  "onb.bible.subcopy": "Deslize versículo por versículo ou leia capítulos inteiros. Salve, anote e compartilhe o que fala com você.",
+  "onb.bible.f1": "Leia no seu idioma",
+  "onb.bible.f2": "Modo feed e capítulos",
+  "onb.bible.f3": "Notas privadas e curtidas",
 };
 export default pt;

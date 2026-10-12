@@ -143,6 +143,27 @@
     color-scheme: dark;
   }
 
+  .bible-night {
+    --background: 222 30% 5%; --foreground: 40 20% 96%;
+    --card: 222 25% 8%; --primary: 42 85% 52%; --primary-foreground: 222 30% 5%;
+    --muted: 222 15% 14%; --muted-foreground: 40 10% 65%; --border: 222 15% 19%;
+    --secondary: 222 20% 10%; --accent: 220 30% 14%; --accent-foreground: 40 20% 96%;
+    color-scheme: dark;
+  }
+  .bible-paper {
+    --background: 40 20% 98%; --foreground: 222 30% 13%; --card: 0 0% 100%;
+    --primary: 42 80% 34%; --primary-foreground: 0 0% 100%;
+    --muted: 40 10% 93%; --muted-foreground: 222 12% 42%; --border: 40 12% 85%;
+    --accent: 40 15% 92%; --accent-foreground: 222 30% 13%; color-scheme: light;
+  }
+  .bible-image-shade { background: linear-gradient(180deg, hsl(var(--background) / .4), hsl(var(--background) / .75)); }
+  .bible-text { overflow-wrap: anywhere; letter-spacing: 0; }
+  .bible-size-18 { font-size: 18px; } .bible-size-20 { font-size: 20px; }
+  .bible-size-22 { font-size: 22px; } .bible-size-24 { font-size: 24px; }
+  .bible-size-26 { font-size: 26px; } .bible-size-28 { font-size: 28px; }
+  .bible-size-30 { font-size: 30px; } .bible-size-32 { font-size: 32px; }
+  .bible-size-34 { font-size: 34px; }
+
   /* ===========================================================
      Light-mode scoped override for the Today page.
      Pure gold-on-white reads cheap. Pro fix = duotone: remap

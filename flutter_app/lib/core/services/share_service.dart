@@ -17,8 +17,10 @@ class ShareService {
   static ({String text, String url}) _withAppLink(String? text, String? url) {
     final finalUrl = (url == null || url.isEmpty) ? kAppPlayStoreUrl : url;
     final baseText = (text ?? '').trim();
-    final alreadyHasLink =
-        baseText.contains(kAppPlayStoreUrl) || finalUrl == kAppPlayStoreUrl;
+    // Only skip when the link is already IN THE TEXT — Android's share
+    // sheet drops a separate url field in most target apps, so the link
+    // must live inside the text payload (mirrors web nativeShare.ts).
+    final alreadyHasLink = baseText.contains(kAppPlayStoreUrl);
 
     final finalText = alreadyHasLink
         ? baseText

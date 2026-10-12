@@ -4,6 +4,7 @@ export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   prefix: "",
+  safelist: ["bible-night", "bible-paper", "bible-size-18", "bible-size-20", "bible-size-22", "bible-size-24", "bible-size-26", "bible-size-28", "bible-size-30", "bible-size-32", "bible-size-34"],
   theme: {
     container: {
       center: true,

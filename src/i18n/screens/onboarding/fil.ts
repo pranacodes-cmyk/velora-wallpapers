@@ -191,5 +191,12 @@ const fil = {
   "onb.proof.r8Time": "kahapon",
   "onb.proof.r8Title": "Payapa na ako ulit",
   "onb.proof.r8Body": "Mas tahimik ang isip ko. Bawas ingay, dagdag Diyos — napapansin din ng mga anak ko.",
+  "onb.bible.kicker": "Banal na Bibliya",
+  "onb.bible.headlinePre": "Ang buong Bibliya,",
+  "onb.bible.headlineGold": "ginawa para sa phone mo.",
+  "onb.bible.subcopy": "I-swipe ang bawat talata o basahin ang buong kabanata. I-save, isulat at i-share ang tumatama sa puso mo.",
+  "onb.bible.f1": "Basahin sa sarili mong wika",
+  "onb.bible.f2": "Feed at kabanata mode",
+  "onb.bible.f3": "Pribadong notes at likes",
 };
 export default fil;

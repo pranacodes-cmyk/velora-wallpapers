@@ -100,6 +100,7 @@ import {
   useMidnightCountdown,
 } from "@/components/today/todayShared";
 import { PrayerAlarmToggles } from "@/components/prayer/PrayerAlarmToggles";
+import { BibleReaderCard } from "@/components/bible/BibleReaderCard";
 // ParallaxRail lazy-imported above
 
 
@@ -1128,6 +1129,7 @@ export default function Today() {
         <VerseHero onPremium={() => setShowPremium(true)} />
 
         <PrayerAlarmToggles />
+        <BibleReaderCard />
 
         <TodayChecklist />
 

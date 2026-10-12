@@ -19,6 +19,7 @@ import '../../widgets/premium_sheet.dart';
 import '../../widgets/screen_scaffold.dart';
 import '../../widgets/streak_badge.dart';
 import '../bible_chat/bible_chat_screen.dart';
+import '../bible_reader/bible_reader_screen.dart';
 import '../daily_verse/daily_verse_screen.dart';
 import '../devotional/devotional_screen.dart';
 import '../journeys/journeys_screen.dart';
@@ -264,6 +265,14 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                 ),
 
                 const app_keep_alive.KeepAlive(child: PrayerAlarmToggles()),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: TextButton.icon(
+                    onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const BibleReaderScreen())),
+                    icon: Icon(Icons.menu_book, color: AppColors.primary, size: 30),
+                    label: Padding(padding: const EdgeInsets.all(12), child: Text(t('bible.read'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.foreground))),
+                  ),
+                ),
 
                 app_keep_alive.KeepAlive(
                   child: TodayChecklist(
