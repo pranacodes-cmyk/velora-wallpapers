@@ -324,7 +324,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                 ),
 
                 if (!isPremium) PremiumNudge(onOpen: _openPremium),
-                PermissionNudge(),
+                const NotificationPermissionCard(),
 
                 app_keep_alive.KeepAlive(
                   child: DailyQuestionCard(
