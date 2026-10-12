@@ -390,7 +390,7 @@ class _PrayScreenScreenState extends ConsumerState<PrayScreenScreen>
         transitionDuration: const Duration(milliseconds: 420),
         reverseTransitionDuration: const Duration(milliseconds: 260),
         // Pro pauses open the Scripture Gate unless the user chose prayers.
-        pageBuilder: (_, __, ___) => ScriptureGateScreen(initialBible: BibleGateService.enabled, pause: pause),
+        pageBuilder: (_, __, ___) => ScriptureGateScreen(initialBible: BibleGateService.enabled && ref.read(premiumProvider), pause: pause),
         transitionsBuilder: (_, animation, __, child) => FadeTransition(
           opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
           child: child,
@@ -591,6 +591,7 @@ class _PrayScreenScreenState extends ConsumerState<PrayScreenScreen>
               premium: premium,
               onTap: () => _openScriptureGate(premium),
               onModeChanged: (bible) async {
+                if (bible && !premium) { Analytics.capture('scripture_gate_bible_locked'); _openPremium(); return; }
                 await BibleGateService.setEnabled(bible);
                 await PrayScreenService.pushBlockerCopy();
                 Analytics.capture('scripture_gate_mode_changed', {'mode': bible ? 'bible' : 'prayer'});
@@ -753,7 +754,7 @@ class _ScriptureGateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pct = BibleGateService.percent;
-    final bibleOn = BibleGateService.enabled;
+    final bibleOn = BibleGateService.enabled && premium;
     Widget seg({required String label, required String icon, required String sub, required bool active, required VoidCallback tap, bool proBadge = false}) => Expanded(
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Bell, BookOpen, Check, ChevronRight, Crown, Lock, Pause, Play, Search, Shield, ShieldAlert, Sparkles } from "lucide-react";
+import { LazyPremiumSheet as PremiumSheet } from "@/components/LazyPremiumSheet";
 import { ScriptureGate } from "@/components/prayscreen/ScriptureGate";
 import { bibleProgress } from "@/services/bibleGate";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,7 @@ export default function PrayScreen() {
   const pauses = usePrayerPauses();
   const pause = pauses[pauseIndex % pauses.length];
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [biblePaywall, setBiblePaywall] = useState(false);
   const [gate, setGate] = useState<null | "live" | "preview">(null);
   const [bible, setBible] = useState(bibleProgress);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -170,7 +172,7 @@ export default function PrayScreen() {
     localStorage.setItem("ps_unblock_until", String(until));
     setUnblockUntil(until);
     // Both tiers enter the same localized pause; selection never changes access.
-    const useBible = bibleMode;
+    const useBible = bibleMode && isPremium;
     setGate("live");
     track("pray_screen_prayer_shown", { reference: pause.reference, lang: localStorage.getItem("app-lang") ?? "en", mode: useBible ? "scripture" : "prayer" });
     track("pray_screen_unlocked", { until: new Date(until).toISOString(), app_count: selected.length });
@@ -268,13 +270,14 @@ export default function PrayScreen() {
             { id: "prayer", label: t("ps.mode.prayer"), sub: "", icon: <Bell className="h-4 w-4" /> },
             { id: "bible", label: t("bible.title"), sub: "", icon: <BookOpen className="h-4 w-4" /> },
           ] as const).map((o) => {
-            const active = o.id === "bible" ? bibleMode : !(bibleMode);
+            const active = o.id === "bible" ? bibleMode && isPremium : !(bibleMode && isPremium);
             return (
               <Button variant="ghost"
                 key={o.id}
                 onClick={() => {
                   haptic("light");
                   const on = o.id === "bible";
+                  if (on && !isPremium) { setBiblePaywall(true); return; }
                   setBibleMode(on);
                   localStorage.setItem("ps_bible_enabled", String(on));
                   track("scripture_gate_mode_changed", { mode: on ? "bible" : "prayer" });
@@ -302,7 +305,7 @@ export default function PrayScreen() {
       {gate && (
         <ScriptureGate
           preview={gate === "preview"}
-          initialBible={bibleMode}
+          initialBible={bibleMode && isPremium}
           prayer={pause}
           onUpgrade={() => { setGate(null); setUpgradeOpen(true); }}
           onDone={() => { if (gate === "live") finishPrayer(); else setGate(null); }}
@@ -336,6 +339,7 @@ export default function PrayScreen() {
         </DialogContent>
       </Dialog>
 
+      <PremiumSheet isOpen={biblePaywall} trigger="pray_screen_bible_mode" onClose={() => setBiblePaywall(false)} onUnlock={() => { setBiblePaywall(false); setBibleMode(true); localStorage.setItem("ps_bible_enabled", "true"); }} />
       <Dialog open={upgradeOpen} onOpenChange={setUpgradeOpen}>
         <DialogContent className="max-w-[calc(100%-24px)] rounded-[24px] border-primary/25 bg-card text-center">
           <Crown className="mx-auto h-9 w-9 text-primary" />

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import '../../core/app_tabs.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +17,6 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/keep_alive.dart' as app_keep_alive;
 import '../../widgets/lucide.dart';
 import '../../state/app_providers.dart';
-import '../../widgets/premium_cross_logo.dart';
 import '../../widgets/premium_sheet.dart';
 import '../../widgets/screen_scaffold.dart';
 import '../../widgets/streak_badge.dart';
@@ -131,7 +132,27 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               child: Row(
                 children: [
-                  const PremiumCrossLogo(size: 36),
+                  SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: IconButton(
+                      tooltip: 'Life Calendar',
+                      padding: EdgeInsets.zero,
+                      style: IconButton.styleFrom(
+                        backgroundColor: TodayInk.primary.withValues(alpha: 0.1),
+                        foregroundColor: TodayInk.primary,
+                        side: BorderSide(color: TodayInk.primary.withValues(alpha: 0.2)),
+                      ),
+                      icon: const Icon(Icons.card_giftcard_outlined, size: 20),
+                      onPressed: () {
+                        haptic(HapticStyle.soft);
+                        launchUrl(
+                          Uri.parse('https://play.google.com/store/apps/details?id=com.mylifecalendar.app'),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      },
+                    ),
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -304,45 +325,65 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
 
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
-                  child: Material(
-                    color: AppColors.card,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: AppColors.border),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      onTap: () {
-                        haptic(HapticStyle.soft);
-                        Navigator.of(context).push(MaterialPageRoute<void>(
-                          builder: (_) => const PrayScreenScreen(),
-                        ));
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(children: [
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(Icons.shield_outlined, size: 24, color: AppColors.primary),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(t('premium.benefit.shield.title'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.foreground)),
-                              const SizedBox(height: 4),
-                              Text(t('ps.tagline'), style: TextStyle(fontSize: 12, height: 1.5, color: AppColors.mutedForeground)),
-                            ],
-                          )),
-                          const SizedBox(width: 14),
-                          Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.mutedForeground),
-                        ]),
+                  child: GestureDetector(
+                    onTap: () {
+                      haptic(HapticStyle.soft);
+                      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const PrayScreenScreen()));
+                    },
+                    child: Container(
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        color: AppColors.card,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
+                        boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.18), blurRadius: 32, offset: const Offset(0, 12), spreadRadius: -18)],
                       ),
+                      child: Stack(children: [
+                        Positioned(right: -40, top: -48, child: Container(width: 160, height: 160, decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [AppColors.primary.withValues(alpha: 0.22), AppColors.primary.withValues(alpha: 0)])))),
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Container(
+                                width: 56, height: 56,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [AppColors.primary.withValues(alpha: 0.25), AppColors.primary.withValues(alpha: 0.05)]),
+                                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.35)),
+                                ),
+                                child: Stack(alignment: Alignment.center, children: [
+                                  Icon(Icons.shield_outlined, size: 28, color: AppColors.primary),
+                                  Icon(Icons.lock_rounded, size: 11, color: AppColors.primary),
+                                ]),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                const SizedBox(height: 2),
+                                Text(t('premium.benefit.shield.title'), style: AppTheme.serif(size: 22, weight: FontWeight.w600, color: AppColors.foreground, height: 1.15)),
+                                const SizedBox(height: 4),
+                                Text(t('ps.tagline'), style: TextStyle(fontSize: 13, height: 1.35, color: AppColors.mutedForeground)),
+                              ])),
+                            ]),
+                            const SizedBox(height: 16),
+                            Row(children: [
+                              _shieldChip(Icons.lock_outline_rounded, t('ps.mode.prayer')),
+                              const SizedBox(width: 8),
+                              _shieldChip(Icons.menu_book_outlined, t('bible.title')),
+                              const Spacer(),
+                              Container(
+                                height: 36,
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.45), blurRadius: 16, offset: const Offset(0, 6), spreadRadius: -6)]),
+                                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                  Text(t('ps.btn.on'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryForeground)),
+                                  const SizedBox(width: 6),
+                                  Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primaryForeground),
+                                ]),
+                              ),
+                            ]),
+                          ]),
+                        ),
+                      ]),
                     ),
                   ),
                 ),
@@ -430,3 +471,14 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     );
   }
 }
+
+Widget _shieldChip(IconData icon, String label) => Container(
+      height: 32,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(color: AppColors.muted.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(16)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 14, color: AppColors.primary),
+        const SizedBox(width: 6),
+        Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.foreground.withValues(alpha: 0.8))),
+      ]),
+    );

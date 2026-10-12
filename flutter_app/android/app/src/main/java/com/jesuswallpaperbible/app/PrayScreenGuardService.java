@@ -229,29 +229,7 @@ public final class PrayScreenGuardService extends Service {
                     new int[]{Color.rgb(12, 20, 44), Color.rgb(7, 11, 24), Color.rgb(4, 6, 14)});
             root.setBackground(sky);
 
-            // Choose a pause without granting access or dismissing the overlay.
-            LinearLayout modes = new LinearLayout(this);
-            modes.setOrientation(LinearLayout.HORIZONTAL);
-            android.content.SharedPreferences pausePrefs = getSharedPreferences(PrayScreenChannel.PREFS, MODE_PRIVATE);
-            Button bibleChoice = new Button(this);
-            Button prayerChoice = new Button(this);
-            bibleChoice.setText(copy("bible", "Bible"));
-            prayerChoice.setText(copy("prayer", "Prayer"));
-            bibleChoice.setAllCaps(false);
-            prayerChoice.setAllCaps(false);
-            Runnable paintModes = () -> {
-                boolean selectedBible = pausePrefs.getBoolean("bible_mode", true);
-                bibleChoice.setTextColor(selectedBible ? Color.rgb(238, 196, 72) : Color.rgb(182, 189, 205));
-                prayerChoice.setTextColor(!selectedBible ? Color.rgb(238, 196, 72) : Color.rgb(182, 189, 205));
-                bibleChoice.setBackgroundColor(Color.TRANSPARENT);
-                prayerChoice.setBackgroundColor(Color.TRANSPARENT);
-            };
-            bibleChoice.setOnClickListener(v -> { pausePrefs.edit().putBoolean("bible_mode", true).apply(); paintModes.run(); });
-            prayerChoice.setOnClickListener(v -> { pausePrefs.edit().putBoolean("bible_mode", false).apply(); paintModes.run(); });
-            modes.addView(bibleChoice, new LinearLayout.LayoutParams(0, (int) (48 * d), 1));
-            modes.addView(prayerChoice, new LinearLayout.LayoutParams(0, (int) (48 * d), 1));
-            paintModes.run();
-            root.addView(modes, lp(0, (int) (20 * d)));
+            // Bible/Prayer is chosen inside Prayly's pause screen; no second switcher here.
 
             // A sacred covenant: His face first, then the promise, then one way in.
             // The verse and prayer live full-screen inside Prayly.

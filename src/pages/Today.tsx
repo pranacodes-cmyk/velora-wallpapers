@@ -2,12 +2,12 @@ import { Suspense, useMemo, useState, useEffect, useRef, useCallback, useLayoutE
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Sun, Flame, Crown, Star, Settings as SettingsIcon, Lock,
+  Sun, Flame, Crown, Star, Settings as SettingsIcon, Lock, Gift,
 } from "lucide-react";
 import { useDailyVerse } from "@/hooks/useDailyVerse";
 import { useStreak } from "@/hooks/useStreak";
 import { usePremium } from "@/hooks/usePremium";
-import { PremiumCrossLogo } from "@/components/PremiumCrossLogo";
+import { Button } from "@/components/ui/button";
 import { StreakBadge } from "@/components/StreakBadge";
 import { useAndroidBack } from "@/hooks/useAndroidBack";
 import { haptic } from "@/utils/haptics";
@@ -1090,7 +1090,23 @@ export default function Today() {
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <PremiumCrossLogo size={36} />
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 shrink-0 rounded-full border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary [&_svg]:size-5"
+            >
+              <a
+                href="https://play.google.com/store/apps/details?id=com.mylifecalendar.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Life Calendar"
+                title="Life Calendar"
+                onClick={() => haptic("soft")}
+              >
+                <Gift strokeWidth={1.8} />
+              </a>
+            </Button>
             <div className="leading-none min-w-0">
               <div className="flex items-center gap-1.5">
                 <greeting.Icon className="w-3 h-3 text-primary" strokeWidth={2.4} />
