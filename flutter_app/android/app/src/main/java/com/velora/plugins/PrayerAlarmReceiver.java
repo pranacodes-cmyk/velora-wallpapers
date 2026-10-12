@@ -52,7 +52,9 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
     public static final String ACTION_PRAY = "com.velora.prayer.PRAY";
 
     /** Heads-up channel WITH bell sound (used when screen is on). */
-    private static final String CHANNEL_SOUND = "prayer_alarm_sound_v2";
+    // New channel ID repairs devices where Android permanently cached the old
+    // channel without sound. Notification-channel audio cannot be changed in place.
+    private static final String CHANNEL_SOUND = "prayer_alarm_sound_v3";
     /** Full-screen channel WITHOUT notification sound; the activity plays the bell. */
     private static final String CHANNEL_SILENT = "prayer_alarm_fullscreen_v2";
     private static final int NOTIF_ID = 9710;
@@ -96,7 +98,7 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
     private void handleReceive(Context context, Intent intent) {
         String action = intent.getAction();
         String label = intent.getStringExtra("label");
-        if (label == null) label = "Prayer Time";
+        if (label == null) label = DailyReminderScheduler.copy(context, "alarm.defaultLabel", "Prayer Time");
         boolean sound = intent.getBooleanExtra("sound", true);
 
         int followUp = intent.getIntExtra("follow_up", 0);
@@ -202,9 +204,9 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
 
         NotificationChannel ch = new NotificationChannel(
                 channelId,
-                CHANNEL_SILENT.equals(channelId) ? "Prayer Alarm" : "Prayer Bell",
+                DailyReminderScheduler.copy(ctx, "alarm.channelName", "Prayer Bell"),
                 NotificationManager.IMPORTANCE_HIGH);
-        ch.setDescription("Daily prayer reminder bells.");
+        ch.setDescription(DailyReminderScheduler.copy(ctx, "alarm.channelDesc", "Daily prayer reminder bells"));
         ch.enableLights(true);
         ch.setLightColor(Color.parseColor("#E8C56B"));
         ch.enableVibration(true);
@@ -274,7 +276,10 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
         RemoteViews alarmView = new RemoteViews(ctx.getPackageName(), R.layout.prayer_alarm_notification);
         alarmView.setTextViewText(R.id.prayer_alarm_time, displayTime);
         alarmView.setTextViewText(R.id.prayer_alarm_title, label);
-        alarmView.setTextViewText(R.id.prayer_alarm_subtitle, "A quiet moment with Jesus is ready");
+        String subtitle = DailyReminderScheduler.copy(ctx, "alarm.subtitle", "A quiet moment with Jesus is ready");
+        alarmView.setTextViewText(R.id.prayer_alarm_subtitle, subtitle);
+        alarmView.setTextViewText(R.id.prayer_alarm_close, DailyReminderScheduler.copy(ctx, "alarm.dismiss", "Dismiss"));
+        alarmView.setTextViewText(R.id.prayer_alarm_pray, DailyReminderScheduler.copy(ctx, "alarm.openPrayer", "Open Prayer"));
         alarmView.setOnClickPendingIntent(R.id.prayer_alarm_close, closePi);
         alarmView.setOnClickPendingIntent(R.id.prayer_alarm_pray, prayPi);
 
@@ -283,7 +288,7 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
                 .setSmallIcon(R.drawable.ic_stat_cross)
                 .setColor(Color.parseColor("#E8C56B"))
                 .setContentTitle(label)
-                .setContentText("A quiet moment with Jesus is ready")
+                .setContentText(subtitle)
                 .setSubText("Prayly")
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setPriority(NotificationCompat.PRIORITY_MAX)

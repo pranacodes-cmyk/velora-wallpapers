@@ -15,6 +15,9 @@ const es = {
   "ov.notif.enable": "Activar notificaciones",
   "ov.notif.opening": "Abriendo…",
   "ov.notif.later": "Quizás luego",
+  "ov.notif.retry.title": "No te pierdas tus momentos de oración",
+  "ov.notif.retry.body": "Las notificaciones siguen desactivadas. Actívalas para recibir la Escritura diaria y tu campana de oración.",
+  "ov.notif.retry.cta": "Abrir ajustes de notificaciones",
 
   "ov.perm.title": "Mantente cerca de la Palabra",
   "ov.perm.body": "Un par de permisos sencillos mantienen fluyendo tu Escritura diaria y la campana de oración.",

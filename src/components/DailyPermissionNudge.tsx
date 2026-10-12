@@ -31,7 +31,7 @@ const DAY_ONE_GRACE_MS = 24 * 60 * 60 * 1000;
  *  - Tomorrow, if anything is still missing, we ask again.
  */
 
-const DAY_KEY = "prayly:dailyPermNudge:lastShownDay";
+const DAY_KEY = "prayly:dailyPermNudge:lastShownAt";
 
 const todayKey = () => {
   const d = new Date();
@@ -39,10 +39,13 @@ const todayKey = () => {
 };
 
 const alreadyShownToday = () => {
-  try { return localStorage.getItem(DAY_KEY) === todayKey(); } catch { return false; }
+  try { {
+    const last = Number(localStorage.getItem(DAY_KEY) || 0);
+    return (Date.now() - last) < 7 * 24 * 60 * 60 * 1000;
+  } } catch { return false; }
 };
 const markShownToday = () => {
-  try { localStorage.setItem(DAY_KEY, todayKey()); } catch {}
+  try { localStorage.setItem(DAY_KEY, String(Date.now())); } catch {}
 };
 
 type MissingState = { notif: boolean; overlay: boolean };

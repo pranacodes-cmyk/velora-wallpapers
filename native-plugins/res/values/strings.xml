@@ -8,4 +8,16 @@
     <string name="facebook_app_id">1327255305975486</string>
     <string name="facebook_client_token">68bd7c7043902ccfc3342d7cbf4ec8e6</string>
     <string name="fb_login_protocol_scheme">fb1327255305975486</string>
+
+    <!-- Prayer Alarm Strings -->
+    <string name="prayer_alarm_morning_title">Morning Prayer</string>
+    <string name="prayer_alarm_evening_title">Evening Prayer</string>
+    <string name="prayer_alarm_default_label">Prayer Time</string>
+    <string name="prayer_alarm_subtitle">Your prayer bell is ringing</string>
+    <string name="prayer_alarm_action_close">Close</string>
+    <string name="prayer_alarm_action_pray">Pray Now</string>
+    <string name="prayer_alarm_action_snooze">Snooze 10 minutes</string>
+    <string name="prayer_alarm_channel_alarm">Prayer Alarm</string>
+    <string name="prayer_alarm_channel_bell">Prayer Bell</string>
+    <string name="prayer_alarm_channel_desc">Daily prayer reminder bells.</string>
 </resources>

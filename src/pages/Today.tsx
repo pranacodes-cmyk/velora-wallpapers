@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
+import { Suspense, useMemo, useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -20,26 +20,27 @@ import { PrayerBellsHero } from "@/components/prayer/PrayerBellsHero";
 import { PrayerBellsPill } from "@/components/prayer/PrayerBellsPill";
 import { useT, t as t_, getLang } from "@/i18n";
 import { markContentReady } from "@/services/perf";
+import { lazyPage } from "@/lib/lazy-page";
 
 // ─── Lazy-loaded chunks ────────────────────────────────────────────────────
 // Modals: only load when first opened. Below-fold cards: mount on scroll-in via
 // IntersectionObserver. Both drop initial JS parse + first-paint cost of Today.
-const PremiumSheet = lazy(() =>
+const PremiumSheet = lazyPage(() =>
   import("@/components/PremiumSheet").then((m) => ({ default: m.PremiumSheet })),
 );
-const SearchOverlay = lazy(() =>
+const SearchOverlay = lazyPage(() =>
   import("@/components/SearchOverlay").then((m) => ({ default: m.SearchOverlay })),
 );
-const ExitConfirmDialog = lazy(() =>
+const ExitConfirmDialog = lazyPage(() =>
   import("@/components/ExitConfirmDialog").then((m) => ({ default: m.ExitConfirmDialog })),
 );
-const PrayerSetupSheet = lazy(() =>
+const PrayerSetupSheet = lazyPage(() =>
   import("@/components/prayer/PrayerSetupSheet").then((m) => ({ default: m.PrayerSetupSheet })),
 );
-const ParallaxRail = lazy(() =>
+const ParallaxRail = lazyPage(() =>
   import("@/components/ParallaxRail").then((m) => ({ default: m.ParallaxRail })),
 );
-const BibleCompanionCard = lazy(() =>
+const BibleCompanionCard = lazyPage(() =>
   import("@/components/companion/BibleCompanionCard").then((m) => ({ default: m.BibleCompanionCard })),
 );
 
@@ -1128,10 +1129,10 @@ export default function Today() {
       <div className="flex-1 overflow-y-auto scroll-container pb-28 pt-3">
         <VerseHero onPremium={() => setShowPremium(true)} />
 
-        <PrayerAlarmToggles />
         <BibleReaderCard />
 
         <TodayChecklist />
+        <PrayerAlarmToggles />
 
         {/* ParallaxRail is 524-line component. Lazy-loaded — reserve height
             so scroll doesn't jump when chunk resolves. */}

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { usePremium } from "@/hooks/usePremium";
 import { PrayerAlarmToggles } from "@/components/prayer/PrayerAlarmToggles";
+import { Button } from "@/components/ui/button";
 
 import { useNavigate } from "react-router-dom";
 import { haptic } from "@/utils/haptics";

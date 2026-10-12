@@ -52,10 +52,20 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
     public static final String ACTION_PRAY = "com.velora.prayer.PRAY";
 
     /** Heads-up channel WITH bell sound (used when screen is on). */
-    private static final String CHANNEL_SOUND = "prayer_alarm_sound_v2";
+    // New channel ID repairs devices where Android permanently cached the old
+    // channel without sound. Notification-channel audio cannot be changed in place.
+    private static final String CHANNEL_SOUND = "prayer_alarm_sound_v3";
     /** Full-screen channel WITHOUT notification sound; the activity plays the bell. */
     private static final String CHANNEL_SILENT = "prayer_alarm_fullscreen_v2";
     private static final int NOTIF_ID = 9710;
+
+    /** Card swiped away without Pray/Dismiss → re-show after the gentle follow-up delay. */
+    public static final String ACTION_SWIPED = "com.velora.prayer.SWIPED";
+    /** Ignored or swiped bells return every 20 minutes until Pray or Dismiss. */
+    private static final long FOLLOW_UP_MS = 20 * 60 * 1000L;
+    /** Safety cap: at most 6 returns (~2 hours) so a forgotten bell never nags all day. */
+    private static final int MAX_FOLLOW_UPS = 6;
+    private static final int FOLLOW_UP_REQUEST_CODE = 9778;
 
     public static final String ACTION_NOOP_SHOW = "com.velora.prayer.NOOP_SHOW";
 
@@ -88,21 +98,34 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
     private void handleReceive(Context context, Intent intent) {
         String action = intent.getAction();
         String label = intent.getStringExtra("label");
-        if (label == null) label = "Prayer Time";
+        if (label == null) label = DailyReminderScheduler.copy(context, "alarm.defaultLabel", "Prayer Time");
         boolean sound = intent.getBooleanExtra("sound", true);
 
+        int followUp = intent.getIntExtra("follow_up", 0);
+
+        if (ACTION_SWIPED.equals(action)) {
+            // Swipe is not a decision — the bell comes back in 20 minutes
+            // (full-screen if the phone is locked by then).
+            scheduleFollowUp(context, label, sound, intent.getIntExtra("hour", -1),
+                    intent.getIntExtra("minute", -1), followUp);
+            return;
+        }
+
         if (ACTION_DISMISS.equals(action)) {
+            cancelFollowUp(context);
             cancelNotification(context);
             return;
         }
 
         if (ACTION_PRAY.equals(action)) {
+            cancelFollowUp(context);
             cancelNotification(context);
             openAppToPrayer(context);
             return;
         }
 
         if (ACTION_SNOOZE.equals(action)) {
+            cancelFollowUp(context);
             cancelNotification(context);
             scheduleSnooze(context, label, sound);
             return;
@@ -112,13 +135,18 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
         // OEM ROMs deliver (one from setAlarmClock, one from the AlarmManager
         // stack). Without this, the bell can ring twice in quick succession.
         long now = System.currentTimeMillis();
-        if (label.equals(lastFireLabel) && (now - lastFireAt) < 90_000L) {
+        if (followUp == 0 && label.equals(lastFireLabel) && (now - lastFireAt) < 90_000L) {
             return;
         }
         lastFireAt = now;
         lastFireLabel = label;
 
         boolean locked = isDeviceLocked(context);
+        int hour = intent.getIntExtra("hour", -1);
+        int minute = intent.getIntExtra("minute", -1);
+        // Arm the return trip immediately: if the card is ignored, swiped,
+        // or killed by the OEM, the bell still comes back. Pray/Dismiss cancel it.
+        scheduleFollowUp(context, label, sound, hour, minute, followUp);
 
         if (locked) {
             // Android 14+ restricts USE_FULL_SCREEN_INTENT — relying on the FSI
@@ -128,7 +156,7 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
             // is showing, so we launch the takeover directly. The notification
             // is posted silently as a safety net for OEMs that block the start.
             ensureAlarmChannel(context, CHANNEL_SILENT, false);
-            postFullScreenAlarm(context, label, false, false, formatAlarmTime(intent));
+            postFullScreenAlarm(context, label, sound, false, false, formatAlarmTime(intent), hour, minute, followUp);
             try {
                 Intent activity = new Intent(context, PrayerAlarmActivity.class);
                 activity.putExtra("label", label);
@@ -143,14 +171,14 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
             // bell. If Android promotes it to full-screen, the activity opens
             // silently so the user never hears two bells.
             ensureAlarmChannel(context, CHANNEL_SOUND, sound);
-            postFullScreenAlarm(context, label, sound, false, formatAlarmTime(intent));
+            postFullScreenAlarm(context, label, sound, sound, false, formatAlarmTime(intent), hour, minute, followUp);
         }
 
         // Reschedule tomorrow's occurrences from stored config off the receiver
         // main thread; AlarmManager/PendingIntent binder work must not delay
         // input dispatch while the lock-screen UI is being launched.
         final Context appContext = context.getApplicationContext();
-        try { PrayerAlarmPlugin.scheduleFromPrefs(appContext); } catch (Exception ignored) {}
+        try { PrayerAlarmScheduler.scheduleFromPrefs(appContext); } catch (Exception ignored) {}
     }
 
     private boolean isDeviceLocked(Context ctx) {
@@ -176,9 +204,9 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
 
         NotificationChannel ch = new NotificationChannel(
                 channelId,
-                CHANNEL_SILENT.equals(channelId) ? "Prayer Alarm" : "Prayer Bell",
+                DailyReminderScheduler.copy(ctx, "alarm.channelName", "Prayer Bell"),
                 NotificationManager.IMPORTANCE_HIGH);
-        ch.setDescription("Daily prayer reminder bells.");
+        ch.setDescription(DailyReminderScheduler.copy(ctx, "alarm.channelDesc", "Daily prayer reminder bells"));
         ch.enableLights(true);
         ch.setLightColor(Color.parseColor("#E8C56B"));
         ch.enableVibration(true);
@@ -204,7 +232,7 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
         nm.createNotificationChannel(ch);
     }
 
-    private void postFullScreenAlarm(Context ctx, String label, boolean notificationSound, boolean activitySound, String displayTime) {
+    private void postFullScreenAlarm(Context ctx, String label, boolean bellEnabled, boolean notificationSound, boolean activitySound, String displayTime, int hour, int minute, int followUp) {
         int piFlags = PendingIntent.FLAG_UPDATE_CURRENT
                 | (Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0);
 
@@ -214,6 +242,8 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
         Intent alarmActivity = new Intent(ctx, PrayerAlarmActivity.class);
         alarmActivity.putExtra("label", label);
         alarmActivity.putExtra("sound", activitySound);
+        alarmActivity.putExtra("hour", hour);
+        alarmActivity.putExtra("minute", minute);
         alarmActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                 | Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
@@ -232,10 +262,24 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
         closeIntent.setData(Uri.parse("prayer://dismiss"));
         PendingIntent closePi = PendingIntent.getBroadcast(ctx, 9713, closeIntent, piFlags);
 
+        // Swipe-away → soft snooze (card returns in 20 minutes).
+        Intent swipedIntent = new Intent(ctx, PrayerAlarmReceiver.class);
+        swipedIntent.setAction(ACTION_SWIPED);
+        swipedIntent.setData(Uri.parse("prayer://swiped"));
+        swipedIntent.putExtra("label", label);
+        swipedIntent.putExtra("sound", bellEnabled);
+        swipedIntent.putExtra("hour", hour);
+        swipedIntent.putExtra("minute", minute);
+        swipedIntent.putExtra("follow_up", followUp);
+        PendingIntent swipedPi = PendingIntent.getBroadcast(ctx, 9716, swipedIntent, piFlags);
+
         RemoteViews alarmView = new RemoteViews(ctx.getPackageName(), R.layout.prayer_alarm_notification);
         alarmView.setTextViewText(R.id.prayer_alarm_time, displayTime);
         alarmView.setTextViewText(R.id.prayer_alarm_title, label);
-        alarmView.setTextViewText(R.id.prayer_alarm_subtitle, "A quiet moment with Jesus is ready");
+        String subtitle = DailyReminderScheduler.copy(ctx, "alarm.subtitle", "A quiet moment with Jesus is ready");
+        alarmView.setTextViewText(R.id.prayer_alarm_subtitle, subtitle);
+        alarmView.setTextViewText(R.id.prayer_alarm_close, DailyReminderScheduler.copy(ctx, "alarm.dismiss", "Dismiss"));
+        alarmView.setTextViewText(R.id.prayer_alarm_pray, DailyReminderScheduler.copy(ctx, "alarm.openPrayer", "Open Prayer"));
         alarmView.setOnClickPendingIntent(R.id.prayer_alarm_close, closePi);
         alarmView.setOnClickPendingIntent(R.id.prayer_alarm_pray, prayPi);
 
@@ -244,13 +288,17 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
                 .setSmallIcon(R.drawable.ic_stat_cross)
                 .setColor(Color.parseColor("#E8C56B"))
                 .setContentTitle(label)
-                .setContentText("A quiet moment with Jesus is ready")
+                .setContentText(subtitle)
                 .setSubText("Prayly")
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setAutoCancel(true)
-                .setOngoing(false)
+                // Ongoing: cannot be swiped on Android ≤13 and stays on the
+                // lock screen. On 14+ a swipe is possible, so deleteIntent
+                // turns it into a 20-minute soft snooze instead of losing it.
+                .setAutoCancel(false)
+                .setOngoing(true)
+                .setDeleteIntent(swipedPi)
                 .setContentIntent(prayPi)
                 .setCustomContentView(alarmView)
                 .setCustomHeadsUpContentView(alarmView)
@@ -310,6 +358,51 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
             } else {
                 am.setExact(AlarmManager.RTC_WAKEUP, at, pi);
             }
+        } catch (Exception ignored) { /* ignore */ }
+    }
+
+    private static PendingIntent followUpIntent(Context ctx, String label, boolean sound, int hour, int minute, int count, int extraFlags) {
+        Intent intent = new Intent(ctx, PrayerAlarmReceiver.class);
+        intent.setAction(ACTION_FIRE);
+        intent.setData(Uri.parse("prayer://follow-up"));
+        if (label != null) intent.putExtra("label", label);
+        intent.putExtra("sound", sound);
+        intent.putExtra("hour", hour);
+        intent.putExtra("minute", minute);
+        intent.putExtra("follow_up", count);
+        int flags = extraFlags | (Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0);
+        return PendingIntent.getBroadcast(ctx, FOLLOW_UP_REQUEST_CODE, intent, flags);
+    }
+
+    private static void scheduleFollowUp(Context ctx, String label, boolean sound, int hour, int minute, int currentCount) {
+        if (currentCount >= MAX_FOLLOW_UPS) return;
+        try {
+            AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+            if (am == null) return;
+            PendingIntent pi = followUpIntent(ctx, label, sound, hour, minute, currentCount + 1,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            long at = System.currentTimeMillis() + FOLLOW_UP_MS;
+            boolean exact = false;
+            try {
+                if (PrayerAlarmScheduler.canUseExactAlarms(am)) {
+                    if (Build.VERSION.SDK_INT >= 23) am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi);
+                    else am.setExact(AlarmManager.RTC_WAKEUP, at, pi);
+                    exact = true;
+                }
+            } catch (SecurityException ignored) { /* fall back */ }
+            if (!exact) {
+                if (Build.VERSION.SDK_INT >= 23) am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi);
+                else am.set(AlarmManager.RTC_WAKEUP, at, pi);
+            }
+        } catch (Exception ignored) { /* ignore */ }
+    }
+
+    /** Pray / Dismiss / Snooze are real decisions — stop the 20-minute return. */
+    public static void cancelFollowUp(Context ctx) {
+        try {
+            AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+            PendingIntent pi = followUpIntent(ctx, null, true, -1, -1, 0, PendingIntent.FLAG_NO_CREATE);
+            if (am != null && pi != null) { am.cancel(pi); pi.cancel(); }
         } catch (Exception ignored) { /* ignore */ }
     }
 }

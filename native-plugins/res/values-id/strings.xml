@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prayer_alarm_morning_title">Doa Pagi</string>
+    <string name="prayer_alarm_evening_title">Doa Malam</string>
+    <string name="prayer_alarm_default_label">Waktu Berdoa</string>
+    <string name="prayer_alarm_subtitle">Lonceng doa Anda berbunyi</string>
+    <string name="prayer_alarm_action_close">Tutup</string>
+    <string name="prayer_alarm_action_pray">Berdoa Sekarang</string>
+    <string name="prayer_alarm_action_snooze">Tunda 10 menit</string>
+    <string name="prayer_alarm_channel_alarm">Alarm Doa</string>
+    <string name="prayer_alarm_channel_bell">Lonceng Doa</string>
+    <string name="prayer_alarm_channel_desc">Lonceng pengingat doa harian.</string>
+</resources>

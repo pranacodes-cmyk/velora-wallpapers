@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prayer_alarm_morning_title">Panalangin sa Umaga</string>
+    <string name="prayer_alarm_evening_title">Panalangin sa Gabi</string>
+    <string name="prayer_alarm_default_label">Oras ng Panalangin</string>
+    <string name="prayer_alarm_subtitle">Tumutunog na ang iyong prayer bell</string>
+    <string name="prayer_alarm_action_close">Isara</string>
+    <string name="prayer_alarm_action_pray">Manalangin Ngayon</string>
+    <string name="prayer_alarm_action_snooze">I-snooze nang 10 minuto</string>
+    <string name="prayer_alarm_channel_alarm">Prayer Alarm</string>
+    <string name="prayer_alarm_channel_bell">Prayer Bell</string>
+    <string name="prayer_alarm_channel_desc">Mga kampana para sa pang-araw-araw na paalala sa panalangin.</string>
+</resources>

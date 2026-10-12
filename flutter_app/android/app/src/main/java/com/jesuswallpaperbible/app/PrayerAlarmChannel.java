@@ -207,6 +207,11 @@ public class PrayerAlarmChannel implements MethodChannel.MethodCallHandler {
                 int h = t.get("hour") instanceof Number ? ((Number) t.get("hour")).intValue() : 7;
                 int m = t.get("minute") instanceof Number ? ((Number) t.get("minute")).intValue() : 0;
                 String label = t.get("label") instanceof String ? (String) t.get("label") : "Prayer";
+                if ("Morning Prayer".equalsIgnoreCase(label)) {
+                    label = com.velora.plugins.DailyReminderScheduler.copy(ctx(), "alarm.morning", label);
+                } else if ("Evening Prayer".equalsIgnoreCase(label)) {
+                    label = com.velora.plugins.DailyReminderScheduler.copy(ctx(), "alarm.evening", label);
+                }
                 JSONObject o = new JSONObject();
                 o.put("hour", h);
                 o.put("minute", m);
@@ -246,7 +251,9 @@ public class PrayerAlarmChannel implements MethodChannel.MethodCallHandler {
         Boolean soundArg = call.argument("soundEnabled");
         try {
             Intent i = new Intent(ctx(), PrayerAlarmActivity.class);
-            i.putExtra("label", label == null ? "Prayer Time" : label);
+            i.putExtra("label", label == null
+                    ? com.velora.plugins.DailyReminderScheduler.copy(ctx(), "alarm.defaultLabel", "Prayer Time")
+                    : label);
             i.putExtra("sound", soundArg == null || soundArg);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             ctx().startActivity(i);

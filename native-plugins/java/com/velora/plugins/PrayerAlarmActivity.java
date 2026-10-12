@@ -25,6 +25,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -34,6 +35,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -99,13 +101,13 @@ public class PrayerAlarmActivity extends Activity {
         }
 
         String label = getIntent().getStringExtra("label");
-        if (label == null) label = "Prayer Time";
+        if (label == null) label = DailyReminderScheduler.copy(this, "alarm.defaultLabel", "Prayer Time");
         String eyebrow = getIntent().getStringExtra("eyebrow");
-        if (eyebrow == null) eyebrow = "PRAYER TIME";
+        if (eyebrow == null) eyebrow = DailyReminderScheduler.copy(this, "alarm.eyebrow", "PRAYER TIME");
         String body = getIntent().getStringExtra("body");
         if (body == null) body = "\u201CBe still, and know that I am God.\u201D\n— Psalm 46:10";
         String cta = getIntent().getStringExtra("cta");
-        if (cta == null) cta = "✝   Open Prayer";
+        if (cta == null) cta = "✝   " + DailyReminderScheduler.copy(this, "alarm.openPrayer", "Open Prayer");
         String route = getIntent().getStringExtra("open_route");
         if (route == null || route.isEmpty()) route = "/devotional?from=alarm";
         boolean showSnooze = getIntent().getBooleanExtra("show_snooze", true);
@@ -133,24 +135,27 @@ public class PrayerAlarmActivity extends Activity {
                 new int[]{ NAVY_TOP, NAVY_MID, NAVY_LOW, NAVY_BOTTOM });
         root.setBackground(bg);
 
-        // ── Background gold rays radiating from top-center ──
-        raysLayer = new RaysView(this, GOLD);
-        FrameLayout.LayoutParams raysLp = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        root.addView(raysLayer, raysLp);
+        // Four handcrafted paper-cut scenes rotate by calendar day. The choice
+        // is deterministic, so the screen remains stable during one alarm.
+        String[] scenes = {
+                "prayer_papercut_dawn", "prayer_papercut_garden",
+                "prayer_papercut_shepherd", "prayer_papercut_gate"
+        };
+        int sceneIndex = (Calendar.getInstance().get(Calendar.DAY_OF_YEAR) - 1) % scenes.length;
+        int sceneId = getResources().getIdentifier(scenes[sceneIndex], "drawable", getPackageName());
+        if (sceneId != 0) {
+            ImageView scene = new ImageView(this);
+            scene.setImageResource(sceneId);
+            scene.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            root.addView(scene, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
 
-        // ── Soft top vignette glow ──
-        View topGlow = new View(this);
-        GradientDrawable topG = new GradientDrawable(
-                GradientDrawable.Orientation.TOP_BOTTOM, new int[]{
-                Color.parseColor("#33E8C56B"),
-                Color.parseColor("#11E8C56B"),
-                Color.parseColor("#00000000")
-        });
-        topGlow.setBackground(topG);
-        FrameLayout.LayoutParams topGlowLp = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, (int) (320 * d));
-        root.addView(topGlow, topGlowLp);
+        // A restrained navy veil preserves legibility without hiding the paper texture.
+        View sceneVeil = new View(this);
+        sceneVeil.setBackgroundColor(Color.parseColor("#5205060F"));
+        root.addView(sceneVeil, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         // ── Bottom navy darkening so buttons read clean ──
         View bottomVignette = new View(this);
@@ -189,6 +194,7 @@ public class PrayerAlarmActivity extends Activity {
         eyebrow.setText("✝   " + eyebrowText);
         eyebrow.setTextColor(GOLD);
         eyebrow.setTextSize(10.5f);
+        eyebrow.setMaxLines(2);
         eyebrow.setLetterSpacing(0.32f);
         eyebrow.setTypeface(Typeface.DEFAULT_BOLD);
         eyebrow.setGravity(Gravity.CENTER);
@@ -203,7 +209,7 @@ public class PrayerAlarmActivity extends Activity {
                 ViewGroup.LayoutParams.MATCH_PARENT, 0, 0.9f));
 
         // ── Halo + cross ──
-        int dialSize = (int) (300 * d);
+        int dialSize = (int) (116 * d);
         FrameLayout dial = new FrameLayout(this);
         LinearLayout.LayoutParams dialLp = new LinearLayout.LayoutParams(dialSize, dialSize);
         dialLp.gravity = Gravity.CENTER_HORIZONTAL;
@@ -230,7 +236,7 @@ public class PrayerAlarmActivity extends Activity {
         ring.setColor(Color.parseColor("#0DE8C56B"));
         ring.setStroke((int) (1.5f * d), Color.parseColor("#88F6D27A"));
         haloInner.setBackground(ring);
-        int ringSize = (int) (220 * d);
+        int ringSize = (int) (92 * d);
         FrameLayout.LayoutParams ringLp = new FrameLayout.LayoutParams(ringSize, ringSize);
         ringLp.gravity = Gravity.CENTER;
         dial.addView(haloInner, ringLp);
@@ -247,7 +253,7 @@ public class PrayerAlarmActivity extends Activity {
         inner.setGradientRadius(ringSize / 1.6f);
         inner.setStroke((int) (1.2f * d), Color.parseColor("#66F6D27A"));
         disc.setBackground(inner);
-        int discSize = (int) (180 * d);
+        int discSize = (int) (72 * d);
         FrameLayout.LayoutParams discLp = new FrameLayout.LayoutParams(discSize, discSize);
         discLp.gravity = Gravity.CENTER;
         dial.addView(disc, discLp);
@@ -256,7 +262,7 @@ public class PrayerAlarmActivity extends Activity {
         crossGlow = new TextView(this);
         ((TextView) crossGlow).setText("✝");
         ((TextView) crossGlow).setTextColor(GOLD_BRIGHT);
-        ((TextView) crossGlow).setTextSize(86);
+        ((TextView) crossGlow).setTextSize(38);
         ((TextView) crossGlow).setTypeface(Typeface.create("serif", Typeface.NORMAL));
         ((TextView) crossGlow).setGravity(Gravity.CENTER);
         ((TextView) crossGlow).setShadowLayer(14f, 0f, 0f, Color.parseColor("#CCF6D27A"));
@@ -269,13 +275,13 @@ public class PrayerAlarmActivity extends Activity {
         TextView time = new TextView(this);
         time.setText(new SimpleDateFormat("h:mm", Locale.getDefault()).format(new Date()));
         time.setTextColor(TEXT_HIGH);
-        time.setTextSize(64);
+        time.setTextSize(58);
         time.setTypeface(Typeface.create("sans-serif-thin", Typeface.NORMAL));
         time.setLetterSpacing(0.02f);
         time.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams timeLp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        timeLp.topMargin = (int) (28 * d);
+        timeLp.topMargin = (int) (14 * d);
         timeLp.gravity = Gravity.CENTER_HORIZONTAL;
         content.addView(time, timeLp);
 
@@ -292,6 +298,25 @@ public class PrayerAlarmActivity extends Activity {
         dateLp.gravity = Gravity.CENTER_HORIZONTAL;
         content.addView(date, dateLp);
 
+        // ── Streak chip (live count, same source as the daily reminder) ──
+        TextView streakChip = new TextView(this);
+        streakChip.setText(DailyReminderScheduler.streakLabel(this));
+        streakChip.setTextColor(GOLD_BRIGHT);
+        streakChip.setTextSize(13);
+        streakChip.setTypeface(Typeface.DEFAULT_BOLD);
+        streakChip.setGravity(Gravity.CENTER);
+        streakChip.setPadding((int) (14 * d), (int) (6 * d), (int) (14 * d), (int) (6 * d));
+        GradientDrawable chipBg = new GradientDrawable();
+        chipBg.setCornerRadius(100 * d);
+        chipBg.setColor(Color.parseColor("#26E8C56B"));
+        chipBg.setStroke((int) (1 * d), Color.parseColor("#66E8C56B"));
+        streakChip.setBackground(chipBg);
+        LinearLayout.LayoutParams streakLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        streakLp.topMargin = (int) (10 * d);
+        streakLp.gravity = Gravity.CENTER_HORIZONTAL;
+        content.addView(streakChip, streakLp);
+
         // ── Label (Morning/Midday/Evening Prayer) ──
         TextView title = new TextView(this);
         title.setText(label);
@@ -299,8 +324,9 @@ public class PrayerAlarmActivity extends Activity {
         title.setTextSize(22);
         title.setTypeface(Typeface.create("serif", Typeface.NORMAL));
         title.setGravity(Gravity.CENTER);
+        title.setMaxLines(2);
         LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         titleLp.topMargin = (int) (22 * d);
         titleLp.gravity = Gravity.CENTER_HORIZONTAL;
         content.addView(title, titleLp);
@@ -325,6 +351,7 @@ public class PrayerAlarmActivity extends Activity {
 
         // ── Primary CTA ──
         Button open = makeButton(ctaText, true, v -> {
+            PrayerAlarmReceiver.cancelFollowUp(this);
             safeFinish();
             try {
                 android.content.Intent i = getPackageManager().getLaunchIntentForPackage(getPackageName());
@@ -345,14 +372,17 @@ public class PrayerAlarmActivity extends Activity {
         content.addView(open, openLp);
 
         // ── Outlined Dismiss ──
-        Button close = makeButton("Dismiss", false, v -> safeFinish());
+        Button close = makeButton(DailyReminderScheduler.copy(this, "alarm.dismiss", "Dismiss"), false, v -> {
+            PrayerAlarmReceiver.cancelFollowUp(this);
+            safeFinish();
+        });
         content.addView(close, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         // ── Snooze text link ──
         if (showSnooze) {
             TextView snooze = new TextView(this);
-            snooze.setText("Snooze 10 minutes");
+            snooze.setText(DailyReminderScheduler.copy(this, "alarm.snooze", "Snooze 10 minutes"));
             snooze.setTextColor(TEXT_LOW);
             snooze.setTextSize(13);
             snooze.setGravity(Gravity.CENTER);
@@ -437,6 +467,7 @@ public class PrayerAlarmActivity extends Activity {
     }
 
     private void snooze10(String label) {
+        PrayerAlarmReceiver.cancelFollowUp(this);
         try {
             android.app.AlarmManager am = (android.app.AlarmManager) getSystemService(Context.ALARM_SERVICE);
             android.content.Intent intent = new android.content.Intent(this, PrayerAlarmReceiver.class);
@@ -462,16 +493,19 @@ public class PrayerAlarmActivity extends Activity {
         try {
             int resId = getResources().getIdentifier("divine_bell", "raw", getPackageName());
             if (resId == 0) return;
-            player = MediaPlayer.create(this, resId);
-            if (player == null) return;
-            player.setAudioAttributes(new AudioAttributes.Builder()
+            AudioAttributes alarmAttributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_ALARM)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build());
+                    .build();
+            // Audio attributes must be supplied while MediaPlayer is created.
+            // Setting them after MediaPlayer.create() has prepared the player
+            // can throw IllegalStateException, which previously left only vibration.
+            player = MediaPlayer.create(this, resId, alarmAttributes, 0);
+            if (player == null) return;
             // Softer than a jarring full-volume alarm — this is a gentle
             // prayer reminder, not a fire drill. ~60% keeps it audible on
             // the lock screen without startling the user.
-            player.setVolume(0.6f, 0.6f);
+            player.setVolume(0.82f, 0.82f);
             player.setLooping(true);
             player.start();
 

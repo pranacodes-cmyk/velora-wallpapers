@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/analytics.dart';
 import '../../core/services/content_data.dart';
+import '../../core/services/content_push_service.dart';
 import '../../core/services/haptics.dart';
 import '../../core/services/prayer_alarm_service.dart';
 import '../../core/services/streak_store.dart';
@@ -25,6 +26,7 @@ import '../devotional/devotional_screen.dart';
 import '../journeys/journeys_screen.dart';
 import '../parallax/parallax_preview_screen.dart';
 import 'prayer_alarm_toggles.dart';
+import 'notification_permission_card.dart';
 import '../settings/settings_screen.dart';
 import 'bible_companion_card.dart';
 import 'daily_question_card.dart';
@@ -263,8 +265,8 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                     ),
                   ),
                 ),
+                const NotificationPermissionCard(),
 
-                const app_keep_alive.KeepAlive(child: PrayerAlarmToggles()),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                   child: TextButton.icon(
@@ -282,6 +284,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                             AppTabs.quiz,
                   ),
                 ),
+                const app_keep_alive.KeepAlive(child: PrayerAlarmToggles()),
 
                 app_keep_alive.KeepAlive(
                   child: ParallaxRail(
@@ -321,6 +324,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                 ),
 
                 if (!isPremium) PremiumNudge(onOpen: _openPremium),
+                const PermissionNudge(),
 
                 app_keep_alive.KeepAlive(
                   child: DailyQuestionCard(

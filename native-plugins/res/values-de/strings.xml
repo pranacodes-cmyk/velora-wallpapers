@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prayer_alarm_morning_title">Morgengebet</string>
+    <string name="prayer_alarm_evening_title">Abendgebet</string>
+    <string name="prayer_alarm_default_label">Gebetszeit</string>
+    <string name="prayer_alarm_subtitle">Deine Gebetsglocke läutet</string>
+    <string name="prayer_alarm_action_close">Schließen</string>
+    <string name="prayer_alarm_action_pray">Jetzt beten</string>
+    <string name="prayer_alarm_action_snooze">Schlummern (10 Min.)</string>
+    <string name="prayer_alarm_channel_alarm">Gebetsalarm</string>
+    <string name="prayer_alarm_channel_bell">Gebetsglocke</string>
+    <string name="prayer_alarm_channel_desc">Tägliche Gebetserinnerungsglocken.</string>
+</resources>

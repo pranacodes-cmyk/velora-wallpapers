@@ -44,6 +44,9 @@
     --glass-border: 42 40% 30% / 0.15;
     --premium-gold: 42 85% 55%;
     --premium-gold-glow: 38 100% 65%;
+    --paywall-cta-foreground: 222 35% 9%;
+    --paywall-selected: 42 85% 52% / 0.1;
+    --paywall-selected-shadow: 0 8px 24px -18px hsl(var(--primary) / 0.7), inset 0 1px 0 hsl(var(--primary) / 0.16);
     --nav-blur: 222 25% 4% / 0.94;
 
     /* Premium tile tokens (dark) */
@@ -92,6 +95,9 @@
     --glass-border: 42 30% 60% / 0.3;
     --premium-gold: 42 85% 44%;
     --premium-gold-glow: 38 100% 52%;
+    --paywall-cta-foreground: 222 35% 9%;
+    --paywall-selected: 42 85% 42% / 0.08;
+    --paywall-selected-shadow: 0 8px 22px -18px hsl(222 60% 24% / 0.35), inset 0 1px 0 hsl(0 0% 100% / 0.9);
     --nav-blur: 0 0% 98% / 0.97;
 
     /* Premium tile tokens (light) — ivory cards with a duotone of warm gold + deep royal blue.
@@ -140,6 +146,9 @@
     --glass: 222 20% 5% / 0.88;
     --glass-border: 42 40% 30% / 0.15;
     --premium-gold: 42 85% 55%;
+    --paywall-cta-foreground: 222 35% 9%;
+    --paywall-selected: 42 85% 52% / 0.1;
+    --paywall-selected-shadow: 0 8px 24px -18px hsl(var(--primary) / 0.7), inset 0 1px 0 hsl(var(--primary) / 0.16);
     color-scheme: dark;
   }
 
@@ -916,4 +925,28 @@ html.startup-safe-mode .onb-storm-badge,
 html.android-device .onb-storm-badge,
 .onb-storm-badge {
   animation: onb-storm-badge 360ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--storm-delay) + 240ms) both !important;
+}
+
+/* Cinematic paywall: scoped midnight palette, independent of reading theme. */
+.paywall-cinema { --muted-foreground: 222 12% 42%; }
+.paywall-cinema.premium-sheet-dark { --muted-foreground: 40 10% 68%; }
+.paywall-film { height: clamp(270px, 42svh, 380px); }
+.paywall-film-media { width: 100%; height: 100%; object-fit: cover; object-position: 50% 27%; }
+.paywall-film-shade { background: linear-gradient(180deg, hsl(var(--background) / 0.12) 0%, transparent 35%, hsl(var(--background) / 0.4) 57%, hsl(var(--background)) 87%); }
+.paywall-heading { padding-bottom: 4px; }
+.paywall-close { top: max(14px, env(safe-area-inset-top)); }
+.paywall-purchase { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+.paywall-plan-active {
+  background: hsl(var(--paywall-selected));
+  box-shadow: var(--paywall-selected-shadow);
+}
+.paywall-cta { color: hsl(var(--paywall-cta-foreground)); }
+@media (max-height: 660px) {
+  .paywall-film { height: 190px; }
+  .paywall-heading h2 { font-size: 22px; }
+}
+
+@media (min-width: 700px) {
+  .paywall-cinema { justify-content: center; }
+  .paywall-layout { max-height: 940px; }
 }

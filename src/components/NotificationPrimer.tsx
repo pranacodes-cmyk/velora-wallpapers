@@ -14,10 +14,12 @@ import { addAppLog } from "@/services/app-logs";
 import { haptic } from "@/utils/haptics";
 import { acquireOverlay } from "@/lib/overlayQueue";
 import { t } from "@/i18n";
+import { POST_ONBOARDING_FLOW_COMPLETE_EVENT } from "@/components/onboarding/OnboardingFlow";
 
 const HOME_PROMPTED_KEY = "jw_notif_home_prompted";
 const REPROMPT_DISMISSED_KEY = "jw_notif_reprompt_dismissed_at";
 const REPROMPT_COOLDOWN_MS = 5 * 24 * 60 * 60 * 1000; // 5 days
+const POST_PAYWALL_SHOWN_KEY = "cw_post_onboarding_premium_shown";
 
 type Phase = "idle" | "asking" | "reprompt";
 
@@ -45,6 +47,7 @@ const markNotificationPromptCooldown = () => {
  *   1. Native platform
  *   2. Splash overlay is fully gone
  *   3. User is on the homepage ("/")
+ *   4. OR explicitly triggered after post-onboarding paywall
  * If denied, shows a beautiful sheet inviting them to enable.
  */
 export function NotificationPrimer() {
@@ -56,93 +59,90 @@ export function NotificationPrimer() {
     if (releaseRef.current) { releaseRef.current(); releaseRef.current = null; }
   };
 
+  const tryAsk = async (isManualTrigger = false) => {
+    if (window.location.pathname !== "/") return;
+    if (!isManualTrigger && document.querySelector("[data-splash]")) return;
+
+    try {
+      const status = await getNotificationPermissionStatus();
+      addAppLog("info", "[Primer] status", { status });
+
+      if (status === "granted" || status === "unavailable") return;
+      
+      // If manually triggered (after paywall), we always try to ask.
+      // If automatic, respect the cooldown.
+      if (!isManualTrigger && isNotificationPromptCoolingDown()) return;
+
+      // Acquire the overlay lock so other overlays wait.
+      const release = await acquireOverlay("notification_primer");
+      releaseRef.current = release;
+
+      if (status === "denied") {
+        setPhase("reprompt");
+        return;
+      }
+
+      // status === "prompt" — fire native dialog
+      setPhase("asking");
+      localStorage.setItem(HOME_PROMPTED_KEY, String(Date.now()));
+      addAppLog("info", "[Primer] requesting native permission");
+      const granted = await requestNotificationPermission();
+      addAppLog("info", "[Primer] result", { granted });
+      
+      if (granted) {
+        await scheduleDailyPrayerNotifications({ skipPermissionRequest: true });
+        setPhase("idle");
+        releaseLock();
+      } else {
+        markNotificationPromptCooldown();
+        setPhase("reprompt");
+      }
+    } catch (err) {
+      addAppLog("error", "[Primer] failed", err);
+      setPhase("idle");
+      releaseLock();
+    }
+  };
+
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
 
-    let cancelled = false;
     let triggered = false;
-
-    const tryAsk = async () => {
-      if (cancelled || triggered) return;
-      if (window.location.pathname !== "/") return;
-      if (document.querySelector("[data-splash]")) return;
-
+    const onTrigger = () => {
       triggered = true;
-      try {
-        const status = await getNotificationPermissionStatus();
-        addAppLog("info", "[Primer] status", { status });
-
-        if (status === "granted" || status === "unavailable") return;
-        if (isNotificationPromptCoolingDown()) return;
-
-        // Acquire the overlay lock so the premium paywall waits for our
-        // native dialog / reprompt sheet to finish before opening.
-        const release = await acquireOverlay("notification_primer");
-        if (cancelled) { release(); return; }
-        releaseRef.current = release;
-
-        if (status === "denied") {
-          // Reprompt sheet — lock is released in handleEnable/handleLater.
-          setPhase("reprompt");
-          return;
-        }
-
-        // status === "prompt" — fire native dialog
-        setPhase("asking");
-        localStorage.setItem(HOME_PROMPTED_KEY, String(Date.now()));
-        addAppLog("info", "[Primer] requesting native permission");
-        const granted = await requestNotificationPermission();
-        addAppLog("info", "[Primer] result", { granted });
-        if (cancelled) { releaseLock(); return; }
-        if (granted) {
-          await scheduleDailyPrayerNotifications({ skipPermissionRequest: true });
-          setPhase("idle");
-          releaseLock();
-        } else {
-          markNotificationPromptCooldown();
-          // Show reprompt sheet — lock stays held until user dismisses it.
-          setPhase("reprompt");
-        }
-      } catch (err) {
-        addAppLog("error", "[Primer] failed", err);
-        setPhase("idle");
-        releaseLock();
-      }
+      setTimeout(() => void tryAsk(true), 1000);
     };
 
-    // Poll until splash is gone & we're on home, then ask
+    window.addEventListener(POST_ONBOARDING_FLOW_COMPLETE_EVENT, onTrigger);
+
     const interval = setInterval(() => {
-      if (triggered || cancelled) {
+      if (triggered) {
         clearInterval(interval);
         return;
       }
+      let postPaywallDone = false;
+      try { postPaywallDone = localStorage.getItem(POST_PAYWALL_SHOWN_KEY) === "1"; } catch {}
       if (
+        postPaywallDone &&
         window.location.pathname === "/" &&
         !document.querySelector("[data-splash]")
       ) {
+        triggered = true;
         clearInterval(interval);
-        // small breathing room for the home UI to settle
         setTimeout(() => void tryAsk(), 800);
       }
     }, 300);
 
-    // Safety stop after 30s
-    const stopT = setTimeout(() => clearInterval(interval), 30000);
-
     return () => {
-      cancelled = true;
+      window.removeEventListener(POST_ONBOARDING_FLOW_COMPLETE_EVENT, onTrigger);
       clearInterval(interval);
-      clearTimeout(stopT);
       releaseLock();
     };
   }, []);
 
-  // When the user returns from system Settings, re-check permission and
-  // dismiss the sheet / schedule notifications if they enabled it.
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
     let handle: { remove: () => void } | undefined;
-    let cancelled = false;
     (async () => {
       const sub = await CapacitorApp.addListener("appStateChange", async (state) => {
         if (!state.isActive) return;
@@ -150,7 +150,7 @@ export function NotificationPrimer() {
           const status = await getNotificationPermissionStatus();
           if (status === "granted") {
             await scheduleDailyPrayerNotifications({ skipPermissionRequest: true });
-            if (!cancelled) setPhase("idle");
+            setPhase("idle");
           }
         } catch (err) {
           addAppLog("error", "[Primer] resume check failed", err);
@@ -159,7 +159,6 @@ export function NotificationPrimer() {
       handle = sub;
     })();
     return () => {
-      cancelled = true;
       handle?.remove();
     };
   }, []);
@@ -168,65 +167,35 @@ export function NotificationPrimer() {
     if (busy) return;
     setBusy(true);
     haptic("medium");
-
-    // Never keep the convincing sheet visible while Android is handling the
-    // system permission dialog. Some OEMs do not resolve the permission call
-    // immediately after the user taps Allow/Deny, which left this button stuck
-    // on "Opening…" until the backdrop was tapped. The user's intent is clear:
-    // open the permission flow, then get this sheet out of the way.
     setPhase("idle");
 
     try {
       const before = await getNotificationPermissionStatus();
-      addAppLog("info", "[Primer] handleEnable status", { before });
-
       if (before === "granted") {
         await scheduleDailyPrayerNotifications({ skipPermissionRequest: true });
         return;
       }
 
-      // Fire the native request. Some Android OEMs return a stale `false`
-      // even when the user tapped Allow, so we ignore it and trust a
-      // post-call status re-check instead.
-      let requestResult = false;
-      try {
-        requestResult = await requestNotificationPermission();
-      } catch (err) {
-        addAppLog("error", "[Primer] request threw", err);
-      }
-      addAppLog("info", "[Primer] request result", { requestResult });
+      await requestNotificationPermission();
 
-      // Poll for up to ~1.5s — gives the OS time to commit the new state.
       let after = await getNotificationPermissionStatus();
       for (let i = 0; i < 5 && after !== "granted"; i++) {
         await new Promise((r) => setTimeout(r, 300));
         after = await getNotificationPermissionStatus();
       }
-      addAppLog("info", "[Primer] post-request status", { after });
 
       if (after === "granted") {
         await scheduleDailyPrayerNotifications({ skipPermissionRequest: true });
         return;
       }
 
-      // User denied (either at the native dialog or it was already blocked).
-      // Record the dismissal so we don't pester them again until the cooldown
-      // (5 days) has elapsed — even across app restarts.
       markNotificationPromptCooldown();
-
-      // If the OS dialog actually appeared (i.e. status was "prompt" before),
-      // and the user dismissed/denied it, just close the sheet — do NOT shove
-      // them into system settings. They'll see the reprompt again after cooldown.
-      if (before === "prompt") {
-        return;
-      }
-
-      // Status was already "denied" before AND the request didn't move it →
-      // permanently blocked. Open settings as a last resort, then dismiss.
-      try {
-        await NotificationPermission.openSettings();
-      } catch (err) {
-        addAppLog("error", "[Primer] openSettings failed", err);
+      if (before !== "prompt") {
+        try {
+          await NotificationPermission.openSettings();
+        } catch (err) {
+          addAppLog("error", "[Primer] openSettings failed", err);
+        }
       }
     } finally {
       setBusy(false);
@@ -270,7 +239,6 @@ export function NotificationPrimer() {
               "0 30px 80px -20px rgba(0,0,0,0.7), 0 0 60px -20px rgba(212,168,69,0.25)",
           }}
         >
-          {/* Glow accent */}
           <div
             className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full pointer-events-none"
             style={{
@@ -281,7 +249,6 @@ export function NotificationPrimer() {
           />
 
           <div className="relative px-7 pt-9 pb-7 text-center">
-            {/* Icon */}
             <motion.div
               initial={{ scale: 0.6, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -307,7 +274,7 @@ export function NotificationPrimer() {
               className="text-[20px] font-semibold tracking-tight text-white"
               style={{ fontFamily: "'Georgia', serif" }}
             >
-              {t("ov.notif.title")}
+              {t("ov.notif.retry.title")}
             </motion.h2>
 
             <motion.p
@@ -316,10 +283,9 @@ export function NotificationPrimer() {
               transition={{ delay: 0.25, duration: 0.45 }}
               className="mt-3 text-[14px] leading-relaxed text-white/65 max-w-xs mx-auto"
             >
-              {t("ov.notif.body")}
+              {t("ov.notif.retry.body")}
             </motion.p>
 
-            {/* Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -337,7 +303,7 @@ export function NotificationPrimer() {
                   boxShadow: "0 10px 30px -10px rgba(212,168,69,0.6)",
                 }}
               >
-                {busy ? t("ov.notif.opening") : t("ov.notif.enable")}
+                {busy ? t("ov.notif.opening") : t("ov.notif.retry.cta")}
               </button>
               <button
                 onClick={handleLater}

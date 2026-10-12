@@ -15,6 +15,9 @@ const id = {
   "ov.notif.enable": "Aktifkan Notifikasi",
   "ov.notif.opening": "Membuka…",
   "ov.notif.later": "Mungkin nanti",
+  "ov.notif.retry.title": "Jangan lewatkan waktu doamu",
+  "ov.notif.retry.body": "Notifikasi masih nonaktif. Aktifkan untuk Firman harian dan lonceng doamu.",
+  "ov.notif.retry.cta": "Buka pengaturan notifikasi",
 
   "ov.perm.title": "Tetap dekat dengan Firman",
   "ov.perm.body": "Beberapa izin sederhana menjaga ayat harian dan lonceng doamu tetap berjalan.",

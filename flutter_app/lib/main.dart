@@ -354,6 +354,9 @@ class _RootGateState extends ConsumerState<RootGate> {
   @override
   Widget build(BuildContext context) {
     final done = ref.watch(onboardingDoneProvider);
+    // Fresh onboarding stays in the premium handoff until its sheet has fully
+    // closed, so the first permission request appears only on Home. Returning
+    // users are also repaired here without depending on a paywall marker.
     if (done && !_inPremiumHandoff) _bootstrapPushes();
 
     if (_inPremiumHandoff) {

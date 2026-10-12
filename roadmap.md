@@ -40,7 +40,19 @@
 
 - [x] Create and render a professional 9:16 PrayScreen feature video: app tap → blocker → prayer → Amen → intentional feed.
 - [x] Remove Replay Welcome Tour from Settings in web and Flutter.
+- [x] Restore Settings onboarding replay in web and Flutter for visual review without clearing user data.
+- [x] Generate three Jesus-and-child heaven-gate visual concepts for paywall review; wait for selection before video and paywall replacement.
 - [x] Push latest code and upload the new Flutter build to Play Internal Testing, then restore the repository private.
 - [x] Reduce only the Home cross preview movement by 20% in web and Flutter.
 - [x] Prayer bell: swipe/ignore returns every 20 min (max 6) until Pray/Dismiss; Close renamed Dismiss (Flutter Android).
 - [x] Set balanced, attractive regional Yearly and Weekly prices in all 174 Google Play markets; verify Monthly, legacy cohorts and yearly trial untouched.
+
+- [x] Sync latest code and upload the new Flutter build to Play Internal Testing, then restore the repository private.
+
+- [x] Redesign the paywall around the approved Jesus-and-boy film in web and Flutter; preserve Yearly/Weekly purchases and onboarding replay.
+- [x] Move prayer alarms below Daily Prayers, restore audible alarm playback, and add four rotating paper-cut lock-screen scenes.
+- [x] Ask for notifications after the first paywall closes, add one localized Home retry, and localize overflow-safe prayer lock screens and paywall copy across all 8 languages.
+- [x] Refine paywall plan controls and typography, with polished in-app light-theme parity in web and Flutter.
+- [x] Remove Replay Welcome Tour from Settings in web and Flutter for the new Play Internal build.
+- [ ] Upload the latest signed Flutter build to Play Internal Testing, verify success, then restore the repository private.
+- [ ] Use the existing saved GitHub token release path rather than adding a new connector.

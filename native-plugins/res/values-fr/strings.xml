@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prayer_alarm_morning_title">Prière du matin</string>
+    <string name="prayer_alarm_evening_title">Prière du soir</string>
+    <string name="prayer_alarm_default_label">Moment de prière</string>
+    <string name="prayer_alarm_subtitle">Votre cloche de prière sonne</string>
+    <string name="prayer_alarm_action_close">Fermer</string>
+    <string name="prayer_alarm_action_pray">Prier maintenant</string>
+    <string name="prayer_alarm_action_snooze">Rappel dans 10 min.</string>
+    <string name="prayer_alarm_channel_alarm">Alarme de prière</string>
+    <string name="prayer_alarm_channel_bell">Cloche de prière</string>
+    <string name="prayer_alarm_channel_desc">Cloches de rappel de prière quotidienne.</string>
+</resources>

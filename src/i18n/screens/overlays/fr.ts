@@ -15,6 +15,9 @@ const fr = {
   "ov.notif.enable": "Activer les notifications",
   "ov.notif.opening": "Ouverture…",
   "ov.notif.later": "Plus tard peut-être",
+  "ov.notif.retry.title": "Ne manque pas tes moments de prière",
+  "ov.notif.retry.body": "Les notifications sont toujours désactivées. Active-les pour recevoir les Écritures quotidiennes et ta cloche de prière.",
+  "ov.notif.retry.cta": "Ouvrir les réglages de notifications",
 
   "ov.perm.title": "Reste proche de la Parole",
   "ov.perm.body": "Quelques autorisations simples pour garder ton verset quotidien et ta cloche de prière actifs.",

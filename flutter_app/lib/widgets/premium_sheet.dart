@@ -17,6 +17,7 @@ import '../core/services/revenuecat_service.dart';
 import '../core/theme/app_colors.dart';
 import 'lucide.dart';
 import 'price_shimmer.dart';
+import 'paywall_welcome_film.dart';
 import '../core/theme/app_theme.dart';
 import '../state/app_providers.dart';
 
@@ -31,7 +32,7 @@ const _goldFill = Color(0xFFE5A70E);
 
 /// Gold used for type, icons and hairlines. On the light ivory surface the
 /// bright tone loses all contrast, so it darkens there.
-Color get _gold => AppColors.isLight ? const Color(0xFFA8780A) : _goldFill;
+Color get _gold => AppColors.darkPrimary;
 
 /// Review stars: the same gold, darkened on ivory.
 Color get _stars =>
@@ -76,6 +77,11 @@ class _Benefit {
 /// Only features that actually ship today. Shield leads — it's the reason
 /// people pay, and the removed Journeys / Bible Chat rows are gone for good.
 List<_Benefit> _buildBenefits() => [
+  _Benefit(
+    Icons.route_outlined,
+    t('premium.benefit.journeys.title'),
+    t('premium.benefit.journeys.sub'),
+  ),
   _Benefit(
     Icons.shield_outlined,
     t('premium.benefit.shield.title'),
@@ -185,8 +191,8 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
   bool _closed = false;
   VoidCallback? _releaseRatingGate;
 
-  // The onboarding offer is always midnight-themed, matching the onboarding
-  // flow itself, which ships in the midnight palette in both system themes.
+  // Only the onboarding handoff remains midnight-themed. Paywalls opened from
+  // inside the app follow the user's active light/dark theme.
   bool get _forceDark => widget.trigger == 'post_onboarding';
   Color get _background =>
       _forceDark ? AppColors.darkBackground : AppColors.background;
@@ -443,243 +449,111 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
     final plans = _buildPlans();
     final benefits = _buildBenefits();
 
-    final backdropOpacity = (1 - (_dragY / 300)).clamp(0.0, 1.0);
-
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: GestureDetector(
-            onTap: _close,
-            child: ColoredBox(
-              color: _background.withValues(alpha: 0.78 * backdropOpacity),
-            ),
-          ),
-        ),
-        Positioned.fill(
-          child: Transform.translate(
-            offset: Offset(0, _dragY),
-            child: Container(
-              padding: EdgeInsets.only(top: max(insets.top, 10)),
-              decoration: BoxDecoration(
-                color: _background,
-                border: Border(top: BorderSide(color: _border)),
-                boxShadow: [
-                  BoxShadow(
-                    color: _foreground.withValues(alpha: 0.25),
-                    blurRadius: 80,
-                    offset: const Offset(0, -20),
-                  ),
-                ],
-              ),
+    return Material(
+      color: _background,
+      child: Stack(
+        children: [
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520, maxHeight: 940),
               child: Column(
                 children: [
-                  // Drag handle
-                  GestureDetector(
-                    onVerticalDragUpdate: (d) =>
-                        setState(() => _dragY = max(0, _dragY + d.delta.dy)),
-                    onVerticalDragEnd: (d) {
-                      if (_dragY > 100 || d.velocity.pixelsPerSecond.dy > 500) {
-                        _close();
-                      } else {
-                        setState(() => _dragY = 0);
-                      }
-                    },
-                    child: Container(
-                      color: Colors.transparent,
-                      padding: const EdgeInsets.only(top: 8, bottom: 2),
-                      alignment: Alignment.center,
-                      child: Container(
-                        width: 36,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: _mutedForeground.withValues(alpha: 0.35),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      ),
-                    ),
-                  ),
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.fromLTRB(
-                        20,
-                        0,
-                        20,
-                        max(insets.bottom, 14),
-                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           _hero(compact),
-                          SizedBox(height: compact ? 6 : 8),
-                          _benefitsGrid(benefits, compact),
-                          SizedBox(height: compact ? 7 : 10),
-                          ..._planCards(plans, compact),
-                          SizedBox(height: compact ? 5 : 8),
-                          if (_selected != PlanId.weekly) ...[
-                            _trialTimeline(compact),
-                            SizedBox(height: compact ? 5 : 8),
-                          ],
-                          _trustStrip(compact),
-                          const SizedBox(height: 8),
-
-                          _cta(compact),
-                          ..._ctaFooterNotes(),
-                          const SizedBox(height: 8),
-                          _footer(),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _benefitsGrid([benefits[1], benefits[3], benefits[0], benefits[4]], compact),
+                                const SizedBox(height: 10),
+                                ..._planCards(plans, compact),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.lock_open, size: 12, color: _gold),
+                                    const SizedBox(width: 8),
+                                    Flexible(child: Text(t('premium.offer.today'),
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _gold))),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(20, 12, 20, max(insets.bottom, 8)),
+                    decoration: BoxDecoration(color: _background,
+                      border: Border(top: BorderSide(color: _border.withValues(alpha: 0.6)))),
+                    child: Column(
+                      children: [
+                        _cta(compact),
+                        const SizedBox(height: 8),
+                        Text(t(_selected == PlanId.weekly ? 'premium.reminder.weekly' : 'premium.reminder.yearly'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 10, height: 1.5, color: _mutedForeground)),
+                        const SizedBox(height: 6),
+                        _footer(),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
           ),
-        ),
-        // Close button — below the safe area, never at status-bar level.
-        Positioned(
-          top: max(insets.top, 10) + 4 + _dragY,
-          right: 16,
-          child: GestureDetector(
-            onTap: _close,
-            child: Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: _muted.withValues(alpha: 0.6),
-                shape: BoxShape.circle,
-              ),
-              child: LucideIcon('x', size: 16, color: _mutedForeground),
+          Positioned(
+            top: max(insets.top, 14), right: 16,
+            child: IconButton(
+              tooltip: t('premium.aria.close'),
+              onPressed: _close,
+              style: IconButton.styleFrom(backgroundColor: _background.withValues(alpha: 0.65)),
+              icon: Icon(Icons.close, size: 16, color: _foreground),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  // ── Hero ──
   Widget _hero(bool compact) {
+    final height = MediaQuery.sizeOf(context).height;
+    final filmHeight = height < 660 ? 190.0 : (height * 0.42).clamp(270.0, 380.0);
     final hero = _heroCopy;
-    return Stack(
-      alignment: Alignment.topCenter,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 2, bottom: 0),
-          child: Column(
-            children: [
-              Container(
-                width: compact ? 32 : 40,
-                height: compact ? 32 : 40,
-                margin: EdgeInsets.only(bottom: compact ? 3 : 5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(compact ? 11 : 14),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      _gold.withValues(alpha: 0.2),
-                      _gold.withValues(alpha: 0.06),
-                    ],
-                  ),
-                  border: Border.all(
-                    color: _gold.withValues(alpha: 0.33),
-                    width: 1.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _gold.withValues(alpha: 0.19),
-                      blurRadius: 26,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: LucideCross(size: 18, color: _gold, strokeWidth: 1.8),
-                ),
-              ),
-              Text(
-                hero.title,
-                textAlign: TextAlign.center,
-                style: AppTheme.serif(
-                  size: compact ? 19 : 23,
-                  weight: FontWeight.w600,
-                  color: _foreground,
-                  height: 1.08,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: compact ? 2 : 4),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 280),
-                  child: Text(
-                    hero.sub,
-                    textAlign: TextAlign.center,
-                    style: AppTheme.serif(
-                      size: compact ? 11.5 : 12.5,
-                      weight: FontWeight.w400,
-                      color: _mutedForeground,
-                    ).copyWith(fontStyle: FontStyle.italic),
-                  ),
-                ),
-              ),
-              // Social proof: solid-gold stars + a hard number, then the
-              // review count and today's joiners on one quiet second line.
-              Padding(
-                padding: EdgeInsets.only(top: compact ? 4 : 7),
-                child: Column(
-                  children: [
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 7,
-                      runSpacing: 4,
-                      children: [
-                        ...List.generate(
-                          5,
-                          (_) => Padding(
-                            padding: EdgeInsets.only(right: 1),
-                            child: Text(
-                              '★',
-                              style: TextStyle(
-                                fontSize: 12,
-                                height: 1,
-                                color: _stars,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Text(
-                          t('premium.social.lovedBy'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            height: 1,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.2,
-                            color: _foreground,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${t('premium.social.reviews')}  ·  ${t('premium.urgency.joinedToday', {'count': NumberFormat('#,##0').format(_joinedToday)})}',
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 10,
-                        height: 1,
-                        fontWeight: FontWeight.w600,
-                        color: _mutedForeground,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+    return SizedBox(
+      height: filmHeight,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          const PaywallWelcomeFilm(),
+          DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
+            begin: Alignment.topCenter, end: Alignment.bottomCenter,
+            stops: const [0, 0.35, 0.57, 0.87],
+            colors: [_background.withValues(alpha: 0.12), _background.withValues(alpha: 0),
+              _background.withValues(alpha: 0.4), _background],
+          ))),
+           Positioned(left: 20, right: 20, bottom: 4,
+            child: Column(children: [
+               Text('Prayly · PRO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: _gold)),
+               const SizedBox(height: 6),
+              Text(hero.title, textAlign: TextAlign.center,
+                 style: TextStyle(fontSize: height < 660 ? 22 : 24, height: 1.12, fontWeight: FontWeight.w600, color: _foreground)),
+               const SizedBox(height: 6),
+              ConstrainedBox(constraints: const BoxConstraints(maxWidth: 340),
+                child: Text(hero.sub, textAlign: TextAlign.center,
+                   style: TextStyle(fontSize: 12, height: 1.35, color: _mutedForeground))),
+            ]),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -687,90 +561,29 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
   // onboarding (web parity).
 
   // ── Benefits (2-col bento) ──
-  Widget _benefitsGrid(List<_Benefit> benefits, bool compact) {
-    return LayoutBuilder(
-      builder: (context, c) {
-        final cardWidth = (c.maxWidth - 6) / 2;
-        return Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: benefits
-              .map(
-                (b) => SizedBox(
-                  width: cardWidth,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: compact ? 3 : 5,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [_glassRaised, _card],
-                      ),
-                      border: Border.all(color: _gold.withValues(alpha: 0.14)),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 26,
-                          height: 26,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                _gold.withValues(alpha: 0.18),
-                                _gold.withValues(alpha: 0.06),
-                              ],
-                            ),
-                            border: Border.all(
-                              color: _gold.withValues(alpha: 0.25),
-                            ),
-                          ),
-                          child: Icon(b.icon, size: 13, color: _gold),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                b.title,
-                                style: TextStyle(
-                                  fontSize: 11.5,
-                                  height: 1.1,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: -0.1,
-                                  color: _foreground,
-                                ),
-                              ),
-                              const SizedBox(height: 1),
-                              Text(
-                                b.sub,
-                                style: TextStyle(
-                                  fontSize: 9.5,
-                                  height: 1.25,
-                                  color: _mutedForeground,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-        );
-      },
-    );
-  }
+  Widget _benefitsGrid(List<_Benefit> benefits, bool compact) => Column(
+    children: [0, 2].map((start) => Padding(
+      padding: EdgeInsets.only(bottom: start == 0 ? 10 : 0),
+      child: Row(children: benefits.skip(start).take(2).map((b) => Expanded(
+        child: Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: Row(children: [
+            Container(width: 28, height: 28,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: _gold.withValues(alpha: 0.1)),
+              child: Icon(b.icon, size: 14, color: _gold)),
+            const SizedBox(width: 9),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(b.title, maxLines: 2,
+                style: TextStyle(fontSize: 11, height: 1.15, fontWeight: FontWeight.w600, color: _foreground)),
+              const SizedBox(height: 2),
+              Text(b.sub, maxLines: 3,
+                style: TextStyle(fontSize: 9, height: 1.15, color: _mutedForeground)),
+            ])),
+          ]),
+        ),
+      )).toList()),
+    )).toList(),
+  );
 
   // ── Limited offer ribbon ──
   Widget _trialTimeline(bool compact) {
@@ -821,8 +634,8 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
           Flexible(
             child: Text(
               headline,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: compact ? 10.5 : 11,
                 height: 1,
@@ -869,223 +682,49 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
       }
 
       final isSel = _selected == plan.id;
-      final hasBadge = plan.badge != null;
-      out.add(
-        Padding(
-          padding: EdgeInsets.only(bottom: compact ? 3 : 5),
-          child: GestureDetector(
-            onTap: () {
-              setState(() => _selected = plan.id);
-              haptic(HapticStyle.soft);
-            },
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  padding: compact
-                      ? EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: hasBadge ? 7 : 6,
-                        )
-                      : EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: hasBadge ? 9 : 8,
-                        ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    // Flat selection: thin gold frame + a whisper of gold tint.
-                    // No glow ring, no drop shadow — the raised look is gone.
-                    color: isSel
-                        ? _gold.withValues(alpha: 0.08)
-                        : _muted.withValues(alpha: 0.3),
-                    border: Border.all(
-                      color: isSel
-                          ? _gold.withValues(alpha: 0.9)
-                          : _border.withValues(alpha: 0.6),
-                      width: isSel ? 1.5 : 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 18,
-                        height: 18,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isSel ? _gold : Colors.transparent,
-                          border: isSel
-                              ? null
-                              : Border.all(
-                                  color: _mutedForeground.withValues(
-                                    alpha: 0.35,
-                                  ),
-                                  width: 1.5,
-                                ),
-                        ),
-                        child: isSel
-                            ? LucideIcon('check', size: 11, color: Colors.black)
-                            : null,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              plan.label,
-                              style: TextStyle(
-                                fontSize: compact ? 13.5 : 14.5,
-                                height: 1.1,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: -0.1,
-                                color: _foreground,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              plan.subtitle,
-                              style: TextStyle(
-                                fontSize: compact ? 10 : 11,
-                                height: 1.1,
-                                color: _mutedForeground,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          // Weekly has no trial badge, but it still reserves the
-                          // exact same space so all three cards are pixel-for-
-                          // pixel the same height (web flexbox does this for
-                          // free; Flutter needs an explicit placeholder).
-                          Visibility(
-                            visible: plan.id != PlanId.weekly,
-                            maintainSize: true,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(999),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    _gold.withValues(alpha: 0.15),
-                                    _gold.withValues(alpha: 0.07),
-                                  ],
-                                ),
-                                border: Border.all(
-                                  color: _gold.withValues(alpha: 0.33),
-                                ),
-                              ),
-                              child: Text(
-                                t('premium.plan.trialBadge').toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.6,
-                                  color: _gold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: compact ? 4 : 6),
-                          if (pkg == null && _pricesLoading)
-                            PriceShimmer(
-                              width: compact ? 46 : 52,
-                              height: compact ? 14 : 15,
-                              base: _mutedForeground,
-                            )
-                          else
-                            Text(
-                              priceLabel,
-                              style: TextStyle(
-                                fontSize: compact ? 14 : 15,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: -0.2,
-                                height: 1,
-                                color: _foreground,
-                              ),
-                            ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '/ $periodLabel',
-                            style: TextStyle(
-                              fontSize: 10,
-                              height: 1,
-                              color: _mutedForeground,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          // Same trick as the trial badge: the weekly card keeps
-                          // the anchor line's height so the row never squishes.
-                          Visibility(
-                            visible: anchor != null,
-                            maintainSize: true,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            child: Text(
-                              anchor ?? '',
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                height: 1,
-                                fontWeight: FontWeight.w500,
-                                color: _mutedForeground.withValues(alpha: 0.9),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                if (plan.badge != null)
-                  Positioned(
-                    top: -7,
-                    left: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [_goldFill, Color(0xFFF59E17)],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _gold.withValues(alpha: 0.25),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        plan.badge!.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 8,
-                          height: 1.1,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.96,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+      out.add(Padding(
+         padding: const EdgeInsets.only(bottom: 8),
+        child: Semantics(
+          selected: isSel,
+          child: OutlinedButton(
+            onPressed: () { setState(() => _selected = plan.id); haptic(HapticStyle.soft); },
+            style: OutlinedButton.styleFrom(
+               minimumSize: Size(double.infinity, compact ? 58 : 60),
+               padding: EdgeInsets.symmetric(horizontal: 14, vertical: compact ? 8 : 9),
+              backgroundColor: isSel ? _gold.withValues(alpha: AppColors.isLight && !_forceDark ? 0.07 : 0.1) : _card,
+              side: BorderSide(color: isSel ? _gold : _border),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              elevation: isSel ? 1 : 0,
+              shadowColor: _gold.withValues(alpha: 0.18),
             ),
+            child: Row(children: [
+               Container(width: 18, height: 18,
+                decoration: BoxDecoration(shape: BoxShape.circle,
+                  color: isSel ? _gold : Colors.transparent,
+                  border: Border.all(color: isSel ? _gold : _mutedForeground.withValues(alpha: 0.5))),
+                child: isSel ? Icon(Icons.check, size: 13, color: AppColors.darkBackground) : null),
+              const SizedBox(width: 12),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                 Text(plan.label, style: TextStyle(fontSize: 14, height: 1.15, fontWeight: FontWeight.w700, color: _foreground)),
+                 const SizedBox(height: 4),
+                Text(plan.id == PlanId.yearly ? t('premium.plan.trialBadge') : plan.subtitle,
+                    style: TextStyle(fontSize: 10, height: 1.25, fontWeight: FontWeight.w500, color: _mutedForeground)),
+              ])),
+               const SizedBox(width: 12),
+              Flexible(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                if (pkg == null && _pricesLoading)
+                  PriceShimmer(width: 52, height: 15, base: _mutedForeground)
+                else Text('$priceLabel / $periodLabel', textAlign: TextAlign.right,
+                   style: TextStyle(fontSize: 14, height: 1.1, fontWeight: FontWeight.w700, color: _foreground)),
+                if (anchor != null) ...[
+                  const SizedBox(height: 4),
+                  Text(anchor, textAlign: TextAlign.right, style: TextStyle(fontSize: 9, height: 1.3, fontWeight: FontWeight.w500, color: _mutedForeground)),
+                ],
+              ])),
+            ]),
           ),
         ),
-      );
+      ));
     }
     return out;
   }
@@ -1138,98 +777,27 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
   }
 
   // ── CTA ──
-  Widget _cta(bool compact) {
-    final planKey = _selected.name; // weekly | monthly | yearly
-    return GestureDetector(
-      onTap: _purchasing ? null : _handleContinue,
-      child: Opacity(
-        opacity: _purchasing ? 0.7 : 1,
-        child: Container(
-          // Fixed height, flat solid gold: no raised/embossed look, no blur
-          // layer, and zero layout jump when the plan changes.
-          height: compact ? 54 : 58,
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: const Color(0xFFE9A800),
-          ),
-          child: _purchasing
-              ? Text(
-                  t('premium.cta.processing'),
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                  ),
-                )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            t('premium.cta.$planKey.title'),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            // Same serif voice as the hero headline, so the CTA
-                            // no longer reads like a foreign font.
-                            style: AppTheme.serif(
-                              size: 20,
-                              weight: FontWeight.w700,
-                              color: Colors.black,
-                              height: 1,
-                              letterSpacing: 0.1,
-                            ),
-                          ),
-                        ),
-                        // Chip sits beside the label instead of floating over
-                        // it — the old overlay clipped the headline.
-                        if (_selected != PlanId.weekly) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 7,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(7),
-                              color: Colors.black,
-                            ),
-                            child: Text(
-                              _zeroTodayLabel().toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 9,
-                                height: 1,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.6,
-                                color: Color(0xFFF7D253),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      t('premium.cta.$planKey.sub'),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 10.5,
-                        height: 1,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black.withValues(alpha: 0.78),
-                      ),
-                    ),
-                  ],
-                ),
-        ),
+  Widget _cta(bool compact) => SizedBox(
+    width: double.infinity,
+    child: FilledButton(
+      onPressed: _purchasing ? null : _handleContinue,
+      style: FilledButton.styleFrom(
+        backgroundColor: _gold, foregroundColor: AppColors.darkBackground,
+          minimumSize: const Size(double.infinity, 52),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-    );
-  }
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Text(t(_purchasing ? 'premium.cta.processing' : 'premium.cta.${_selected.name}.title'),
+           textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, height: 1.1, fontWeight: FontWeight.w700)),
+        if (!_purchasing) ...[
+          const SizedBox(height: 4),
+          Text(_selected == PlanId.yearly ? _zeroTodayLabel() : t('premium.cta.weekly.sub'),
+            textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, height: 1.1, fontWeight: FontWeight.w600)),
+        ],
+      ]),
+    ),
+  );
 
   List<Widget> _ctaFooterNotes() {
     final out = <Widget>[];

@@ -15,6 +15,9 @@ const fil = {
   "ov.notif.enable": "I-enable ang Notifications",
   "ov.notif.opening": "Nagbubukas…",
   "ov.notif.later": "Sa ibang pagkakataon na lang",
+  "ov.notif.retry.title": "Huwag palampasin ang oras ng panalangin",
+  "ov.notif.retry.body": "Naka-off pa ang notifications. I-on para sa daily Scripture at prayer bell mo.",
+  "ov.notif.retry.cta": "Buksan ang notification settings",
 
   "ov.perm.title": "Manatiling malapit sa Salita",
   "ov.perm.body": "Ilang simpleng permissions lang para tuloy-tuloy ang iyong daily Scripture at prayer bell.",

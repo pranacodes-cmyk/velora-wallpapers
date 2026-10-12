@@ -19,6 +19,8 @@ class ContentPushes {
 
   static const _optOutKey = 'prayly:contentPush:optOut:v1';
   static const _permissionAskedKey = 'prayly:contentPush:permissionAsked:v1';
+  static const permissionRetryDismissedKey = 'prayly:contentPush:retryDismissed:v1';
+  static final permissionRevision = ValueNotifier<int>(0);
 
   static bool get optedOut => Prefs.getBool(_optOutKey);
 
@@ -34,8 +36,8 @@ class ContentPushes {
     }
   }
 
-  /// Android 13+ never posts anything without the runtime grant. Ask once,
-  /// then leave it alone — a second silent request is a no-op anyway.
+  /// Android 13+ never posts anything without the runtime grant. The normal
+  /// bootstrap only asks once; the explicit Home retry may force another ask.
   static Future<bool> ensurePermission({bool force = false}) async {
     if (kIsWeb) return false;
     try {
@@ -45,6 +47,7 @@ class ContentPushes {
       if (!force && Prefs.getBool(_permissionAskedKey)) return false;
       await Prefs.setBool(_permissionAskedKey, true);
       final result = await Permission.notification.request();
+      permissionRevision.value++;
       return result.isGranted;
     } catch (_) {
       return false;
@@ -61,6 +64,9 @@ class ContentPushes {
     await _invoke<int>('repair');
     await markAppOpen();
   }
+
+  static Future<bool> get permissionWasAsked async =>
+      Prefs.getBool(_permissionAskedKey);
 
   /// Full (re-)arm — used after the user re-enables pushes or grants the
   /// permission later from settings.

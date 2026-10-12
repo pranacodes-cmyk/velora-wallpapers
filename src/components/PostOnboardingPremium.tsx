@@ -179,7 +179,10 @@ export function PostOnboardingPremium() {
     // NOT tracked in timersRef on purpose: a purchase flips isPremium, which
     // re-runs the effect cleanup and would clear this timer, leaving the
     // onboarding overlay on screen forever.
-    window.setTimeout(completeOnboardingHandoff, 260);
+    window.setTimeout(() => {
+      completeOnboardingHandoff();
+      window.dispatchEvent(new Event("prayly:request-notifications-after-paywall"));
+    }, 260);
   };
 
   return (

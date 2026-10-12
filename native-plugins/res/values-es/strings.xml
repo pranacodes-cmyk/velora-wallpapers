@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prayer_alarm_morning_title">Oración de la mañana</string>
+    <string name="prayer_alarm_evening_title">Oración de la noche</string>
+    <string name="prayer_alarm_default_label">Tiempo de oración</string>
+    <string name="prayer_alarm_subtitle">Tu campana de oración está sonando</string>
+    <string name="prayer_alarm_action_close">Cerrar</string>
+    <string name="prayer_alarm_action_pray">Orar ahora</string>
+    <string name="prayer_alarm_action_snooze">Posponer 10 min.</string>
+    <string name="prayer_alarm_channel_alarm">Alarma de oración</string>
+    <string name="prayer_alarm_channel_bell">Campana de oración</string>
+    <string name="prayer_alarm_channel_desc">Campanas diarias de recordatorio de oración.</string>
+</resources>

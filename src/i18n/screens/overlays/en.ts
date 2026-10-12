@@ -17,6 +17,9 @@ const en = {
   "ov.notif.enable": "Enable Notifications",
   "ov.notif.opening": "Opening…",
   "ov.notif.later": "Maybe later",
+  "ov.notif.retry.title": "Don't miss your prayer moments",
+  "ov.notif.retry.body": "Notifications are still off. Turn them on for daily Scripture and your prayer bell.",
+  "ov.notif.retry.cta": "Open notification settings",
 
   // DailyPermissionNudge
   "ov.perm.title": "Stay close to the Word",

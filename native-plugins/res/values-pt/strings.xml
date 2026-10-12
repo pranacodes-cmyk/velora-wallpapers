@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prayer_alarm_morning_title">Oração da manhã</string>
+    <string name="prayer_alarm_evening_title">Oração da noite</string>
+    <string name="prayer_alarm_default_label">Tempo de oração</string>
+    <string name="prayer_alarm_subtitle">Seu sino de oração está tocando</string>
+    <string name="prayer_alarm_action_close">Fechar</string>
+    <string name="prayer_alarm_action_pray">Orar agora</string>
+    <string name="prayer_alarm_action_snooze">Soneca (10 min)</string>
+    <string name="prayer_alarm_channel_alarm">Alarme de oração</string>
+    <string name="prayer_alarm_channel_bell">Sino de oração</string>
+    <string name="prayer_alarm_channel_desc">Sinos diários de lembrete de oração.</string>
+</resources>

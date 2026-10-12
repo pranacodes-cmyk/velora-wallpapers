@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prayer_alarm_morning_title">सुबह की प्रार्थना</string>
+    <string name="prayer_alarm_evening_title">शाम की प्रार्थना</string>
+    <string name="prayer_alarm_default_label">प्रार्थना का समय</string>
+    <string name="prayer_alarm_subtitle">आपकी प्रार्थना की घंटी बज रही है</string>
+    <string name="prayer_alarm_action_close">बंद करें</string>
+    <string name="prayer_alarm_action_pray">अभी प्रार्थना करें</string>
+    <string name="prayer_alarm_action_snooze">10 मिनट बाद याद दिलाएं</string>
+    <string name="prayer_alarm_channel_alarm">प्रार्थना अलार्म</string>
+    <string name="prayer_alarm_channel_bell">प्रार्थना की घंटी</string>
+    <string name="prayer_alarm_channel_desc">दैनिक प्रार्थना अनुस्मारक घंटियाँ।</string>
+</resources>

@@ -52,6 +52,9 @@ export default {
           DEFAULT: "hsl(var(--premium-gold))",
           glow: "hsl(var(--premium-gold-glow))",
         },
+        paywall: {
+          cta: "hsl(var(--paywall-cta-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
