@@ -356,12 +356,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
 
   const selected = livePlans.find((p) => p.id === selectedPlan);
   const selectedPackage = packages[selectedPlan];
-  const zeroTodayLabel = selectedPackage
-    ? (() => {
-        const { currency, label } = numericDisplayPrice(selectedPackage);
-        return t("premium.cta.zeroToday", { price: formatZeroMoney(currency, label) });
-      })()
-    : t("premium.cta.zeroTodayFallback");
+  const zeroTodayLabel = t("premium.cta.zeroTodayFallback");
 
   // Pull the honest yearly-vs-weekly savings % from the computed badge.
   const savingsMatch = livePlans.find((p) => p.id === "yearly")?.badge?.match(/SAVE (\d+)%/);
@@ -532,11 +527,11 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
           transition={{ duration: 0.25 }}
-          className={`paywall-cinema fixed inset-0 z-[10001] flex flex-col bg-background text-foreground ${forceMidnightTheme ? "premium-sheet-dark" : ""}`}
+          className={`paywall-cinema fixed inset-0 z-[10001] flex flex-col justify-center bg-background text-foreground ${forceMidnightTheme ? "premium-sheet-dark" : ""}`}
           data-back-consumer="premium-sheet"
         >
-          <div className="paywall-layout mx-auto flex h-full w-full max-w-[520px] flex-col">
-            <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          <div className="paywall-layout mx-auto flex max-h-full w-full max-w-[520px] flex-col">
+            <div className="relative min-h-0 shrink overflow-y-auto overscroll-contain">
               <div className="paywall-film relative overflow-hidden">
                 <PaywallWelcomeFilm />
                 <div className="paywall-film-shade pointer-events-none absolute inset-0" />
@@ -546,7 +541,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                   <p className="mx-auto mt-2 max-w-[330px] text-[12px] leading-snug text-muted-foreground">{heroCopy.sub}</p>
                 </div>
               </div>
-              <div className="px-6 pb-3 pt-5">
+              <div className="px-6 pb-3 pt-4">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                   {[benefits[2], benefits[1], benefits[0], benefits[4]].map((benefit) => {
                     const Icon = benefit.icon;

@@ -63,5 +63,10 @@
 - [x] Add localized Bible/Prayer blocker switch with continuous chapters in web/Flutter.
 - [x] Remove duplicate Home Bible entry while preserving Bible navigation.
 - [x] Replace the Home Bible Chat card with Prayly Shield in web and Flutter.
+- [x] Sync latest changes and release Prayly 1.0.1199 (30100164) to Play Internal Testing; verify workflow and upload success, then restore GitHub repository private.
 
 - [ ] Verify native blocker mode handoff, chapter scroll and layout on a physical device after an explicitly approved Flutter build.
+- [x] Correct paywall empty space and currency-neutral trial copy in matching web/Flutter layouts; web verified at 384×576 and 384×824.
+- [x] Audit released bundle size, remove Vungle from both Android targets and exclude 25 redundant assets (2.992 MB compressed in released bundle); preserve subscriptions and offline Bible.
+- [x] Remove duplicate Flutter Home notification card.
+- [ ] Verify cleaned Flutter build size, native paywall and frame performance after an explicitly approved CI build; no native build requested for this audit.

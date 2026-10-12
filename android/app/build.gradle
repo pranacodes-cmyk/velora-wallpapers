@@ -70,13 +70,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
 
-    // Vungle (Liftoff Monetize) mediation adapter for AdMob.
-    // Pulls in the Vungle SDK transitively. Required so AdMob can serve
-    // Vungle bids configured in the Mediation dashboard.
-    implementation 'com.google.ads.mediation:vungle:7.7.3.0'
-
-    // Pangle (ByteDance) mediation was removed on purpose — it shipped a
-    // ~15 MB Vulkan validation layer and strict device requirements.
+    // AdMob only; no third-party mediation adapters.
 
 
     // Meta (Facebook) SDK — explicit pin so AppEventsLogger.activateApp is available

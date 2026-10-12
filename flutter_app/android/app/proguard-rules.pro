@@ -7,12 +7,10 @@
 -keep class io.flutter.plugins.** { *; }
 -dontwarn io.flutter.embedding.**
 
-# --- Google Play services / AdMob + mediation ------------------------------
+# --- Google Play services / AdMob ------------------------------------------
 -keep class com.google.android.gms.** { *; }
 -dontwarn com.google.android.gms.**
 -keep class com.google.ads.** { *; }
--keep class com.vungle.** { *; }
--dontwarn com.vungle.**
 
 # --- Play Billing / RevenueCat ---------------------------------------------
 -keep class com.android.billingclient.** { *; }

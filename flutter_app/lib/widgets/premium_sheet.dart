@@ -267,12 +267,8 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
   }
 
   String _zeroTodayLabel() {
-    final pkg = _packages[_selected];
-    if (pkg == null) return t('premium.cta.zeroTodayFallback');
-    final info = _priceInfo(pkg);
-    return t('premium.cta.zeroToday', {
-      'price': _formatZeroMoney(info.currency, info.label),
-    });
+    // Currency-neutral copy also avoids stale OTA strings containing "$0".
+    return t('premium.cta.zeroTodayFallback');
   }
 
   void _toast(String message) {
@@ -457,15 +453,17 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 520, maxHeight: 940),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
+                  Flexible(
+                    fit: FlexFit.loose,
                     child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           _hero(compact),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+                            padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
@@ -522,7 +520,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
 
   Widget _hero(bool compact) {
     final height = MediaQuery.sizeOf(context).height;
-    final filmHeight = height < 660 ? 180.0 : (height * 0.30).clamp(190.0, 300.0);
+    final filmHeight = height < 660 ? 180.0 : (height * 0.40).clamp(220.0, 360.0);
     final hero = _heroCopy;
     return SizedBox(
       height: filmHeight,

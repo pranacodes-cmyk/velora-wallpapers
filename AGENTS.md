@@ -20,4 +20,7 @@
 - Keep the post-onboarding paywall in the midnight palette, while paywalls opened inside the app follow the active light/dark theme; this preserves onboarding continuity without breaking in-app theme expectations.
 
 - Keep Yearly/Weekly plan selection pinned beside the purchase CTA while film/benefits scroll; both choices stay visible on short phones.
+- Let paywall content shrink to its natural height with bounded scrolling rather than expanding the benefits region; this prevents empty space above plans on tall devices.
+- Bundle only AdMob ad-serving adapters in both Android targets; keep purchase and attribution services separate from ad mediation.
+- Declare journey cover assets explicitly in Flutter rather than bundling the directory; this excludes redundant image copies without changing offline content.
 - Use one localized Bible/Prayer sacred-pause route with bundled Bible chapters and independent local progress; switching modes must never dismiss the native guard handoff.

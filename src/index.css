@@ -931,7 +931,7 @@ html.android-device .onb-storm-badge,
 .paywall-cinema { --muted-foreground: 40 10% 68%; }
 .light .paywall-cinema { --muted-foreground: 222 12% 42%; }
 .paywall-cinema.premium-sheet-dark { --muted-foreground: 40 10% 68%; }
-.paywall-film { height: clamp(210px, 32svh, 300px); }
+.paywall-film { height: clamp(220px, 40svh, 360px); }
 .paywall-film-media { width: 100%; height: 100%; object-fit: cover; object-position: 50% 27%; }
 .paywall-film-shade { background: linear-gradient(180deg, hsl(var(--background) / 0.12) 0%, transparent 35%, hsl(var(--background) / 0.4) 57%, hsl(var(--background)) 87%); }
 .paywall-heading { padding-bottom: 6px; }
