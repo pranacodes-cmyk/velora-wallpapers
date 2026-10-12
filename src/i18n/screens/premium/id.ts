@@ -1,4 +1,6 @@
 const id = {
+  "premium.benefit.bible.title": "Alkitab tanpa iklan",
+  "premium.benefit.bible.sub": "Gulir ayat atau baca pasal",
   "premium.aria.close": "Tutup",
 
   "premium.plan.yearly.label": "Tahunan",

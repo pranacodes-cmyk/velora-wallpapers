@@ -1,4 +1,6 @@
 const hi = {
+  "premium.benefit.bible.title": "बिना विज्ञापन बाइबल",
+  "premium.benefit.bible.sub": "वचन स्क्रॉल करें या अध्याय पढ़ें",
   "premium.aria.close": "बंद करें",
 
   "premium.plan.yearly.label": "सालाना",

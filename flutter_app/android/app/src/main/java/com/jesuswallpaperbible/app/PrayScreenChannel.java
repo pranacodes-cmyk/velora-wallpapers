@@ -60,6 +60,14 @@ public final class PrayScreenChannel implements MethodChannel.MethodCallHandler 
             case "getApps":
                 loadApps(result);
                 break;
+            case "getPauseMode":
+                result.success(prefs().contains("bible_mode") ? prefs().getBoolean("bible_mode", true) : null);
+                break;
+            case "setPauseMode":
+                Boolean bibleMode = call.argument("bible");
+                if (bibleMode != null) prefs().edit().putBoolean("bible_mode", bibleMode).apply();
+                result.success(true);
+                break;
             case "openUsageAccess":
                 open(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
                 result.success(true);

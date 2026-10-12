@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { PaywallWelcomeFilm } from "@/components/PaywallWelcomeFilm";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
-import { X, Check, Shield, Route, Sunrise, Image as ImageIcon, BanIcon, Headphones, LockOpen } from "lucide-react";
+import { X, Check, Shield, Route, Sunrise, Image as ImageIcon, BanIcon, Headphones, LockOpen, ArrowRight, BookOpen } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { haptic } from "@/utils/haptics";
 import { useState, useCallback, useEffect, useMemo } from "react";
@@ -68,7 +68,7 @@ function buildBenefits(t: (key: string) => string) {
   return [
     { icon: Shield,     title: t("premium.benefit.shield.title"),       sub: t("premium.benefit.shield.sub") },
     { icon: Route,      title: t("premium.benefit.journeys.title"),     sub: t("premium.benefit.journeys.sub") },
-    { icon: BanIcon,    title: t("premium.benefit.adFree.title"),       sub: t("premium.benefit.adFree.sub") },
+    { icon: BookOpen,   title: t("premium.benefit.bible.title"),       sub: t("premium.benefit.bible.sub") },
     { icon: ImageIcon,  title: t("premium.benefit.hdWallpapers.title"), sub: t("premium.benefit.hdWallpapers.sub") },
     { icon: Sunrise,    title: t("premium.benefit.dailyVerse.title"),   sub: t("premium.benefit.dailyVerse.sub") },
     { icon: Headphones, title: t("premium.benefit.prayerAudio.title"),  sub: t("premium.benefit.prayerAudio.sub") },
@@ -541,14 +541,14 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                 <PaywallWelcomeFilm />
                 <div className="paywall-film-shade pointer-events-none absolute inset-0" />
                 <div className="paywall-heading absolute inset-x-0 bottom-0 px-5 text-center">
-                  <p className="mb-1.5 text-[10px] font-semibold text-primary">Prayly · PRO</p>
-                  <h2 className="text-[24px] font-semibold leading-[1.12]">{heroCopy.title}</h2>
-                  <p className="mx-auto mt-1.5 max-w-[330px] text-[12px] leading-snug text-muted-foreground">{heroCopy.sub}</p>
+                  <p className="mb-2 text-[10px] font-medium text-primary">Prayly · PRO</p>
+                  <h2 className="paywall-title text-[28px] font-semibold leading-[1.15]">{heroCopy.title}</h2>
+                  <p className="mx-auto mt-2 max-w-[330px] text-[12px] leading-snug text-muted-foreground">{heroCopy.sub}</p>
                 </div>
               </div>
-              <div className="px-5 pb-2.5 pt-3">
-                <div className="mb-3 grid grid-cols-2 gap-x-4 gap-y-2.5">
-                  {[benefits[1], benefits[3], benefits[0], benefits[4]].map((benefit) => {
+              <div className="px-6 pb-3 pt-5">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                  {[benefits[2], benefits[1], benefits[0], benefits[4]].map((benefit) => {
                     const Icon = benefit.icon;
                     return <div key={benefit.title} className="flex min-w-0 items-center gap-2.5 text-left">
                       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
@@ -556,43 +556,44 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                       </span>
                       <span className="min-w-0">
                         <span className="block break-words text-[11px] font-semibold leading-tight text-foreground">{benefit.title}</span>
-                        <span className="mt-0.5 block break-words text-[9px] leading-tight text-muted-foreground">{benefit.sub}</span>
+                        <span className="mt-0.5 block break-words text-[10px] leading-[1.35] text-muted-foreground">{benefit.sub}</span>
                       </span>
                     </div>;
                   })}
                 </div>
-                <div role="radiogroup" aria-label="Plans" className="space-y-2">
+              </div>
+            </div>
+            <footer className="paywall-purchase shrink-0 bg-background px-5 pt-2">
+                <div role="radiogroup" aria-label="Plans" className="mb-2 space-y-2">
                   {livePlans.map((plan) => {
                     const active = selectedPlan === plan.id;
                     return <Button key={plan.id} variant="ghost" role="radio" aria-checked={active}
                       onClick={() => { setSelectedPlan(plan.id); haptic("soft"); }}
-                      className={`paywall-plan-option h-auto min-h-[58px] w-full justify-start gap-0 whitespace-normal rounded-[8px] border px-3.5 py-2 text-left transition-[border-color,background-color,box-shadow] hover:border-primary/55 hover:bg-primary/5 ${active ? "paywall-plan-active border-primary" : "border-border bg-card"}`}>
+                      className={`paywall-plan-option h-auto min-h-[54px] w-full justify-start gap-0 whitespace-normal rounded-xl border px-3 py-2.5 text-left transition-[border-color,background-color,box-shadow] hover:border-primary/55 hover:bg-primary/5 ${active ? "paywall-plan-active border-primary" : "border-border bg-card"}`}>
                       <span className={`mr-3 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border transition-colors ${active ? "border-primary bg-primary text-paywall-cta" : "border-muted-foreground/55 bg-background"}`}>
                         {active && <Check className="h-3 w-3" strokeWidth={3} />}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[14px] font-bold leading-tight text-foreground">{plan.label}</span>
+                        <span className="block text-[14px] font-semibold leading-tight text-foreground">{plan.label}</span>
                         <span className="mt-1 block text-[10px] font-medium leading-snug text-muted-foreground">{plan.id === "yearly" ? t("premium.plan.trialBadge") : plan.subtitle}</span>
                       </span>
                       <span className="ml-3 max-w-[46%] break-words text-right">
-                        <span className="block text-[15px] font-bold leading-tight text-foreground">{plan.price}<span className="ml-1 text-[10px] font-medium text-muted-foreground">/ {plan.period}</span></span>
+                        <span className="block text-[15px] font-semibold leading-tight text-foreground">{plan.price}<span className="ml-1 text-[10px] font-medium text-muted-foreground">/ {plan.period}</span></span>
                         {plan.anchor && <span className="mt-1 block text-[9px] font-medium leading-snug text-muted-foreground">{plan.anchor}</span>}
                       </span>
                     </Button>;
                   })}
                 </div>
-                <div className="mt-2.5 flex items-center justify-center gap-2 text-[10px] text-primary">
+
+                <div className="mb-2 flex items-center justify-center gap-2 text-[10px] text-primary">
                   <LockOpen className="h-3 w-3 shrink-0" />
                   <span className="text-center font-semibold">{t("premium.offer.today")}</span>
                 </div>
-              </div>
-            </div>
-            <footer className="paywall-purchase shrink-0 border-t border-border/60 bg-background px-5 pt-2.5">
-              <Button onClick={handleContinue} disabled={purchasing} className="paywall-cta h-auto min-h-[52px] w-full flex-col gap-0.5 whitespace-normal rounded-[8px] bg-primary py-2.5 shadow-sm hover:bg-primary/90">
-                <span className="text-[16px] font-bold leading-tight">{purchasing ? t("premium.cta.processing") : t(`premium.cta.${selectedPlan}.title`)}</span>
-                {!purchasing && <span className="text-[10px] font-semibold leading-tight">{selectedPlan === "yearly" ? zeroTodayLabel : t("premium.cta.weekly.sub")}</span>}
+              <Button onClick={handleContinue} disabled={purchasing} className="paywall-cta h-auto min-h-12 w-full gap-3 whitespace-normal rounded-full bg-primary px-5 py-3 hover:bg-primary/90">
+                <span className="text-[14px] font-semibold leading-tight">{purchasing ? t("premium.cta.processing") : t(`premium.cta.${selectedPlan}.title`)}</span>
+                <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" strokeWidth={1.8} />
               </Button>
-              <p className="mt-2 text-center text-[10px] leading-relaxed text-muted-foreground">{t(selectedPlan === "weekly" ? "premium.reminder.weekly" : "premium.reminder.yearly")}</p>
+              <p className="mt-2 text-center text-[10px] leading-snug text-muted-foreground">{selectedPlan === "yearly" ? `${zeroTodayLabel} · ` : ""}{t(selectedPlan === "weekly" ? "premium.reminder.weekly" : "premium.reminder.yearly")}</p>
               <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3">
                 <Button variant="link" onClick={handleRestore} disabled={restoring} className="h-8 px-0 text-[10px] font-normal text-muted-foreground">{t(restoring ? "premium.footer.restoring" : "premium.footer.restore")}</Button>
                 <span className="text-[10px] text-muted-foreground">{t("premium.footer.terms")}</span>

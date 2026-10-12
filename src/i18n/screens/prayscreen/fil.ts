@@ -1,4 +1,7 @@
 const fil = {
+  "ps.mode.prayer": "Panalangin",
+  "ps.mode.title": "Bago magbukas ng app",
+  "ps.bible.done": "Nabasa ko na · Magpatuloy",
   "ps.tagline": "Piliin ang Diyos bago mag-scroll",
   "ps.active": "AKTIBO",
   "ps.paused": "NAKAPAUSE",

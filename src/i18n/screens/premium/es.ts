@@ -1,4 +1,6 @@
 const es = {
+  "premium.benefit.bible.title": "Biblia sin anuncios",
+  "premium.benefit.bible.sub": "Versículos y capítulos",
   "premium.aria.close": "Cerrar",
 
   "premium.plan.yearly.label": "Anual",

@@ -40,8 +40,8 @@ const PrayerSetupSheet = lazyPage(() =>
 const ParallaxRail = lazyPage(() =>
   import("@/components/ParallaxRail").then((m) => ({ default: m.ParallaxRail })),
 );
-const BibleCompanionCard = lazyPage(() =>
-  import("@/components/companion/BibleCompanionCard").then((m) => ({ default: m.BibleCompanionCard })),
+const PrayScreenFeatureCard = lazyPage(() =>
+  import("@/components/prayscreen/PrayScreenFeatureCard").then((m) => ({ default: m.PrayScreenFeatureCard })),
 );
 
 
@@ -101,7 +101,6 @@ import {
   useMidnightCountdown,
 } from "@/components/today/todayShared";
 import { PrayerAlarmToggles } from "@/components/prayer/PrayerAlarmToggles";
-import { BibleReaderCard } from "@/components/bible/BibleReaderCard";
 // ParallaxRail lazy-imported above
 
 
@@ -1129,7 +1128,6 @@ export default function Today() {
       <div className="flex-1 overflow-y-auto scroll-container pb-28 pt-3">
         <VerseHero onPremium={() => setShowPremium(true)} />
 
-        <BibleReaderCard />
 
         <TodayChecklist />
         <PrayerAlarmToggles />
@@ -1143,8 +1141,8 @@ export default function Today() {
         <PersonalizedJourneyCard />
 
         {/* Below-fold: lazy chunk. Placeholder holds space so LCP is stable. */}
-        <Suspense fallback={<div style={{ minHeight: 220 }} aria-hidden />}>
-          <BibleCompanionCard />
+        <Suspense fallback={<div className="min-h-24" aria-hidden />}>
+          <PrayScreenFeatureCard />
         </Suspense>
 
         {!isPremium && <PremiumNudge onOpen={() => setShowPremium(true)} />}

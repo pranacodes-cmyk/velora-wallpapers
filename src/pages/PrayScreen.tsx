@@ -64,8 +64,7 @@ export default function PrayScreen() {
   const [overlayAllowed, setOverlayAllowed] = useState(() => localStorage.getItem("ps_preview_overlay") === "true");
   const [batteryOk, setBatteryOk] = useState(() => localStorage.getItem("ps_preview_battery") === "true");
   const [permissionOpen, setPermissionOpen] = useState(false);
-  const [prayerOpen, setPrayerOpen] = useState(false);
-  // Pause mode: Prayer (free, default for free users) or Bible (Pro). Same key as Flutter.
+  // Bible/Prayer choice uses the same device preference as Flutter.
   const [bibleMode, setBibleMode] = useState(() => localStorage.getItem("ps_bible_enabled") !== "false");
   const [offerOpen, setOfferOpen] = useState(false);
   const [pauseIndex, setPauseIndex] = useState(() => new Date().getDate());
@@ -170,10 +169,9 @@ export default function PrayScreen() {
     const until = Math.max(scheduled, minimum);
     localStorage.setItem("ps_unblock_until", String(until));
     setUnblockUntil(until);
-    // Pro pauses open the Scripture Gate (next KJV verses); free keeps the prayer.
-    const useBible = isPremium && bibleMode;
-    if (useBible) setGate("live");
-    else setPrayerOpen(true);
+    // Both tiers enter the same localized pause; selection never changes access.
+    const useBible = bibleMode;
+    setGate("live");
     track("pray_screen_prayer_shown", { reference: pause.reference, lang: localStorage.getItem("app-lang") ?? "en", mode: useBible ? "scripture" : "prayer" });
     track("pray_screen_unlocked", { until: new Date(until).toISOString(), app_count: selected.length });
   };
@@ -182,7 +180,6 @@ export default function PrayScreen() {
   // in the whole app — ask for the rating right here, then let the paywall
   // scheduler take its turn on later unlocks.
   const finishPrayer = () => {
-    setPrayerOpen(false);
     setGate(null);
     setBible(bibleProgress());
     track("pray_screen_prayer_completed", { reference: pause.reference });
@@ -260,24 +257,23 @@ export default function PrayScreen() {
         </Button>
       </section>
 
-      {/* Pause mode selector — Prayer is free; Bible is Pro. Sits below apps, above the CTA. */}
+      {/* Default pause mode; both Bible and Prayer are available to everyone. */}
       <section className="mt-5">
         <div className="mb-2 flex items-center justify-between px-1">
-          <h2 className="text-[11px] font-black tracking-[0.14em] text-foreground/65">WHEN AN APP IS BLOCKED</h2>
-          {isPremium && bibleMode && <span className="text-[9px] font-bold text-foreground/50">{bible.read} verses · {bible.percent.toFixed(1)}%</span>}
+          <h2 className="text-[11px] font-black tracking-[0.14em] text-foreground/65">{t("ps.mode.title")}</h2>
+          {bibleMode && <span className="text-[9px] font-bold text-foreground/50">{bible.read} verses · {bible.percent.toFixed(1)}%</span>}
         </div>
         <div className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card/70 p-1">
           {([
-            { id: "prayer", label: "Prayer", sub: "Free", icon: <Bell className="h-4 w-4" /> },
-            { id: "bible", label: "Bible", sub: isPremium ? "KJV" : "PRO", icon: <BookOpen className="h-4 w-4" /> },
+            { id: "prayer", label: t("ps.mode.prayer"), sub: "", icon: <Bell className="h-4 w-4" /> },
+            { id: "bible", label: t("bible.title"), sub: "", icon: <BookOpen className="h-4 w-4" /> },
           ] as const).map((o) => {
-            const active = o.id === "bible" ? isPremium && bibleMode : !(isPremium && bibleMode);
+            const active = o.id === "bible" ? bibleMode : !(bibleMode);
             return (
-              <button
+              <Button variant="ghost"
                 key={o.id}
                 onClick={() => {
                   haptic("light");
-                  if (o.id === "bible" && !isPremium) { track("scripture_gate_card_tapped", { is_premium: false }); setGate("preview"); return; }
                   const on = o.id === "bible";
                   setBibleMode(on);
                   localStorage.setItem("ps_bible_enabled", String(on));
@@ -286,9 +282,7 @@ export default function PrayScreen() {
                 className={`flex h-12 items-center justify-center gap-2 rounded-xl text-[13px] font-extrabold transition-colors ${active ? "bg-primary text-primary-foreground" : "text-foreground/70"}`}
               >
                 {o.icon}{o.label}
-                {o.sub === "PRO" ? <span className="rounded-full border border-primary/50 px-1.5 py-px text-[8.5px] font-black text-primary">PRO</span>
-                  : <span className={`text-[9.5px] font-bold ${active ? "text-primary-foreground/70" : "text-foreground/40"}`}>{o.sub}</span>}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -308,6 +302,8 @@ export default function PrayScreen() {
       {gate && (
         <ScriptureGate
           preview={gate === "preview"}
+          initialBible={bibleMode}
+          prayer={pause}
           onUpgrade={() => { setGate(null); setUpgradeOpen(true); }}
           onDone={() => { if (gate === "live") finishPrayer(); else setGate(null); }}
         />
@@ -339,21 +335,6 @@ export default function PrayScreen() {
           <Button variant="ghost" onClick={() => { setOfferOpen(false); setUpgradeOpen(true); }} className="text-xs font-black text-primary">{t("ps.offer.pro")}</Button>
         </DialogContent>
       </Dialog>
-
-      {/* Full-screen Sacred Pause — nothing else on screen while praying. */}
-      {prayerOpen && (
-        <div className="fixed inset-0 z-50 flex animate-in fade-in duration-300 flex-col bg-background bg-[radial-gradient(circle_at_50%_18%,hsl(var(--primary)/0.16),transparent_70%)] px-7 pb-6 pt-[max(env(safe-area-inset-top),20px)]">
-          <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-primary/30 bg-primary/10"><Shield className="h-8 w-8 text-primary" /></div>
-            <p className="mt-5 text-[12.5px] font-black uppercase tracking-[0.18em] text-primary">{t("ps.prayer.kicker")}</p>
-            <p className="mt-6 font-serif text-[30px] font-bold leading-[1.24]">“{pause.verse}”</p>
-            <p className="mt-3.5 text-[11px] font-black uppercase tracking-[0.14em] text-primary">{pause.reference}</p>
-            <div className="my-7 h-px w-11 bg-primary/35" />
-            <p className="text-[15px] leading-[1.7] text-foreground/75">{pause.prayer}</p>
-          </div>
-          <Button onClick={finishPrayer} className="h-14 w-full rounded-full text-[14.5px] font-black">{t("ps.prayer.done")}</Button>
-        </div>
-      )}
 
       <Dialog open={upgradeOpen} onOpenChange={setUpgradeOpen}>
         <DialogContent className="max-w-[calc(100%-24px)] rounded-[24px] border-primary/25 bg-card text-center">

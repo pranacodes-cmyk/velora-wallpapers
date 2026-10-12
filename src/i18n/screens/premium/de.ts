@@ -1,5 +1,7 @@
 // German (de) — premium screen.
 const de: Record<string, string> = {
+  "premium.benefit.bible.title": "Bibel ohne Werbung",
+  "premium.benefit.bible.sub": "Verse und Kapitel lesen",
   "premium.aria.close": "Schließen",
   "premium.plan.yearly.label": "Jährlich",
   "premium.plan.yearly.subtitle": "3 Tage kostenlos · Heute keine Zahlung",

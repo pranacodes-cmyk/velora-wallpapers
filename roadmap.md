@@ -56,3 +56,12 @@
 - [x] Remove Replay Welcome Tour from Settings in web and Flutter for the new Play Internal build.
 - [x] Upload the latest signed Flutter build to Play Internal Testing, verify success, then restore the repository private.
 - [x] Use the existing saved GitHub token release path rather than adding a new connector.
+
+- [x] Refine cinematic paywall spacing, typography and CTA in web/Flutter; accelerate video startup and verify preview.
+- [ ] Verify native paywall playback and layout on a device after the next explicitly approved Flutter build.
+- [x] Keep Yearly/Weekly visible above a compact paywall CTA; include accurate Bible benefits in web/Flutter.
+- [x] Add localized Bible/Prayer blocker switch with continuous chapters in web/Flutter.
+- [x] Remove duplicate Home Bible entry while preserving Bible navigation.
+- [x] Replace the Home Bible Chat card with Prayly Shield in web and Flutter.
+
+- [ ] Verify native blocker mode handoff, chapter scroll and layout on a physical device after an explicitly approved Flutter build.

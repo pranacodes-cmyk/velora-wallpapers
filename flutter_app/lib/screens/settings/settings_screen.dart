@@ -136,6 +136,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  Future<void> _redoOnboarding() async {
+    await Prefs.setString(StorageKeys.onboardingReplay, '1');
+    await Prefs.remove(StorageKeys.onboardingDoneAt);
+    await Prefs.remove('cw_post_onboarding_premium_shown');
+    if (!mounted) return;
+    final controller = ref.read(onboardingDoneProvider.notifier);
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    await controller.replay();
+  }
+
   Future<void> _deleteData() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -936,6 +946,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               title: t('settings.section.support'),
               child: Column(
                 children: [
+                  _Row(
+                    icon: Icons.replay_rounded,
+                    iconColor: AppColors.primary,
+                    label: t('settings.redoOnboarding'),
+                    desc: t('settings.redoOnboardingDesc'),
+                    onTap: _redoOnboarding,
+                  ),
+                  const _Divider(),
                   _Row(
                     icon: Icons.star_rounded,
                     iconColor: AppColors.primary,

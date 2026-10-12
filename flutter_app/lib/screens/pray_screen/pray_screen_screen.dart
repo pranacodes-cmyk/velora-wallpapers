@@ -382,7 +382,7 @@ class _PrayScreenScreenState extends ConsumerState<PrayScreenScreen>
     Analytics.capture('pray_screen_prayer_shown', {
       'reference': pause.reference,
       'lang': L10n.current.lang,
-      'mode': ref.read(premiumProvider) && BibleGateService.enabled ? 'scripture' : 'prayer',
+      'mode': BibleGateService.enabled ? 'scripture' : 'prayer',
     });
     return Navigator.of(context, rootNavigator: true).push<void>(
       PageRouteBuilder<void>(
@@ -390,7 +390,7 @@ class _PrayScreenScreenState extends ConsumerState<PrayScreenScreen>
         transitionDuration: const Duration(milliseconds: 420),
         reverseTransitionDuration: const Duration(milliseconds: 260),
         // Pro pauses open the Scripture Gate unless the user chose prayers.
-        pageBuilder: (_, __, ___) => ref.read(premiumProvider) && BibleGateService.enabled ? const ScriptureGateScreen() : _SacredPauseScreen(pause: pause),
+        pageBuilder: (_, __, ___) => ScriptureGateScreen(initialBible: BibleGateService.enabled, pause: pause),
         transitionsBuilder: (_, animation, __, child) => FadeTransition(
           opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
           child: child,
@@ -592,6 +592,7 @@ class _PrayScreenScreenState extends ConsumerState<PrayScreenScreen>
               onTap: () => _openScriptureGate(premium),
               onModeChanged: (bible) async {
                 await BibleGateService.setEnabled(bible);
+                await PrayScreenService.pushBlockerCopy();
                 Analytics.capture('scripture_gate_mode_changed', {'mode': bible ? 'bible' : 'prayer'});
                 if (mounted) setState(() {});
               },
@@ -752,7 +753,7 @@ class _ScriptureGateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pct = BibleGateService.percent;
-    final bibleOn = premium && BibleGateService.enabled;
+    final bibleOn = BibleGateService.enabled;
     Widget seg({required String label, required String icon, required String sub, required bool active, required VoidCallback tap, bool proBadge = false}) => Expanded(
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
@@ -777,7 +778,7 @@ class _ScriptureGateCard extends StatelessWidget {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Row(children: [
-          Text('WHEN AN APP IS BLOCKED', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.4, color: AppColors.fg(0.65))),
+          Text(L10n.current.t('ps.mode.title'), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.4, color: AppColors.fg(0.65))),
           const Spacer(),
           if (bibleOn) Text('${BibleGateService.versesRead} verses · ${pct.toStringAsFixed(1)}%', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: AppColors.fg(0.5))),
         ]),
@@ -787,9 +788,9 @@ class _ScriptureGateCard extends StatelessWidget {
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(color: AppColors.card.withValues(alpha: .7), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border)),
         child: Row(children: [
-          seg(label: 'Prayer', icon: 'bell', sub: 'Free', active: !bibleOn, tap: () => onModeChanged(false)),
+          seg(label: L10n.current.t('ps.mode.prayer'), icon: 'bell', sub: '', active: !bibleOn, tap: () => onModeChanged(false)),
           const SizedBox(width: 4),
-          seg(label: 'Bible', icon: 'book-open', sub: 'KJV', active: bibleOn, proBadge: !premium, tap: premium ? () => onModeChanged(true) : onTap),
+          seg(label: L10n.current.t('bible.title'), icon: 'book-open', sub: '', active: bibleOn, tap: () => onModeChanged(true)),
         ]),
       ),
     ]);

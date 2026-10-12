@@ -1,4 +1,7 @@
 const de = {
+  "ps.mode.prayer": "Gebet",
+  "ps.mode.title": "Vor dem Öffnen einer App",
+  "ps.bible.done": "Gelesen · Weiter",
   "ps.tagline": "Wähle Gott vor dem Scrollen",
   "ps.active": "AKTIV",
   "ps.paused": "PAUSIERT",

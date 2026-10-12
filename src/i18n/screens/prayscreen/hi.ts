@@ -1,4 +1,7 @@
 const hi = {
+  "ps.mode.prayer": "प्रार्थना",
+  "ps.mode.title": "ऐप खुलने से पहले",
+  "ps.bible.done": "पढ़ लिया · आगे बढ़ें",
   "ps.tagline": "स्क्रॉल से पहले परमेश्वर को चुनें",
   "ps.active": "चालू",
   "ps.paused": "रुका हुआ",

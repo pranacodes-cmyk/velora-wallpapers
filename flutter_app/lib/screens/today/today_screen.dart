@@ -19,8 +19,7 @@ import '../../widgets/premium_cross_logo.dart';
 import '../../widgets/premium_sheet.dart';
 import '../../widgets/screen_scaffold.dart';
 import '../../widgets/streak_badge.dart';
-import '../bible_chat/bible_chat_screen.dart';
-import '../bible_reader/bible_reader_screen.dart';
+import '../pray_screen/pray_screen_screen.dart';
 import '../daily_verse/daily_verse_screen.dart';
 import '../devotional/devotional_screen.dart';
 import '../journeys/journeys_screen.dart';
@@ -28,7 +27,6 @@ import '../parallax/parallax_preview_screen.dart';
 import 'prayer_alarm_toggles.dart';
 import 'notification_permission_card.dart';
 import '../settings/settings_screen.dart';
-import 'bible_companion_card.dart';
 import 'daily_question_card.dart';
 import 'journey_card.dart';
 import 'parallax_rail.dart';
@@ -267,14 +265,6 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                 ),
                 const NotificationPermissionCard(),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  child: TextButton.icon(
-                    onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const BibleReaderScreen())),
-                    icon: Icon(Icons.menu_book, color: AppColors.primary, size: 30),
-                    label: Padding(padding: const EdgeInsets.all(12), child: Text(t('bible.read'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.foreground))),
-                  ),
-                ),
 
                 app_keep_alive.KeepAlive(
                   child: TodayChecklist(
@@ -312,12 +302,46 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                   ),
                 ),
 
-                app_keep_alive.KeepAlive(
-                  child: BibleCompanionCard(
-                    onAsk: (question) => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            BibleChatScreen(initialQuestion: question),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+                  child: Material(
+                    color: AppColors.card,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(color: AppColors.border),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: () {
+                        haptic(HapticStyle.soft);
+                        Navigator.of(context).push(MaterialPageRoute<void>(
+                          builder: (_) => const PrayScreenScreen(),
+                        ));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(Icons.shield_outlined, size: 24, color: AppColors.primary),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(t('premium.benefit.shield.title'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.foreground)),
+                              const SizedBox(height: 4),
+                              Text(t('ps.tagline'), style: TextStyle(fontSize: 12, height: 1.5, color: AppColors.mutedForeground)),
+                            ],
+                          )),
+                          const SizedBox(width: 14),
+                          Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.mutedForeground),
+                        ]),
                       ),
                     ),
                   ),

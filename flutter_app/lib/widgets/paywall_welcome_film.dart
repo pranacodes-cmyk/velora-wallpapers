@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:video_player/video_player.dart';
 
 /// One lightweight CDN film, with a static first frame if playback is unavailable.
@@ -18,20 +19,21 @@ class _PaywallWelcomeFilmState extends State<PaywallWelcomeFilm>
   ));
   bool _ready = false;
   bool _active = true;
+  bool _started = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _initialize();
   }
 
   Future<void> _initialize() async {
     try {
-      await _video.initialize();
-      if (!mounted) return;
+      // Configure while the controller is still idle; initialize applies these
+      // values before returning, without extra platform round trips afterward.
       await _video.setVolume(0);
       await _video.setLooping(true);
+      await _video.initialize();
       if (!mounted) return;
       setState(() => _ready = true);
       _syncPlayback();
@@ -52,6 +54,10 @@ class _PaywallWelcomeFilmState extends State<PaywallWelcomeFilm>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (!_started && !MediaQuery.disableAnimationsOf(context)) {
+      _started = true;
+      _initialize();
+    }
     _syncPlayback();
   }
 
@@ -73,8 +79,8 @@ class _PaywallWelcomeFilmState extends State<PaywallWelcomeFilm>
     child: Stack(
       fit: StackFit.expand,
       children: [
-        Image.network(_poster, fit: BoxFit.cover, alignment: const Alignment(0, -0.46),
-          errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+        CachedNetworkImage(imageUrl: _poster, fit: BoxFit.cover, alignment: const Alignment(0, -0.46),
+          errorWidget: (_, __, ___) => const SizedBox.shrink()),
         if (_ready && !_video.value.hasError)
           FittedBox(
             fit: BoxFit.cover,

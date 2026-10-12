@@ -1,4 +1,6 @@
 const en = {
+  "premium.benefit.bible.title": "Ad-free Bible",
+  "premium.benefit.bible.sub": "Scroll verses or read chapters",
   "premium.aria.close": "Close",
 
   "premium.plan.yearly.label": "Annual",

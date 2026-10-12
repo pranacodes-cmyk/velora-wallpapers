@@ -88,9 +88,9 @@ List<_Benefit> _buildBenefits() => [
     t('premium.benefit.shield.sub'),
   ),
   _Benefit(
-    Icons.block,
-    t('premium.benefit.adFree.title'),
-    t('premium.benefit.adFree.sub'),
+    Icons.menu_book_outlined,
+    t('premium.benefit.bible.title'),
+    t('premium.benefit.bible.sub'),
   ),
   _Benefit(
     Icons.image_outlined,
@@ -465,24 +465,13 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
                         children: [
                           _hero(compact),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                            padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                _benefitsGrid([benefits[1], benefits[3], benefits[0], benefits[4]], compact),
-                                const SizedBox(height: 10),
-                                ..._planCards(plans, compact),
-                                const SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.lock_open, size: 12, color: _gold),
-                                    const SizedBox(width: 8),
-                                    Flexible(child: Text(t('premium.offer.today'),
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _gold))),
-                                  ],
-                                ),
+                                _benefitsGrid([benefits[2], benefits[0], benefits[1], benefits[4]], compact),
+
+
                               ],
                             ),
                           ),
@@ -491,14 +480,21 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.fromLTRB(20, 12, 20, max(insets.bottom, 8)),
-                    decoration: BoxDecoration(color: _background,
-                      border: Border(top: BorderSide(color: _border.withValues(alpha: 0.6)))),
+                    padding: EdgeInsets.fromLTRB(20, 8, 20, max(insets.bottom, 8)),
+                    decoration: BoxDecoration(color: _background),
                     child: Column(
                       children: [
+                        ..._planCards(plans, compact),
+                        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Icon(Icons.lock_open, size: 12, color: _gold),
+                          const SizedBox(width: 8),
+                          Flexible(child: Text(t('premium.offer.today'), textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: _gold))),
+                        ]),
+                        const SizedBox(height: 12),
                         _cta(compact),
                         const SizedBox(height: 8),
-                        Text(t(_selected == PlanId.weekly ? 'premium.reminder.weekly' : 'premium.reminder.yearly'),
+                        Text('${_selected == PlanId.yearly ? '${_zeroTodayLabel()} · ' : ''}${t(_selected == PlanId.weekly ? 'premium.reminder.weekly' : 'premium.reminder.yearly')}',
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 10, height: 1.5, color: _mutedForeground)),
                         const SizedBox(height: 6),
@@ -526,7 +522,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
 
   Widget _hero(bool compact) {
     final height = MediaQuery.sizeOf(context).height;
-    final filmHeight = height < 660 ? 190.0 : (height * 0.42).clamp(270.0, 380.0);
+    final filmHeight = height < 660 ? 180.0 : (height * 0.30).clamp(190.0, 300.0);
     final hero = _heroCopy;
     return SizedBox(
       height: filmHeight,
@@ -545,7 +541,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
                Text('Prayly · PRO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: _gold)),
                const SizedBox(height: 6),
               Text(hero.title, textAlign: TextAlign.center,
-                 style: TextStyle(fontSize: height < 660 ? 22 : 24, height: 1.12, fontWeight: FontWeight.w600, color: _foreground)),
+                 style: TextStyle(fontSize: height < 660 ? 22 : 28, height: 1.15, fontWeight: FontWeight.w600, color: _foreground)),
                const SizedBox(height: 6),
               ConstrainedBox(constraints: const BoxConstraints(maxWidth: 340),
                 child: Text(hero.sub, textAlign: TextAlign.center,
@@ -563,7 +559,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
   // ── Benefits (2-col bento) ──
   Widget _benefitsGrid(List<_Benefit> benefits, bool compact) => Column(
     children: [0, 2].map((start) => Padding(
-      padding: EdgeInsets.only(bottom: start == 0 ? 10 : 0),
+      padding: EdgeInsets.only(bottom: start == 0 ? 14 : 0),
       child: Row(children: benefits.skip(start).take(2).map((b) => Expanded(
         child: Padding(
           padding: const EdgeInsets.only(right: 8),
@@ -573,11 +569,11 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
               child: Icon(b.icon, size: 14, color: _gold)),
             const SizedBox(width: 9),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(b.title, maxLines: 2,
+              Text(b.title,
                 style: TextStyle(fontSize: 11, height: 1.15, fontWeight: FontWeight.w600, color: _foreground)),
               const SizedBox(height: 2),
-              Text(b.sub, maxLines: 3,
-                style: TextStyle(fontSize: 9, height: 1.15, color: _mutedForeground)),
+              Text(b.sub,
+                style: TextStyle(fontSize: 10, height: 1.35, color: _mutedForeground)),
             ])),
           ]),
         ),
@@ -689,11 +685,11 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
           child: OutlinedButton(
             onPressed: () { setState(() => _selected = plan.id); haptic(HapticStyle.soft); },
             style: OutlinedButton.styleFrom(
-               minimumSize: Size(double.infinity, compact ? 58 : 60),
-               padding: EdgeInsets.symmetric(horizontal: 14, vertical: compact ? 8 : 9),
-              backgroundColor: isSel ? _gold.withValues(alpha: AppColors.isLight && !_forceDark ? 0.07 : 0.1) : _card,
+               minimumSize: Size(double.infinity, 54),
+               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              backgroundColor: isSel ? _gold.withValues(alpha: AppColors.isLight && !_forceDark ? 0.055 : 0.055) : _card,
               side: BorderSide(color: isSel ? _gold : _border),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               elevation: isSel ? 1 : 0,
               shadowColor: _gold.withValues(alpha: 0.18),
             ),
@@ -705,7 +701,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
                 child: isSel ? Icon(Icons.check, size: 13, color: AppColors.darkBackground) : null),
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                 Text(plan.label, style: TextStyle(fontSize: 14, height: 1.15, fontWeight: FontWeight.w700, color: _foreground)),
+                 Text(plan.label, style: TextStyle(fontSize: 14, height: 1.15, fontWeight: FontWeight.w600, color: _foreground)),
                  const SizedBox(height: 4),
                 Text(plan.id == PlanId.yearly ? t('premium.plan.trialBadge') : plan.subtitle,
                     style: TextStyle(fontSize: 10, height: 1.25, fontWeight: FontWeight.w500, color: _mutedForeground)),
@@ -715,7 +711,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
                 if (pkg == null && _pricesLoading)
                   PriceShimmer(width: 52, height: 15, base: _mutedForeground)
                 else Text('$priceLabel / $periodLabel', textAlign: TextAlign.right,
-                   style: TextStyle(fontSize: 14, height: 1.1, fontWeight: FontWeight.w700, color: _foreground)),
+                   style: TextStyle(fontSize: 14, height: 1.1, fontWeight: FontWeight.w600, color: _foreground)),
                 if (anchor != null) ...[
                   const SizedBox(height: 4),
                   Text(anchor, textAlign: TextAlign.right, style: TextStyle(fontSize: 9, height: 1.3, fontWeight: FontWeight.w500, color: _mutedForeground)),
@@ -777,26 +773,25 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
   }
 
   // ── CTA ──
-  Widget _cta(bool compact) => SizedBox(
-    width: double.infinity,
-    child: FilledButton(
-      onPressed: _purchasing ? null : _handleContinue,
-      style: FilledButton.styleFrom(
-        backgroundColor: _gold, foregroundColor: AppColors.darkBackground,
-          minimumSize: const Size(double.infinity, 52),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Text(t(_purchasing ? 'premium.cta.processing' : 'premium.cta.${_selected.name}.title'),
-           textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, height: 1.1, fontWeight: FontWeight.w700)),
-        if (!_purchasing) ...[
-          const SizedBox(height: 4),
-          Text(_selected == PlanId.yearly ? _zeroTodayLabel() : t('premium.cta.weekly.sub'),
-            textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, height: 1.1, fontWeight: FontWeight.w600)),
-        ],
-      ]),
+  Widget _cta(bool compact) => DecoratedBox(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(999),
+      gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: AppColors.paywallButtonGradient),
+      boxShadow: AppColors.paywallButtonShadow,
     ),
+    child: SizedBox(width: double.infinity, child: FilledButton(
+      onPressed: _purchasing ? null : _handleContinue,
+      style: FilledButton.styleFrom(backgroundColor: Colors.transparent,
+        disabledBackgroundColor: Colors.transparent, foregroundColor: AppColors.darkBackground,
+        minimumSize: const Size(double.infinity, 48),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), shape: const StadiumBorder()),
+      child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
+        Flexible(child: Text(t(_purchasing ? 'premium.cta.processing' : 'premium.cta.${_selected.name}.title'),
+          textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
+        const SizedBox(width: 12), const Icon(Icons.arrow_forward_rounded, size: 16),
+      ]),
+    )),
   );
 
   List<Widget> _ctaFooterNotes() {

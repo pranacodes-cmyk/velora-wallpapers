@@ -1,4 +1,7 @@
 const id = {
+  "ps.mode.prayer": "Doa",
+  "ps.mode.title": "Sebelum membuka aplikasi",
+  "ps.bible.done": "Sudah dibaca · Lanjutkan",
   "ps.tagline": "Pilih Tuhan sebelum menggulir",
   "ps.active": "AKTIF",
   "ps.paused": "DIJEDA",

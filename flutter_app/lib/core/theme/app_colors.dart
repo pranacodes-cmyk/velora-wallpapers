@@ -122,6 +122,11 @@ class AppColors {
 
   // Public dark-scope values used by the intentionally midnight onboarding
   // paywall while the rest of the app remains in the user's selected theme.
+  static List<Color> get paywallButtonGradient => [_hsl(44, 90, 63), _hsl(40, 88, 48)];
+  static List<BoxShadow> get paywallButtonShadow => [
+    BoxShadow(color: _dPrimary.withValues(alpha: 0.24), blurRadius: 18,
+      spreadRadius: -8, offset: const Offset(0, 7)),
+  ];
   static Color get darkBackground => _dBackground;
   static Color get darkPrimary => _dPrimary;
   static Color get darkForeground => _dForeground;

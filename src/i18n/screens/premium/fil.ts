@@ -1,4 +1,6 @@
 const fil = {
+  "premium.benefit.bible.title": "Bibliyang walang ads",
+  "premium.benefit.bible.sub": "Mga talata at kabanata",
   "premium.aria.close": "Isara",
   "premium.plan.yearly.label": "Taunan",
   "premium.plan.yearly.subtitle": "3 araw libre · Walang bayad ngayon",

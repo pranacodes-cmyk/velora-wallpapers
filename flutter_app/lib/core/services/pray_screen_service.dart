@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../localization/app_localizations.dart';
 import 'analytics.dart';
 import 'prefs.dart';
+import 'bible_gate_service.dart';
 
 class PrayScreenStatus {
   const PrayScreenStatus({
@@ -221,6 +222,7 @@ class PrayScreenService {
     // The blocker keeps only a title and one line; the verse and prayer are
     // shown full-screen inside Prayly, straight from the backend.
     try {
+      await _channel.invokeMethod<bool>('setPauseMode', {'bible': BibleGateService.enabled});
       await _channel.invokeMethod<bool>('setCopy', {
         'copy': <String, String>{
           'kicker': l.t('ps.block.kicker'),
@@ -228,6 +230,8 @@ class PrayScreenService {
           'sub': l.t('ps.block.sub'),
           'unlock': l.t('ps.block.unlock'),
           'note': l.t('ps.block.note'),
+          'bible': l.t('bible.title'),
+          'prayer': l.t('ps.mode.prayer'),
         },
       });
     } catch (_) {}
@@ -310,8 +314,12 @@ class PrayScreenService {
   static Future<bool> consumeSacredPauseLaunch() async {
     if (kIsWeb) return false;
     try {
-      return await _channel.invokeMethod<bool>('consumeSacredPauseLaunch') ??
-          false;
+      final pending = await _channel.invokeMethod<bool>('consumeSacredPauseLaunch') ?? false;
+      if (pending) {
+        final bible = await _channel.invokeMethod<bool>('getPauseMode');
+        if (bible != null) await BibleGateService.setEnabled(bible);
+      }
+      return pending;
     } catch (_) {
       return false;
     }

@@ -1,4 +1,7 @@
 const en = {
+  "ps.mode.prayer": "Prayer",
+  "ps.mode.title": "When an app is blocked",
+  "ps.bible.done": "I’ve read · Continue",
   "ps.tagline": "Choose God before the scroll",
   "ps.active": "ACTIVE",
   "ps.paused": "PAUSED",
