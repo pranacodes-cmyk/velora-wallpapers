@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/ads_service.dart';
+import '../../core/services/challenge_store.dart';
 import '../../core/services/daily_reminder_service.dart';
 import '../../core/services/haptics.dart';
 import '../../core/services/prefs.dart';
