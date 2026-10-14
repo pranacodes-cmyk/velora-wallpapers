@@ -18,7 +18,7 @@ import 'prefs.dart';
 const _identityKey = 'prayly_challenge_identity_v1';
 const _overviewKey = 'prayly_challenge_circles_cache_v1';
 
-const kCircleAvatars = ['🕊️', '🦁', '🌿', '🌸', '⭐', '🔥', '🐑', '🌻', '🌊', '⛰️', '🌙', '☀️'];
+const kCircleAvatars = ['🐑', '🕊️', '🦁', '⭐', '🌊', '🌿', '🔥', '🌻', '⛰️', '🌸', '🌙', '☀️'];
 const kCircleEmojis = ['🪔', '🏡', '❤️', '⛪', '🙏', '✨', '🌿', '👨‍👩‍👧'];
 
 class CircleIdentity {
@@ -42,6 +42,7 @@ class CircleMember {
         bestStreak = _int(j['bestStreak']),
         litToday = j['litToday'] == true,
         todayDone = _int(j['todayDone']),
+        isPro = j['isPro'] == true,
         isMe = j['isMe'] == true,
         sentToday = (j['sentToday'] is List) ? (j['sentToday'] as List).map((e) => '$e').toList() : <String>[];
   final String id;
@@ -54,6 +55,7 @@ class CircleMember {
   final int bestStreak;
   final bool litToday;
   final int todayDone;
+  final bool isPro;
   final bool isMe;
   final List<String> sentToday;
 }
@@ -234,6 +236,7 @@ class ChallengeCircleService {
       'todayOn': today,
       'todayDone': ChallengeStore.tasksDoneToday(st, today).length,
       'attempts': st.attempts,
+      'isPro': Prefs.getBool(StorageKeys.premiumUnlocked),
     };
   }
 
@@ -305,5 +308,43 @@ class ChallengeCircleService {
       _syncTimer = null;
       _call('sync', {'progress': progressPayload()}).catchError((_) => <String, dynamic>{});
     });
+  }
+
+  /* ── Journey buddies (web mirror: buddiesOf / myBuddyCode) ─────────── */
+
+  static const _buddyCodeKey = 'prayly_buddy_code_v1';
+
+  /// Everyone who shares any circle with me, most progress first.
+  static List<(CircleMember, String)> buddies([CircleOverview? o]) {
+    final seen = <String, (CircleMember, String)>{};
+    for (final c in (o ?? cached)?.circles ?? const <Circle>[]) {
+      for (final m in c.members) {
+        if (!m.isMe && !seen.containsKey(m.id)) seen[m.id] = (m, c.id);
+      }
+    }
+    final list = seen.values.toList()..sort((a, b) => b.$1.completedDays.compareTo(a.$1.completedDays));
+    return list;
+  }
+
+  /// My personal buddy code (my own walk circle), created on first use.
+  static Future<String> myBuddyCode() async {
+    final saved = Prefs.getString(_buddyCodeKey);
+    if (saved != null && saved.isNotEmpty) return saved;
+    var o = cached;
+    o ??= await fetchOverview().catchError((_) => const CircleOverview([], [], {}));
+    Circle? own;
+    for (final c in o.circles) {
+      if (c.isOwner) { own = c; break; }
+    }
+    var code = own?.code ?? '';
+    if (code.isEmpty) {
+      final id = await createCircle('Journey', '🐑');
+      for (final c in cached?.circles ?? const <Circle>[]) {
+        if (c.id == id) code = c.code;
+      }
+    }
+    if (code.isEmpty) throw const CircleError('network');
+    Prefs.setString(_buddyCodeKey, code);
+    return code;
   }
 }

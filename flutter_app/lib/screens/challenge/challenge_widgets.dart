@@ -14,46 +14,15 @@ import '../today/today_shared.dart' show kSerif, kSerifFallback;
 /// Shared visuals for 75 Days of Light.
 /// Web mirrors: `src/components/challenge/*`.
 
-/* ── assets ─────────────────────────────────────────────────────────────── */
+/* ── task glyphs ────────────────────────────────────────────────────────── */
 
-class LampArt {
-  const LampArt(this.asset, this.w, this.h, this.wx, this.wy);
-  final String asset;
-  final double w;
-  final double h;
-
-  /// Normalized wick tip inside the trimmed art.
-  final double wx;
-  final double wy;
-}
-
-const kLamps = <LampArt>[
-  LampArt('assets/images/challenge/lamp-1.webp', 560, 299, 0.961, 0.268),
-  LampArt('assets/images/challenge/lamp-2.webp', 560, 298, 0.954, 0.245),
-  LampArt('assets/images/challenge/lamp-3.webp', 560, 326, 0.953, 0.261),
-  LampArt('assets/images/challenge/lamp-4.webp', 560, 300, 0.97, 0.133),
-  LampArt('assets/images/challenge/lamp-5.webp', 560, 437, 0.985, 0.114),
-];
-
-const kTaskArt = <String, String>{
-  'read': 'assets/images/challenge/task-read.webp',
-  'pray': 'assets/images/challenge/task-pray.webp',
-  'live': 'assets/images/challenge/task-live.webp',
-  'reflect': 'assets/images/challenge/task-reflect.webp',
-};
-
+/// Lucide glyph per daily task (web: `taskIcons.ts`).
 const kTaskIcon = <String, String>{
   'read': 'book-open',
   'pray': 'hand-heart',
-  'live': 'sparkles',
+  'live': 'heart',
   'reflect': 'pen-line',
 };
-
-String heroArt() => AppColors.isLight
-    ? 'assets/images/challenge/hero-dawn.webp'
-    : 'assets/images/challenge/hero-night.webp';
-
-const kCircleArt = 'assets/images/challenge/circle-family.webp';
 
 /* ── palette helpers ────────────────────────────────────────────────────── */
 
@@ -89,165 +58,6 @@ class ChInk {
 
 String upper(String s) => L10n.current.lang == 'hi' ? s : s.toUpperCase();
 
-/* ── lamp with a live flame ─────────────────────────────────────────────── */
-
-enum LampState { lit, waiting, ember }
-
-class ChallengeLamp extends StatefulWidget {
-  const ChallengeLamp({super.key, required this.tier, required this.intensity, required this.state, required this.width});
-  final int tier;
-  final double intensity;
-  final LampState state;
-  final double width;
-
-  @override
-  State<ChallengeLamp> createState() => _ChallengeLampState();
-}
-
-class _ChallengeLampState extends State<ChallengeLamp> with SingleTickerProviderStateMixin {
-  late final AnimationController _flicker =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 2400))..repeat();
-
-  @override
-  void dispose() {
-    _flicker.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final lamp = kLamps[widget.tier.clamp(0, 4)];
-    final width = widget.width;
-    final height = width * lamp.h / lamp.w;
-    final power = switch (widget.state) {
-      LampState.lit => widget.intensity,
-      LampState.waiting => widget.intensity * 0.72,
-      LampState.ember => 0.12,
-    };
-    final flameH = width * (0.12 + 0.26 * power);
-    final flameW = flameH * 0.62;
-    final glow = width * (0.38 + 1.05 * power);
-    final wx = lamp.wx * width;
-    final wy = lamp.wy * height;
-    final padTop = math.max(0.0, flameH + glow * 0.18 - wy);
-    final padRight = math.max(0.0, wx + flameW * 0.6 - width);
-    final reduce = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-
-    return ExcludeSemantics(
-      child: SizedBox(
-        width: width + padRight,
-        height: height + padTop,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Positioned(
-              left: wx - glow / 2,
-              top: padTop + wy - flameH * 0.55 - glow / 2,
-              width: glow,
-              height: glow,
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(colors: [
-                      const Color(0xFFFFC94A).withValues(alpha: widget.state == LampState.ember ? 0.12 : 0.30 + power * 0.25),
-                      const Color(0xFFFF8A1F).withValues(alpha: widget.state == LampState.ember ? 0.04 : 0.10 + power * 0.08),
-                      const Color(0x00FF8A1F),
-                    ], stops: const [0, 0.45, 1]),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 0,
-              top: padTop,
-              width: width,
-              height: height,
-              child: Image.asset(lamp.asset, fit: BoxFit.contain, filterQuality: FilterQuality.medium, gaplessPlayback: true),
-            ),
-            Positioned(
-              left: wx - flameW / 2,
-              top: padTop + wy - flameH + flameH * 0.08,
-              width: flameW,
-              height: flameH,
-              child: IgnorePointer(
-                child: AnimatedBuilder(
-                  animation: _flicker,
-                  builder: (_, __) {
-                    final p = reduce ? 0.0 : _flicker.value * math.pi * 2;
-                    final sway = math.sin(p) * 0.04 + math.sin(p * 3.1) * 0.02;
-                    final scaleY = 1 + math.sin(p * 2.3) * 0.05;
-                    return Transform(
-                      alignment: Alignment.bottomCenter,
-                      transform: Matrix4.identity()
-                        ..rotateZ(sway)
-                        ..scaleByDouble(1.0, scaleY, 1.0, 1.0),
-                      child: Opacity(
-                        opacity: widget.state == LampState.ember ? 0.55 : 1,
-                        child: const CustomPaint(painter: _FlamePainter()),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FlamePainter extends CustomPainter {
-  const _FlamePainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final sx = size.width / 40, sy = size.height / 64;
-    Path path(List<double> d) {
-      // d: start x,y then cubic triples.
-      final p = Path()..moveTo(d[0] * sx, d[1] * sy);
-      for (var i = 2; i + 5 < d.length + 1; i += 6) {
-        p.cubicTo(d[i] * sx, d[i + 1] * sy, d[i + 2] * sx, d[i + 3] * sy, d[i + 4] * sx, d[i + 5] * sy);
-      }
-      return p..close();
-    }
-
-    final outer = path([20, 1, 27, 15, 37, 26, 37, 41, 37, 55, 29, 63, 20, 63, 11, 63, 3, 55, 3, 41, 3, 26, 13, 15, 20, 1]);
-    final inner = path([20, 18, 24, 28, 30, 35, 30, 45, 30, 54, 25, 60, 20, 60, 15, 60, 10, 54, 10, 45, 10, 35, 16, 28, 20, 18]);
-    final rect = Offset.zero & size;
-    canvas.drawPath(
-      outer,
-      Paint()
-        ..shader = const RadialGradient(
-          center: Alignment(0, 0.56),
-          radius: 0.9,
-          colors: [Color(0xFFFFF8D6), Color(0xFFFFC94A), Color(0xF2FF8A1F), Color(0x00FF5A00)],
-          stops: [0, 0.38, 0.72, 1],
-        ).createShader(rect),
-    );
-    canvas.drawPath(
-      inner,
-      Paint()
-        ..shader = const RadialGradient(
-          center: Alignment(0, 0.6),
-          radius: 0.7,
-          colors: [Color(0xFFFFFFFF), Color(0xFFFFF1B0), Color(0x00FFD45C)],
-          stops: [0, 0.55, 1],
-        ).createShader(rect),
-    );
-    final core = Rect.fromCenter(center: Offset(20 * sx, 57 * sy), width: 12 * sx, height: 9 * sy);
-    canvas.drawOval(
-      core,
-      Paint()
-        ..shader = const RadialGradient(colors: [Color(0xE69CC8FF), Color(0x005B8CFF)]).createShader(core),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
 /* ── buttons ────────────────────────────────────────────────────────────── */
 
 class GoldButton extends StatelessWidget {
@@ -276,23 +86,20 @@ class GoldButton extends StatelessWidget {
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
+              color: AppColors.primary,
               borderRadius: BorderRadius.circular(999),
-              gradient: LinearGradient(colors: [ChInk.gold, ChInk.goldGlow]),
-              boxShadow: enabled
-                  ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.45), blurRadius: 24, spreadRadius: -12, offset: const Offset(0, 12))]
-                  : null,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (icon != null) ...[LucideIconLite(icon!, size: 18, color: ChInk.ctaForeground), const SizedBox(width: 8)],
+                if (icon != null) ...[LucideIconLite(icon!, size: 18, color: AppColors.primaryForeground), const SizedBox(width: 8)],
                 Flexible(
                   child: Text(label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w800, color: ChInk.ctaForeground)),
+                      style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w800, color: AppColors.primaryForeground)),
                 ),
-                if (trailing != null) ...[const SizedBox(width: 6), LucideIconLite(trailing!, size: 20, color: ChInk.ctaForeground)],
+                if (trailing != null) ...[const SizedBox(width: 6), LucideIconLite(trailing!, size: 20, color: AppColors.primaryForeground)],
               ],
             ),
           ),
@@ -589,6 +396,102 @@ BoxDecoration chCard({Color? border, double radius = 26, Color? color}) => BoxDe
       borderRadius: BorderRadius.circular(radius),
       border: Border.all(color: border ?? AppColors.border.withValues(alpha: 0.6)),
     );
+
+/* ── journey surfaces ───────────────────────────────────────────────────── */
+
+/// Journey type scale (web: `text-[28px] font-bold`, section `text-[19px]`).
+class JourneyText {
+  const JourneyText._();
+  static TextStyle title() => TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
+        height: 1.15,
+        letterSpacing: -0.56,
+        color: AppColors.foreground,
+      );
+  static TextStyle section() =>
+      TextStyle(fontSize: 19, fontWeight: FontWeight.w700, height: 1.2, color: AppColors.foreground);
+}
+
+/// Quiet card surface for the Journey hub.
+BoxDecoration journeyCard({double radius = 18, Color? border, Color? color}) => BoxDecoration(
+      color: color ?? AppColors.card,
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(color: border ?? AppColors.border.withValues(alpha: 0.6)),
+      boxShadow: [
+        BoxShadow(
+          color: AppColors.foreground.withValues(alpha: AppColors.isLight ? 0.05 : 0.10),
+          blurRadius: 2,
+          offset: const Offset(0, 1),
+        ),
+      ],
+    );
+
+/// Compact pill action: outline by default, solid primary when [filled].
+class JourneyPillButton extends StatelessWidget {
+  const JourneyPillButton({super.key, required this.label, this.icon, this.filled = false, this.onTap, this.height = 42});
+  final String label;
+  final String? icon;
+  final bool filled;
+  final VoidCallback? onTap;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = filled ? AppColors.primaryForeground : AppColors.foreground;
+    return Semantics(
+      button: true,
+      label: label,
+      child: _Pressable(
+        onTap: onTap,
+        child: Container(
+          height: height,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: filled ? AppColors.primary : null,
+            borderRadius: BorderRadius.circular(999),
+            border: filled ? null : Border.all(color: AppColors.border),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[LucideIconLite(icon!, size: 16, color: fg), const SizedBox(width: 6)],
+              Flexible(
+                child: Text(label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 14, fontWeight: filled ? FontWeight.w800 : FontWeight.w700, color: fg)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Small round check used for daily steps (web: `h-7 w-7 rounded-full`).
+class StepCheck extends StatelessWidget {
+  const StepCheck({super.key, required this.done, this.size = 28});
+  final bool done;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutBack,
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: done ? AppColors.primary : Colors.transparent,
+          border: done ? null : Border.all(color: AppColors.mutedForeground.withValues(alpha: 0.35), width: 2),
+        ),
+        child: done ? LucideIconLite('check', size: size * 0.57, color: AppColors.primaryForeground, strokeWidth: 3) : null,
+      );
+}
 
 /* ── bottom sheet scaffold ──────────────────────────────────────────────── */
 

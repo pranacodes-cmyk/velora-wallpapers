@@ -10,7 +10,7 @@
 //   streak alive; without oil the streak resets but the progress stays.
 // • Covenant path: a missed day relights the challenge from Day 1.
 // • Every 7-day streak earns a jar of oil. Free keeps 1, Pro keeps 3.
-import { CHALLENGE_DAYS, TASK_IDS, type TaskId } from "@/data/challenge75";
+import { CHALLENGE_DAYS, REQUIRED_TASKS, TASK_IDS, type TaskId } from "@/data/challenge75";
 
 export const CHALLENGE_KEY = "prayly_challenge_v1";
 export const JOURNAL_KEY = "prayly_challenge_journal_v1";
@@ -156,7 +156,10 @@ export function currentDay(s: ChallengeState, today = localDate()): number {
 }
 
 export function tasksDoneToday(s: ChallengeState, today = localDate()): TaskId[] {
-  if (litToday(s, today)) return [...TASK_IDS];
+  if (litToday(s, today)) {
+    // Reflection is optional — only show what was actually completed.
+    return s.today && s.today.date === today ? [...s.today.done] : [...REQUIRED_TASKS];
+  }
   return s.today && s.today.date === today ? s.today.done : [];
 }
 
@@ -179,7 +182,7 @@ function latest(a: string | null, b: string | null) {
 
 /* ── actions ─────────────────────────────────────────────────────────────── */
 
-export function startChallenge(mode: ChallengeMode, morning: string, evening: boolean) {
+export function startChallenge(mode: ChallengeMode) {
   const today = localDate();
   const prev = getChallenge();
   write({
@@ -190,7 +193,7 @@ export function startChallenge(mode: ChallengeMode, morning: string, evening: bo
     attempts: prev.status === "idle" ? prev.attempts : prev.attempts + 1,
     bestStreak: prev.bestStreak,
     lastCheckOn: today,
-    reminders: { enabled: true, morning, evening },
+    reminders: { enabled: true, morning: "07:00", evening: true },
   });
 }
 
@@ -253,24 +256,35 @@ export type CompletionResult = {
   day: number;
   streak: number;
   graceEarned: boolean;
-  lampUpgraded: boolean;
+  /** Arrived at a new island (every 15 days, before the cross). */
+  islandReached: boolean;
   finished: boolean;
 };
 
-/** Mark a practice done for today. Lights the day when all four are done. */
+/**
+ * Mark a practice done for today. Lights the day when read, pray and live it
+ * are done — reflection is optional and can also be recorded after the day lit.
+ */
 export function completeTask(task: TaskId, isPremium: boolean): CompletionResult {
   const today = localDate();
   const s = getChallenge();
   const day = currentDay(s, today);
-  const empty: CompletionResult = { lit: false, day, streak: liveStreak(s, today), graceEarned: false, lampUpgraded: false, finished: false };
-  if (s.status !== "active" || litToday(s, today)) return empty;
+  const empty: CompletionResult = { lit: false, day, streak: liveStreak(s, today), graceEarned: false, islandReached: false, finished: false };
+  if (s.status !== "active") return empty;
+  if (litToday(s, today)) {
+    if (task !== "reflect") return empty;
+    const td = s.today;
+    if (!td || td.date !== today || td.done.includes(task)) return empty;
+    write({ ...s, today: { ...td, done: [...td.done, task] } });
+    return empty;
+  }
 
   const done = new Set(s.today && s.today.date === today ? s.today.done : []);
   done.add(task);
   const ordered = TASK_IDS.filter((t) => done.has(t));
   const nextToday = { date: today, day, done: ordered };
 
-  if (ordered.length < TASK_IDS.length) {
+  if (!REQUIRED_TASKS.every((t) => done.has(t))) {
     write({ ...s, today: nextToday });
     return { ...empty };
   }
@@ -300,7 +314,7 @@ export function completeTask(task: TaskId, isPremium: boolean): CompletionResult
     day,
     streak,
     graceEarned,
-    lampUpgraded: Math.floor(after / 15) > Math.floor(before / 15) && after < CHALLENGE_DAYS,
+    islandReached: Math.floor(after / 15) > Math.floor(before / 15) && after < CHALLENGE_DAYS,
     finished,
   };
 }

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { Check, Loader2, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { JourneyAvatar } from "./JourneyAvatar";
 import { useT } from "@/i18n";
 import { haptic } from "@/utils/haptics";
 import { track } from "@/services/analytics";
@@ -7,9 +9,14 @@ import {
   AVATARS, CIRCLE_EMOJIS, createCircle, ensureIdentity, getIdentity, joinCircle,
 } from "@/services/challengeCircle";
 import { BottomSheet } from "./BottomSheet";
-import { circleErrorKey } from "./useCircles";
 
-export type CircleFlow = "create" | "join" | null;
+// Local error mapper: the crew helpers this used to import are gone.
+const circleErrorKey = (err: unknown): string =>
+  typeof err === "object" && err && "code" in (err as Record<string, unknown>)
+    ? `ch.circle.error.${String((err as Record<string, unknown>).code)}`
+    : "ch.circle.error.unknown";
+
+export type CircleFlow = "create" | "join" | "profile" | null;
 
 type Props = {
   flow: CircleFlow;
@@ -25,7 +32,7 @@ const field =
 
 /**
  * Create / join flow. First time, it asks how the circle should see you
- * (name + emoji), then continues straight into create or join.
+ * (name + mascot avatar), then continues straight into create or join.
  */
 export function CircleSheets({ flow, initialCode = "", onClose, onDone }: Props) {
   const { t, lang } = useT();
@@ -42,7 +49,7 @@ export function CircleSheets({ flow, initialCode = "", onClose, onDone }: Props)
   useEffect(() => {
     if (!flow) return;
     const id = getIdentity();
-    setStep(id ? "form" : "profile");
+    setStep(flow === "profile" || !id ? "profile" : "form");
     setError(null);
     setBusy(false);
     if (initialCode) setCode(initialCode.toUpperCase());
@@ -59,7 +66,8 @@ export function CircleSheets({ flow, initialCode = "", onClose, onDone }: Props)
       await ensureIdentity(clean, avatar, lang);
       track("challenge_circle_profile_saved");
       haptic("soft");
-      setStep("form");
+      if (flow === "profile") onDone("", false);
+      else setStep("form");
     } catch (err) {
       setError(circleErrorKey(err));
     } finally {
@@ -98,39 +106,46 @@ export function CircleSheets({ flow, initialCode = "", onClose, onDone }: Props)
     } catch { /* clipboard blocked */ }
   };
 
-  const title = step === "profile" ? t("ch.circle.youTitle") : flow === "create" ? t("ch.circle.newTitle") : t("ch.circle.joinTitle");
+  const title = step === "profile" ? t("ch.profile.title") : flow === "create" ? t("ch.circle.newTitle") : t("ch.buddy.joinTitle");
 
   return (
     <BottomSheet open title={title} onClose={onClose} closeLabel={t("ch.back")}>
       {step === "profile" ? (
-        <div className="space-y-5">
+        <div className="space-y-2.5">
+          <div className="flex items-center gap-4">
+            <JourneyAvatar avatar={avatar} className="h-12 w-12 ring-2 ring-primary/50 ring-offset-4 ring-offset-card" />
+            <div className="min-w-0"><p className="break-words text-lg font-semibold text-foreground">{name.trim() || t("ch.circle.yourName")}</p><p className="mt-1 text-[13px] leading-snug text-muted-foreground">{t("ch.profile.sub")}</p></div>
+          </div>
           <label className="block">
             <span className="mb-2 block text-[12px] font-bold uppercase tracking-[0.16em] text-muted-foreground">{t("ch.circle.yourName")}</span>
-            <input value={name} maxLength={24} onChange={(e) => setName(e.target.value)} placeholder={t("ch.circle.yourNamePlaceholder")} className={field} autoFocus />
+            <input value={name} maxLength={24} onChange={(e) => setName(e.target.value)} placeholder={t("ch.circle.yourNamePlaceholder")} className={field} />
           </label>
           <div>
             <span className="mb-2 block text-[12px] font-bold uppercase tracking-[0.16em] text-muted-foreground">{t("ch.circle.avatar")}</span>
-            <div className="grid grid-cols-6 gap-2">
-              {AVATARS.map((a) => (
-                <button
+            <div className="mx-auto grid max-w-[240px] grid-cols-4 gap-2.5">
+              {AVATARS.map((a, i) => (
+                <Button
+                  variant="ghost"
                   key={a}
                   type="button"
                   onClick={() => { haptic("light"); setAvatar(a); }}
                   aria-pressed={avatar === a}
-                  className={`flex h-12 items-center justify-center rounded-2xl text-[24px] transition-transform active:scale-90 ${avatar === a ? "bg-primary/20 ring-2 ring-primary" : "bg-muted/60"}`}
+                  aria-label={`${t("ch.circle.avatar")} ${i + 1}`}
+                  className={`relative aspect-square h-auto w-full rounded-full p-1 transition-transform active:scale-95 ${avatar === a ? "bg-primary/15 ring-2 ring-primary ring-offset-2" : "bg-card ring-1 ring-border/60"}`}
                 >
-                  {a}
-                </button>
+                  <JourneyAvatar avatar={a} />
+                  {avatar === a && <span className="absolute bottom-0 right-0 grid h-5 w-5 place-items-center rounded-full bg-primary text-primary-foreground ring-2 ring-background"><Check className="h-3 w-3" strokeWidth={3} /></span>}
+                </Button>
               ))}
             </div>
           </div>
-          <p className="flex gap-2 rounded-2xl bg-muted/50 p-3 text-[12.5px] leading-snug text-muted-foreground">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{t("ch.circle.privacy")}
+          <p className="flex gap-2 rounded-xl bg-muted/50 p-2 text-[11.5px] leading-snug text-muted-foreground">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{t("ch.profile.privacy")}
           </p>
           {error && <p className="text-[13px] font-semibold text-destructive">{t(error)}</p>}
-          <button type="button" disabled={!name.trim() || busy} onClick={saveProfile} className={primaryBtn}>
+          <Button type="button" disabled={!name.trim() || busy} onClick={saveProfile} className={`${primaryBtn} h-auto`}>
             {busy && <Loader2 className="h-4 w-4 animate-spin" />}{t("ch.circle.continue")}
-          </button>
+          </Button>
         </div>
       ) : flow === "create" ? (
         <div className="space-y-5">

@@ -93,11 +93,12 @@ type Member = {
   today_on: string | null;
   today_done: number;
   attempts: number;
+  is_pro: boolean;
   updated_at: string;
 };
 
 const MEMBER_COLUMNS =
-  "id, display_name, avatar, mode, started_on, completed_days, current_streak, best_streak, last_lit_on, today_on, today_done, attempts, updated_at";
+  "id, display_name, avatar, mode, started_on, completed_days, current_streak, best_streak, last_lit_on, today_on, today_done, attempts, is_pro, updated_at";
 
 async function authenticate(body: Record<string, unknown>): Promise<Member> {
   const memberId = typeof body.memberId === "string" ? body.memberId : "";
@@ -129,6 +130,7 @@ function progressPatch(progress: Record<string, unknown> | undefined) {
   if ("todayOn" in progress) patch.today_on = cleanDate(progress.todayOn);
   if ("todayDone" in progress) patch.today_done = clampInt(progress.todayDone, 0, 4);
   if ("attempts" in progress) patch.attempts = clampInt(progress.attempts, 1, 1000);
+  if ("isPro" in progress) patch.is_pro = progress.isPro === true;
   return patch;
 }
 
@@ -150,6 +152,7 @@ function publicMember(m: Member, viewerToday: string, meId: string) {
     litToday,
     todayDone: recent ? (litToday ? 4 : m.today_done) : 0,
     lastLitOn: m.last_lit_on,
+    isPro: m.is_pro === true,
     isMe: m.id === meId,
   };
 }

@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/ads_service.dart';
 import '../../core/services/analytics.dart';
-import '../../core/services/daily_funnel.dart';
 import '../../core/services/haptics.dart';
 import '../../core/services/rating_service.dart';
 import '../../core/theme/app_colors.dart';
@@ -22,7 +21,10 @@ import 'quiz_revive.dart';
 
 /// 1:1 port of `src/pages/Quiz.tsx` + `src/components/quiz/*`.
 class QuizScreen extends ConsumerStatefulWidget {
-  const QuizScreen({super.key});
+  const QuizScreen({super.key, this.autoDaily = false});
+
+  /// Route-local intent; never broadcasts navigation to the retained Today tab.
+  final bool autoDaily;
 
   @override
   ConsumerState<QuizScreen> createState() => _QuizScreenState();
@@ -36,20 +38,16 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
   _Hype? _hype;
   Timer? _hypeTimer;
 
-  int _lastAutoStartQuiz = DailyFunnel.autoStartQuiz.value;
-
   @override
   void initState() {
     super.initState();
     _quiz = QuizController();
     _quiz.addListener(_onQuizChanged);
-    DailyFunnel.autoStartQuiz.addListener(_onAutoStartRequested);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(quizBackHandlerProvider.notifier).state = _handleHardwareBack;
+      if (widget.autoDaily) _startDailyQuiz();
     });
-    // In case the request landed before this tab's state existed.
-    _onAutoStartRequested();
   }
 
   /// Android hardware back, routed here by the shell. Returns true when it
@@ -74,10 +72,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
 
   /// Auto-start from the prayer/Today handoff (web: `?auto=daily`) — drops
   /// the user straight into the running daily quiz.
-  void _onAutoStartRequested() {
-    final v = DailyFunnel.autoStartQuiz.value;
-    if (v == 0 || v == _lastAutoStartQuiz) return;
-    _lastAutoStartQuiz = v;
+  void _startDailyQuiz() {
     if (_quiz.state != QuizState.idle) return;
     if (_quiz.dailyCompleted) return;
     Analytics.capture('quiz_started', {'mode': quizModeKey(QuizMode.daily)});
@@ -87,7 +82,6 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
   @override
   void dispose() {
     _quiz.removeListener(_onQuizChanged);
-    DailyFunnel.autoStartQuiz.removeListener(_onAutoStartRequested);
     _quiz.dispose();
     _hypeTimer?.cancel();
     WidgetsBinding.instance.addPostFrameCallback((_) {

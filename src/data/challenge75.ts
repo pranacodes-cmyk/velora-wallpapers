@@ -6,11 +6,13 @@
 import en1 from "@/i18n/content/challenge/en";
 import en2 from "@/i18n/content/challenge/en-p2";
 import en3 from "@/i18n/content/challenge/en-p3";
-import { tc } from "@/i18n";
+import { t, tc } from "@/i18n";
 
 export const CHALLENGE_DAYS = 75;
 export const TASK_IDS = ["read", "pray", "live", "reflect"] as const;
 export type TaskId = (typeof TASK_IDS)[number];
+/** Tasks that must be done to light the day; "reflect" is optional. */
+export const REQUIRED_TASKS = ["read", "pray", "live"] as const;
 
 /** Canonical (Protestant, 0-based) book order used by the English edition. */
 export const BOOK = {
@@ -67,6 +69,9 @@ export type ChallengeDay = ReadingRef & {
   prayer: string;
   action: string;
   how: string;
+  missionTitle: string;
+  missionWhy: string;
+  missionEmoji: string;
   question: string;
 };
 
@@ -80,8 +85,11 @@ export function challengeDay(day: number): ChallengeDay {
     insight: dayText(n, "insight"),
     focus: dayText(n, "focus"),
     prayer: dayText(n, "prayer"),
-    action: dayText(n, "action"),
-    how: dayText(n, "how"),
+    action: t(`chm.${n}.title`),
+    how: t(`chm.${n}.action`),
+    missionTitle: t(`chm.${n}.title`),
+    missionWhy: t(`chm.${n}.why`),
+    missionEmoji: t(`chm.${n}.emoji`),
     question: dayText(n, "question"),
   };
 }
@@ -101,13 +109,6 @@ export const STAGES: Stage[] = [
 export function stageForDay(day: number): Stage {
   return STAGES.find((s) => day >= s.from && day <= s.to) ?? STAGES[STAGES.length - 1];
 }
-
-/** Lamp tier unlocked by the number of completed days (0–4). */
-export function lampTierFor(completed: number): number {
-  return Math.min(4, Math.floor(Math.max(0, completed) / 15));
-}
-
-export const MILESTONES = [1, 7, 15, 30, 45, 60, 75] as const;
 
 /* ── Book resolution per bundled edition ─────────────────────────────────── */
 

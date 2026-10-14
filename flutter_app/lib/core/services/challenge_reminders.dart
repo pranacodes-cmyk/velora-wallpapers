@@ -16,6 +16,8 @@ class ChallengeReminderService {
 
   static const _channel = MethodChannel('com.jesuswallpaperbible.app/prayer_alarm');
   static const _daysAhead = 3;
+  static const _morningHour = 7;
+  static const _nightHour = 21;
 
   static Future<bool> requestPermission() async {
     if (kIsWeb) return false;
@@ -36,21 +38,17 @@ class ChallengeReminderService {
     if (kIsWeb) return;
     final s = stateArg ?? ChallengeStore.state;
     final items = <Map<String, Object>>[];
-    if (s.status == 'active' && s.reminders.enabled) {
+    if (s.status == 'active') {
       final today = ChallengeStore.localDate();
       final lit = ChallengeStore.litToday(s, today);
       final pending = lit ? ChallengeStore.currentDay(s, today) + 1 : ChallengeStore.currentDay(s, today);
-      final left = 4 - ChallengeStore.tasksDoneToday(s, today).length;
-      final parts = s.reminders.morning.split(':');
-      final mh = int.tryParse(parts.first) ?? 7;
-      final mm = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
       final now = DateTime.now();
 
       for (var i = 0; i < _daysAhead; i++) {
         final date = ChallengeStore.addDays(today, i);
         final day = i == 0 ? pending : pending + (lit ? i - 1 : 0);
         if (day > kChallengeDays) break;
-        final morning = _at(date, mh, mm);
+        final morning = _at(date, _morningHour, 0);
         if (morning.isAfter(now) && !(i == 0 && lit)) {
           items.add({
             'at': morning.millisecondsSinceEpoch,
@@ -59,17 +57,8 @@ class ChallengeReminderService {
             'route': '/challenge',
           });
         }
-        if (!s.reminders.evening || (i == 0 && lit)) continue;
-        final evening = _at(date, 19, 30);
-        if (evening.isAfter(now)) {
-          items.add({
-            'at': evening.millisecondsSinceEpoch,
-            'title': t('ch.notif.evening.title'),
-            'body': t('ch.notif.evening.body', {'left': i == 0 ? left : 4, 'day': day}),
-            'route': '/challenge/day',
-          });
-        }
-        final night = _at(date, 21, 30);
+        if (i == 0 && lit) continue;
+        final night = _at(date, _nightHour, 0);
         if (night.isAfter(now)) {
           items.add({
             'at': night.millisecondsSinceEpoch,

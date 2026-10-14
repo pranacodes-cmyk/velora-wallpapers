@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../../core/localization/app_localizations.dart';
+import '../../widgets/lucide.dart';
+import '../challenge/voyage.dart';
 import 'onboarding_motion.dart';
-import 'onboarding_shared.dart';
 import 'verse_slide.dart' show OnbHeadline;
 
-/// 1:1 port of `JourneysSlide` (slide 1) from `OnboardingFlow.tsx`.
-/// Three journey cards with hue-tinted accent bar, cross glyph tile and a
-/// 7-bar equaliser on the first card.
+/// 1:1 port of `JourneysSlide` from `OnboardingLateSlides.tsx`: the 75 Days
+/// of Light voyage (twilight sea, ship sailing out) above three practice
+/// cards with a hue-tinted accent bar, icon tile and a 7-bar equaliser.
 class _Journey {
-  const _Journey(this.title, this.meta, this.hue);
+  const _Journey(this.title, this.meta, this.hue, this.icon);
   final String title;
   final String meta;
   final double hue;
+  final String icon;
 }
 
 Color _h(double hue, double s, double l, [double a = 1]) =>
@@ -24,9 +26,9 @@ class JourneysSlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final journeys = <_Journey>[
-      _Journey(t('onb.journeys.item1Title'), t('onb.journeys.item1Meta'), 42),
-      _Journey(t('onb.journeys.item2Title'), t('onb.journeys.item2Meta'), 28),
-      _Journey(t('onb.journeys.item3Title'), t('onb.journeys.item3Meta'), 220),
+      _Journey(t('onb.journeys.item1Title'), t('onb.journeys.item1Meta'), 42, 'book-open'),
+      _Journey(t('onb.journeys.item2Title'), t('onb.journeys.item2Meta'), 28, 'hand-heart'),
+      _Journey(t('onb.journeys.item3Title'), t('onb.journeys.item3Meta'), 220, 'users'),
     ];
 
     return Stack(
@@ -63,6 +65,26 @@ class JourneysSlide extends StatelessWidget {
               child: Column(
                 children: onbStagger([
                   SizedBox(height: MediaQuery.paddingOf(context).top),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 320),
+                    child: Container(
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: _h(42, 70, 55, 0.28)),
+                        boxShadow: const [BoxShadow(color: Color(0xCC000000), blurRadius: 44, spreadRadius: -20, offset: Offset(0, 22))],
+                      ),
+                      child: const VoyagePoster(
+                        days: 18,
+                        fromDays: 0,
+                        night: true,
+                        labels: true,
+                        sailDelay: Duration(milliseconds: 900),
+                        sailDuration: Duration(milliseconds: 2600),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Opacity(
                     opacity: 0.75,
                     child: Text(
@@ -180,18 +202,14 @@ class _JourneyCard extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [_h(hue, 85, 55, 0.22), _h(hue, 85, 45, 0.04)],
-                    ),
-                    border: Border.all(color: _h(hue, 70, 55, 0.3)),
+                    color: _h(hue, 70, 55, 0.14),
+                    border: Border.all(color: _h(hue, 70, 55, 0.35)),
                   ),
-                  child: Center(child: _CrossGlyph(color: _h(hue, 85, 62))),
+                  child: Center(child: LucideIcon(journey.icon, size: 20, strokeWidth: 1.9, color: _h(hue, 85, 66))),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -224,47 +242,6 @@ class _JourneyCard extends StatelessWidget {
                 ),
                 if (showEqualiser) const _Equaliser(),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// 13x18 cross glyph — same two rounded bars as the inline SVG on web.
-class _CrossGlyph extends StatelessWidget {
-  const _CrossGlyph({required this.color});
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 13,
-      height: 18,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              width: 3.7,
-              height: 18,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(1),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 4.5,
-            child: Container(
-              width: 13,
-              height: 3.7,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(1),
-              ),
             ),
           ),
         ],

@@ -29,7 +29,7 @@ const hi = {
   "premium.benefit.dailyVerse.title": "दैनिक वचन",
   "premium.benefit.dailyVerse.sub": "वॉलपेपर हर दिन अपने आप बदले",
   "premium.benefit.journeys.title": "प्रकाश के 75 दिन",
-  "premium.benefit.journeys.sub": "विज्ञापन-मुक्त, अनुग्रह के तेल के 3 जार के साथ",
+  "premium.benefit.journeys.sub": "विज्ञापन-मुक्त, 3 अनुग्रह लंगर के साथ",
   "premium.benefit.prayerAudio.title": "प्रार्थना ऑडियो",
   "premium.benefit.prayerAudio.sub": "आपके नाम के साथ प्रार्थना",
   "premium.review.1.text": "जिस पहली सुबह मेरा वचन लॉक स्क्रीन पर आया, मेरी आँखें भर आईं। लगा जैसे परमेश्वर इस ऐप से मुझे फिर अपने पास बुला रहे हैं।",

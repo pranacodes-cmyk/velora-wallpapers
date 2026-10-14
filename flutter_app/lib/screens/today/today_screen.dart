@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
-import '../../core/app_tabs.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/localization/app_localizations.dart';
@@ -24,11 +23,13 @@ import '../pray_screen/pray_screen_screen.dart';
 import '../daily_verse/daily_verse_screen.dart';
 import '../devotional/devotional_screen.dart';
 import '../challenge/challenge_home_card.dart';
+import '../quiz/quiz_route.dart';
 import '../parallax/parallax_preview_screen.dart';
 import 'prayer_alarm_toggles.dart';
 import 'notification_permission_card.dart';
 import '../settings/settings_screen.dart';
 import 'daily_question_card.dart';
+import 'gift_button.dart';
 import 'parallax_rail.dart';
 import 'premium_nudge.dart';
 import 'today_checklist.dart';
@@ -131,23 +132,11 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               child: Row(
                 children: [
-                  SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: IconButton(
-                      tooltip: 'Life Calendar',
-                      padding: EdgeInsets.zero,
-                      style: IconButton.styleFrom(
-                        backgroundColor: TodayInk.primary.withValues(alpha: 0.1),
-                        foregroundColor: TodayInk.primary,
-                        side: BorderSide(color: TodayInk.primary.withValues(alpha: 0.2)),
-                      ),
-                      icon: const Icon(Icons.card_giftcard_outlined, size: 20),
-                      onPressed: () {
-                        haptic(HapticStyle.soft);
-                        showLifeCalendarPreview(context, ref.read(languageProvider));
-                      },
-                    ),
+                  GiftButton(
+                    onTap: () {
+                      haptic(HapticStyle.soft);
+                      showLifeCalendarPreview(context, ref.read(languageProvider));
+                    },
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -286,9 +275,8 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                 app_keep_alive.KeepAlive(
                   child: TodayChecklist(
                     onOpenDevotional: _openDevotional,
-                    onOpenQuiz: () =>
-                        ref.read(activeTabProvider.notifier).state =
-                            AppTabs.quiz,
+                    onOpenQuiz: () => openQuiz(context),
+                    onOpenDailyQuiz: () => openQuiz(context, autoDaily: true),
                   ),
                 ),
                 const app_keep_alive.KeepAlive(child: PrayerAlarmToggles()),
@@ -378,9 +366,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
 
                 app_keep_alive.KeepAlive(
                   child: DailyQuestionCard(
-                    onOpenQuiz: () =>
-                        ref.read(activeTabProvider.notifier).state =
-                            AppTabs.quiz,
+                    onOpenQuiz: () => openQuiz(context),
                   ),
                 ),
 

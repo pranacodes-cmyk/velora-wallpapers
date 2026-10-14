@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Star } from "lucide-react";
+import { ChevronRight, Star } from "lucide-react";
 
 import type { QuizQuestion } from "@/data/quizQuestions";
 import { localizeQuizQuestion } from "@/i18n/content";
@@ -166,6 +166,9 @@ export default function DailyQuestionCard() {
           <span className="text-[9.5px] font-bold tracking-[0.22em] uppercase text-primary/85">
             {t("today.question.label")}
           </span>
+          <span className="text-[10px] font-semibold tabular-nums text-foreground/45">
+            {t("today.question.newIn", { time: refresh })}
+          </span>
         </div>
 
         <p
@@ -255,7 +258,7 @@ export default function DailyQuestionCard() {
                     : "text-amber-800 dark:text-amber-300"
                 }`}
               >
-                {isCorrect ? "✓ Amen — correct!" : "Not quite — keep growing"}
+                {isCorrect ? t("today.question.correct") : t("today.question.incorrect")}
               </span>
             </div>
             <p className="text-[12px] leading-[1.5] text-foreground/85 font-medium">
@@ -274,34 +277,26 @@ export default function DailyQuestionCard() {
           className="flex items-center justify-between mt-3 pt-3 gap-3"
           style={{ borderTop: "1px solid var(--tile-divider)" }}
         >
+          <span className="min-w-0 truncate text-[10px] font-bold tracking-[0.1em] uppercase text-foreground/55">
+            {answered ? t("today.question.label") : t("today.question.tapToBegin")}
+          </span>
           {answered ? (
-            <>
-              <span className="text-[10px] font-bold tracking-[0.1em] uppercase text-foreground/55 shrink-0">
-                New question in {refresh}
-              </span>
-              <motion.button
-                whileTap={{ scale: 0.96 }}
-                onClick={() => { haptic("medium"); track("today_quiz_start_tapped", { surface: "quiz_card_answered" }); navigate("/quiz"); }}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-extrabold"
-                style={{
-                  background: "linear-gradient(180deg, hsl(42 92% 60%), hsl(38 88% 48%))",
-                  color: "hsl(var(--background))",
-                  boxShadow: "0 6px 16px -4px hsl(var(--primary) / 0.55), inset 0 1px 0 hsl(0 0% 100% / 0.3)",
-                }}
-              >
-                <Star className="w-3.5 h-3.5" strokeWidth={2.6} />
-                Start full quiz
-              </motion.button>
-            </>
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={() => { haptic("medium"); track("today_quiz_start_tapped", { surface: "quiz_card_answered" }); navigate("/quiz"); }}
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-[hsl(var(--premium-gold))] to-[hsl(var(--premium-gold-glow))] px-3.5 py-2 text-[12px] font-extrabold text-[hsl(var(--paywall-cta-foreground))] shadow-[0_6px_16px_-6px_hsl(var(--primary)/0.6)]"
+            >
+              <Star className="w-3.5 h-3.5" strokeWidth={2.6} />
+              {t("today.question.startQuiz")}
+            </motion.button>
           ) : (
-            <>
-              <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-foreground/55">
-                Tap an answer to begin
-              </span>
-              <span className="text-[10px] font-bold tracking-[0.08em] uppercase text-foreground/40 tabular-nums">
-                New in {refresh}
-              </span>
-            </>
+            <button
+              onClick={() => { haptic("light"); track("today_quiz_start_tapped", { surface: "quiz_card_idle" }); navigate("/quiz"); }}
+              className="flex shrink-0 items-center gap-1 text-[12px] font-bold text-primary"
+            >
+              {t("today.question.startQuiz")}
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
           )}
         </div>
       </div>

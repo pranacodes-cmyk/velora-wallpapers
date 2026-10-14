@@ -51,38 +51,21 @@ const FLUTTER_DROP = /^onb\.chat\./;
 
 /**
  * Key families the Flutter app never resolves (verified with a repo-wide scan of
- * `lib/**`): journey guides (`jg.`) and journey readings (`jr.`), which belong to
- * the web-only Journeys tab. They accounted for several MB of dead weight.
+ * `lib/**`): the retired Journeys catalogue — UI (`jn.`), day content (`j.`),
+ * guides (`jg.`) and readings (`jr.`). 75 Days of Light (`ch.`/`chd.`) replaced
+ * it, and these families were several MB of dead weight.
  *
  * NOTE: the daily prayer bodies (`p.`) and their closing declarations (`pd.`)
  * ARE kept — `ContentData.prayerForDate` localizes the Devotional prayer with
  * the same `enrichPrayer` logic the web app uses, so dropping them would force
  * every language back to English prayers.
  */
-const FLUTTER_UNUSED = /^(jg\.|jr\.)/;
+const FLUTTER_UNUSED = /^(jn\.|j\.|jg\.|jr\.)/;
 
 function stripFlutterDrops(dict) {
   return Object.fromEntries(
     Object.entries(dict).filter(([k]) => !FLUTTER_DROP.test(k) && !FLUTTER_UNUSED.test(k)),
   );
-}
-
-/**
- * Flutter's compact reflection sheet reuses the translated Journey vocabulary
- * instead of maintaining a second set of near-identical strings. These aliases
- * keep every Flutter-only control localized in all supported languages.
- */
-function addFlutterAliases(dict) {
-  return {
-    ...dict,
-    "jn.featured.meta.hm": "{{h}}h {{m}}m",
-    "jn.reflect.placeholder": dict["jn.reflect.prompts.0"] ?? "",
-    "jn.reflect.charCount": "{{count}} / 500",
-    "jn.reflect.skip": dict["jn.reflect.skipAria"] ?? "",
-    "jn.reflect.yourLine": `${dict["jn.reflect.title"] ?? ""}: {{text}}`,
-    "jn.reflect.finish": dict["jn.reflect.doneBtn"] ?? "",
-    "jn.reflect.submit": dict["jn.reflect.cta"] ?? "",
-  };
 }
 
 async function dictFor(lang) {
@@ -120,7 +103,7 @@ await mkdir(OUT, { recursive: true });
 
 for (const lang of LANGS) {
   const dict = lang === "en" ? enDict : { ...enDict, ...(await dictFor(lang)) };
-  const kept = addFlutterAliases(stripFlutterDrops(dict));
+  const kept = stripFlutterDrops(dict);
   const sorted = Object.fromEntries(Object.keys(kept).sort().map((k) => [k, kept[k]]));
   await writeFile(path.join(OUT, `${lang}.json`), JSON.stringify(sorted, null, 0));
   console.log(`${lang}.json — ${Object.keys(sorted).length} keys`);

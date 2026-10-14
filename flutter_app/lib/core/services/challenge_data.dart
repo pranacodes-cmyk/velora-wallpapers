@@ -7,6 +7,8 @@ import '../localization/app_localizations.dart';
 /// translation JSON (`chd.<day>.<field>`), English is the merged fallback.
 const kChallengeDays = 75;
 const kTaskIds = <String>['read', 'pray', 'live', 'reflect'];
+/// Tasks required to light a day; reflection is optional.
+const kRequiredTasks = <String>['read', 'pray', 'live'];
 const kMilestones = <int>[1, 7, 15, 30, 45, 60, 75];
 
 class ReadingRef {
@@ -58,6 +60,8 @@ class ChallengeDayPlan {
     required this.prayer,
     required this.action,
     required this.how,
+    required this.missionWhy,
+    required this.missionEmoji,
     required this.question,
   });
 
@@ -69,6 +73,8 @@ class ChallengeDayPlan {
   final String prayer;
   final String action;
   final String how;
+  final String missionWhy;
+  final String missionEmoji;
   final String question;
 }
 
@@ -83,8 +89,10 @@ ChallengeDayPlan challengeDay(int day) {
     insight: dayText(n, 'insight'),
     focus: dayText(n, 'focus'),
     prayer: dayText(n, 'prayer'),
-    action: dayText(n, 'action'),
-    how: dayText(n, 'how'),
+    action: t('chm.$n.title'),
+    how: t('chm.$n.action'),
+    missionWhy: t('chm.$n.why'),
+    missionEmoji: t('chm.$n.emoji'),
     question: dayText(n, 'question'),
   );
 }
@@ -107,9 +115,6 @@ const kStages = <ChallengeStage>[
 
 ChallengeStage stageForDay(int day) =>
     kStages.firstWhere((s) => day >= s.from && day <= s.to, orElse: () => kStages.last);
-
-/// Lamp tier unlocked by the number of completed days (0–4).
-int lampTierFor(int completed) => math.min(4, math.max(0, completed) ~/ 15);
 
 /// The Hindi edition ships its New Testament in a different file order.
 const Map<int, int> _hiNt = {

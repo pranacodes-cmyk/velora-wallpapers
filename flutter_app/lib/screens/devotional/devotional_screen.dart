@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../../core/app_tabs.dart';
 import '../../widgets/lucide.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
@@ -14,10 +13,10 @@ import '../../core/services/content_data.dart';
 import '../../core/services/daily_funnel.dart';
 import '../../core/services/prayer_slots.dart';
 import '../../core/services/today_tasks_store.dart';
-import '../../state/app_providers.dart';
 import '../../widgets/app_toast.dart';
 import '../../widgets/funnel_exit_modal.dart';
 import '../prayer/personal_prayer_sheet.dart';
+import '../quiz/quiz_route.dart';
 import 'devotional_backgrounds.dart';
 import 'devotional_slide.dart';
 import 'locked_prayer_card.dart';
@@ -191,13 +190,13 @@ class _DevotionalScreenState extends ConsumerState<DevotionalScreen>
     // 1:1 of `leaveDevotional` on web:
     //  CONTINUE -> drop the user straight into the next step (no prompt).
     //  BACK     -> silent exit; Today gently invites them into the next step.
+    var toQuiz = false;
     if (fromContinue && prayerWasSeen && !tasks.reflection) {
       DailyFunnel.requestOpenReflection();
     } else if (fromContinue && prayerWasSeen && !tasks.quiz) {
-      // Web: `navigate("/quiz?auto=daily")` — this app has no quiz *route*,
-      // so switch the bottom-nav tab and ask the quiz screen to auto-start.
-      ref.read(activeTabProvider.notifier).state = AppTabs.quiz;
-      DailyFunnel.requestAutoStartQuiz();
+      // Web: `navigate("/quiz?auto=daily")` — the quiz page replaces this
+      // one and auto-starts the daily round.
+      toQuiz = true;
     }
     // BACK must be a plain, silent exit. Setting a handoff here made Today
     // instantly re-open the reflection sheet, which trapped the user in a
@@ -209,7 +208,9 @@ class _DevotionalScreenState extends ConsumerState<DevotionalScreen>
 
     // `pop()` (not `maybePop()`): `maybePop` re-enters this screen's own
     // PopScope, which on device left the back button doing nothing at all.
-    if (mounted && Navigator.of(context).canPop()) {
+    if (mounted && toQuiz) {
+      Navigator.of(context).pushReplacement(quizRoute(autoDaily: true));
+    } else if (mounted && Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     }
     // Old daily-routine setup restored: interstitial on prayer close/back,

@@ -3,7 +3,6 @@ import {
   completedCount, currentDay, evaluateChallenge, getChallenge, litToday, liveStreak,
   localDate, subscribeChallenge, tasksDoneToday, type ChallengeState,
 } from "@/services/challenge";
-import { lampTierFor } from "@/data/challenge75";
 import { scheduleProgressSync } from "@/services/challengeCircle";
 import type { TaskId } from "@/data/challenge75";
 
@@ -15,9 +14,6 @@ export type ChallengeView = {
   lit: boolean;
   done: TaskId[];
   streak: number;
-  tier: number;
-  /** 0–1 brightness of the flame across the whole journey */
-  intensity: number;
 };
 
 export function viewOf(state: ChallengeState, today = localDate()): ChallengeView {
@@ -30,8 +26,6 @@ export function viewOf(state: ChallengeState, today = localDate()): ChallengeVie
     lit: litToday(state, today),
     done: tasksDoneToday(state, today),
     streak: liveStreak(state, today),
-    tier: lampTierFor(completed),
-    intensity: Math.min(1, 0.22 + (completed / 75) * 0.78),
   };
 }
 

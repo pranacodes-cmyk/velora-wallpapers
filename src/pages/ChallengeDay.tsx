@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { BookOpen, Check, ChevronDown, ChevronLeft, HandHeart, Lock, PenLine, RotateCcw, Sparkles } from "lucide-react";
 import { useT } from "@/i18n";
 import { useChallenge } from "@/hooks/useChallenge";
 import { usePremium } from "@/hooks/usePremium";
-import { challengeDay, lampTierFor, stageForDay, type TaskId } from "@/data/challenge75";
+import { challengeDay, REQUIRED_TASKS, stageForDay, type TaskId } from "@/data/challenge75";
 import { CHALLENGE_AD_FLAG, completeTask, readJournal, saveJournal, undoTask, type CompletionResult } from "@/services/challenge";
 import { syncChallengeReminders } from "@/services/challengeReminders";
 import { track } from "@/services/analytics";
@@ -13,27 +13,41 @@ import { nativeShare } from "@/utils/nativeShare";
 import { maybeRequestRating } from "@/services/rating";
 import { CelebrationOverlay } from "@/components/challenge/CelebrationOverlay";
 import { HoldButton } from "@/components/challenge/HoldButton";
-import { TASK_ART } from "@/components/challenge/challengeAssets";
+import { TASK_ICON } from "@/components/challenge/taskIcons";
+import { setVoyageSeen } from "@/components/challenge/voyage";
 import { useChapter } from "@/components/challenge/useReading";
+import { Button } from "@/components/ui/button";
 
 type Mode = "today" | "review" | "locked";
 
+function TaskGlyph({ id, done }: { id: TaskId; done: boolean }) {
+  const Icon = TASK_ICON[id];
+  return (
+    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl transition-colors ${done ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"}`}>
+      <Icon className="h-5 w-5" strokeWidth={1.9} />
+    </span>
+  );
+}
+
 function TaskCard({
-  id, title, sub, done, children, onUndo, undoLabel, doneLabel,
+  id, title, sub, done, children, onUndo, undoLabel, doneLabel, badge,
 }: {
   id: TaskId; title: string; sub: string; done: boolean; children: React.ReactNode;
-  onUndo?: () => void; undoLabel: string; doneLabel: string;
+  onUndo?: () => void; undoLabel: string; doneLabel: string; badge?: string;
 }) {
   return (
     <section
       id={`task-${id}`}
-      className={`relative overflow-hidden rounded-[26px] border bg-card transition-colors ${done ? "border-primary/45" : "border-border/60"}`}
+      className={`relative scroll-mt-24 overflow-hidden rounded-[20px] border bg-card transition-colors ${done ? "border-primary/45" : "border-border/60"}`}
     >
       {done && <span aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-primary/15 blur-3xl" />}
-      <header className="relative flex items-center gap-3 p-4 pb-0">
-        <img src={TASK_ART[id]} alt="" className="h-14 w-14 shrink-0 rounded-2xl object-cover ring-1 ring-border/60" loading="lazy" />
+      <header className="relative flex items-center gap-3 p-3.5 pb-0">
+        <TaskGlyph id={id} done={done} />
         <div className="min-w-0 flex-1">
-          <p className="text-[17px] font-semibold leading-tight text-foreground">{title}</p>
+          <p className="text-[16px] font-semibold leading-tight text-foreground">
+            {title}
+            {badge && <span className="ml-2 inline-block rounded-full bg-muted px-2 py-0.5 align-[2px] text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground">{badge}</span>}
+          </p>
           <p className="mt-0.5 truncate text-[13px] text-muted-foreground">{sub}</p>
         </div>
         {done ? (
@@ -51,17 +65,19 @@ function TaskCard({
           <span className="h-7 w-7 shrink-0 rounded-full border-2 border-dashed border-muted-foreground/40" aria-hidden />
         )}
       </header>
-      <div className="relative p-4">{children}</div>
+      <div className="relative p-3.5">{children}</div>
     </section>
   );
 }
 
 const goldBtn =
-  "flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[hsl(var(--premium-gold))] to-[hsl(var(--premium-gold-glow))] py-3.5 text-[15px] font-bold text-[hsl(var(--paywall-cta-foreground))] shadow-[0_12px_26px_-14px_hsl(var(--primary)/0.9)] active:scale-[0.985] disabled:opacity-45 disabled:shadow-none";
+  "flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-[15px] font-bold text-primary-foreground active:scale-[0.985] disabled:opacity-45";
 
 export default function ChallengeDay() {
   const navigate = useNavigate();
   const params = useParams<{ n?: string }>();
+  const [search] = useSearchParams();
+  const focusTask = search.get("task");
   const { t, lang } = useT();
   const { isPremium } = usePremium();
   const view = useChallenge();
@@ -71,15 +87,19 @@ export default function ChallengeDay() {
   const dayNumber = requested && Number.isFinite(requested) ? Math.min(75, Math.max(1, requested)) : view.day;
   const mode: Mode = useMemo(() => {
     if (state.status === "idle") return "locked";
+    // Today stays in "today" mode even after lighting, so the optional
+    // reflection can still be recorded.
+    if (dayNumber === view.day && state.status === "active") return "today";
     if (state.completed[String(dayNumber)]) return "review";
-    if (dayNumber === view.day && !lit && state.status === "active") return "today";
     return "locked";
-  }, [state, dayNumber, view.day, lit]);
+  }, [state, dayNumber, view.day]);
 
   const plan = challengeDay(dayNumber);
   const stage = stageForDay(dayNumber);
   const chapter = useChapter(lang, plan);
-  const isDone = (id: TaskId) => mode === "review" || done.includes(id);
+  // Reflection is optional: on today's page, show exactly what was completed.
+  const isToday = dayNumber === view.day && state.status === "active";
+  const isDone = (id: TaskId) => (isToday ? done.includes(id) : mode === "review");
 
   const [readOpen, setReadOpen] = useState(false);
   const [readEnd, setReadEnd] = useState(false);
@@ -91,6 +111,13 @@ export default function ChallengeDay() {
   useEffect(() => { setNote(readJournal()[String(dayNumber)] ?? ""); setReadOpen(false); setReadEnd(false); }, [dayNumber]);
   useEffect(() => { track("challenge_day_viewed", { day: dayNumber, mode }); }, [dayNumber]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Opened from a step on the Journey hub: bring that step into view.
+  useEffect(() => {
+    if (!focusTask || focusTask === "read") return;
+    const timer = setTimeout(() => document.getElementById(`task-${focusTask}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 350);
+    return () => clearTimeout(timer);
+  }, [focusTask]);
+
   useEffect(() => {
     if (!readOpen || chapter.status !== "ready" || !endRef.current) return;
     const io = new IntersectionObserver((entries) => {
@@ -101,7 +128,8 @@ export default function ChallengeDay() {
   }, [readOpen, chapter.status]);
 
   const finishTask = (id: TaskId) => {
-    if (mode !== "today" || done.includes(id)) return;
+    if (done.includes(id)) return;
+    if (mode !== "today" && !(isToday && id === "reflect")) return;
     const result = completeTask(id, isPremium);
     haptic(result.lit ? "heavy" : "medium");
     track("challenge_task_done", { task: id, day: plan.day });
@@ -120,7 +148,8 @@ export default function ChallengeDay() {
   const keyVerse = chapter.status === "ready" ? chapter.verses[plan.verse - 1] : "";
   const ref = chapter.bookName ? `${chapter.bookName} ${plan.chapter}` : "";
   const keyRef = chapter.bookName ? `${chapter.bookName} ${plan.chapter}:${plan.verse}` : "";
-  const doneCount = mode === "review" ? 4 : done.length;
+  const requiredDone = REQUIRED_TASKS.filter((id) => done.includes(id)).length;
+  const doneCount = mode === "review" ? 3 : requiredDone;
   const back = () => navigate("/challenge", { replace: false });
 
   if (state.status === "idle") return <Navigate to="/challenge" replace />;
@@ -159,17 +188,17 @@ export default function ChallengeDay() {
         </div>
         <div className="mt-3 grid grid-cols-4 gap-1.5" aria-hidden>
           {[0, 1, 2, 3].map((i) => (
-            <span key={i} className={`h-1.5 rounded-full transition-colors duration-500 ${i < doneCount ? "bg-gradient-to-r from-[hsl(var(--premium-gold))] to-[hsl(var(--premium-gold-glow))]" : "bg-muted"}`} />
+            <span key={i} className={`h-1.5 rounded-full transition-colors duration-500 ${(i < 3 ? i < doneCount : mode === "review" || done.includes("reflect")) ? "bg-gradient-to-r from-[hsl(var(--premium-gold))] to-[hsl(var(--premium-gold-glow))]" : "bg-muted"}`} />
           ))}
         </div>
       </header>
 
-      <main className="mx-auto max-w-[560px] space-y-4 px-4 pt-2">
+      <main className="mx-auto max-w-[560px] space-y-3 px-4 pt-1">
         {/* Day intro */}
-        <section className="challenge-rise px-1 pb-1 pt-2">
+        <section className="challenge-rise px-1 pb-1 pt-1">
           <p className="text-[11.5px] font-bold uppercase tracking-[0.2em] text-primary">{t(`ch.stage.${stage.key}`)} · {t("ch.day", { day: dayNumber })}</p>
-          <h1 className="mt-1.5 font-serif text-[30px] font-semibold leading-[1.1] text-foreground [text-wrap:balance]">{plan.title}</h1>
-          <p className="mt-3 text-[15px] leading-relaxed text-foreground/80 [text-wrap:pretty]">{plan.insight}</p>
+          <h1 className="mt-1 font-serif text-[26px] font-semibold leading-[1.1] text-foreground [text-wrap:balance]">{plan.title}</h1>
+          <p className="mt-2 text-[14px] leading-snug text-foreground/80 [text-wrap:pretty]">{plan.insight}</p>
         </section>
 
         {/* 1 · Read */}
@@ -183,7 +212,7 @@ export default function ChallengeDay() {
           )}
           {chapter.status === "ready" && (
             <>
-              <figure className="rounded-2xl border border-primary/20 bg-primary/[0.06] p-4">
+              <figure className="rounded-xl border border-primary/20 bg-primary/[0.06] p-3.5">
                 <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-primary">{t("ch.read.keyVerse")}</p>
                 <blockquote className="mt-1.5 font-serif text-[18px] leading-relaxed text-foreground">“{keyVerse}”</blockquote>
                 <figcaption className="mt-1.5 text-[12.5px] font-semibold text-muted-foreground">{keyRef}</figcaption>
@@ -229,9 +258,9 @@ export default function ChallengeDay() {
         <TaskCard id="pray" title={t("ch.task.pray")} sub={t("ch.task.pray.sub")} done={isDone("pray")} doneLabel={t("ch.task.done")} undoLabel={t("ch.task.undo")} onUndo={mode === "today" ? () => undo("pray") : undefined}>
           <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-primary">{t("ch.pray.focus")}</p>
           <p className="mt-1 text-[15px] font-semibold leading-snug text-foreground">{plan.focus}</p>
-          <div className="mt-3 rounded-2xl bg-background/60 p-4 ring-1 ring-border/50">
+          <div className="mt-2.5 rounded-xl bg-background/60 p-3.5 ring-1 ring-border/50">
             <p className="mb-1.5 flex items-center gap-1.5 text-[12px] font-semibold text-muted-foreground"><HandHeart className="h-3.5 w-3.5" />{t("ch.pray.withMe")}</p>
-            <p className="font-serif text-[17px] italic leading-[1.7] text-foreground/90">{plan.prayer}</p>
+            <p className="font-serif text-[16px] italic leading-[1.55] text-foreground/90">{plan.prayer}</p>
           </div>
           {!isDone("pray") && (
             <div className="mt-3.5">
@@ -242,21 +271,25 @@ export default function ChallengeDay() {
 
         {/* 3 · Live it */}
         <TaskCard id="live" title={t("ch.task.live")} sub={t("ch.task.live.sub")} done={isDone("live")} doneLabel={t("ch.task.done")} undoLabel={t("ch.task.undo")} onUndo={mode === "today" ? () => undo("live") : undefined}>
-          <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-primary">{t("ch.live.title")}</p>
-          <p className="mt-1 text-[17px] font-semibold leading-snug text-foreground">{plan.action}</p>
-          <p className="mt-2 text-[14.5px] leading-relaxed text-muted-foreground">{plan.how}</p>
+          <p className="text-[10.5px] font-bold uppercase tracking-normal text-primary">{t("ch.live.title", { day: String(plan.day).padStart(2, "0") })}</p>
+          <h2 className="mt-2 text-[22px] font-semibold leading-snug text-foreground">{plan.missionTitle} <span aria-hidden>{plan.missionEmoji}</span></h2>
+          <p className="mt-2 text-[15px] leading-relaxed text-foreground/90">{plan.how}</p>
+          <div className="mt-4 border-l-2 border-primary/50 pl-3">
+            <p className="text-[12px] font-semibold text-primary">{t("ch.live.why")}</p>
+            <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">{plan.missionWhy}</p>
+          </div>
           {!isDone("live") && (
             <>
-              <button onClick={() => finishTask("live")} className={`mt-3.5 ${goldBtn}`}>
-                <Sparkles className="h-[18px] w-[18px]" />{t("ch.live.done")}
-              </button>
+              <Button variant="outline" onClick={() => finishTask("live")} className="mt-4 h-auto min-h-12 w-full justify-start gap-3 whitespace-normal rounded-lg border-primary/40 py-3 text-left text-[14px] font-semibold text-foreground">
+                <span className="h-5 w-5 shrink-0 rounded border-2 border-primary" aria-hidden />{t("ch.live.done")}
+              </Button>
               <p className="mt-2 text-center text-[12.5px] text-muted-foreground">{t("ch.live.later")}</p>
             </>
           )}
         </TaskCard>
 
         {/* 4 · Reflect */}
-        <TaskCard id="reflect" title={t("ch.task.reflect")} sub={t("ch.task.reflect.sub")} done={isDone("reflect")} doneLabel={t("ch.task.done")} undoLabel={t("ch.task.undo")} onUndo={mode === "today" ? () => undo("reflect") : undefined}>
+        <TaskCard id="reflect" title={t("ch.task.reflect")} sub={t("ch.task.reflect.sub")} badge={t("ch.task.optional")} done={isDone("reflect")} doneLabel={t("ch.task.done")} undoLabel={t("ch.task.undo")} onUndo={mode === "today" ? () => undo("reflect") : undefined}>
           <p className="font-serif text-[18px] leading-snug text-foreground">{plan.question}</p>
           <textarea
             value={note}
@@ -287,7 +320,7 @@ export default function ChallengeDay() {
           )}
         </TaskCard>
 
-        <p className="px-4 pt-3 text-center font-serif text-[14px] italic text-muted-foreground">
+        <p className="px-4 pt-2 text-center font-serif text-[13px] italic text-muted-foreground">
           “{t("ch.verse")}”<span className="mt-1 block text-[12px] not-italic">{t("ch.verseRef")}</span>
         </p>
       </main>
@@ -295,8 +328,6 @@ export default function ChallengeDay() {
       {celebration && (
         <CelebrationOverlay
           result={celebration}
-          tier={lampTierFor(completed)}
-          intensity={Math.min(1, 0.22 + (completed / 75) * 0.78)}
           onShare={() => {
             track("challenge_day_shared", { day: celebration.day });
             void nativeShare({
@@ -308,6 +339,7 @@ export default function ChallengeDay() {
           onDone={() => {
             const r = celebration;
             setCelebration(null);
+            setVoyageSeen(r.day);
             if (!isPremium && r.day >= 2 && !r.finished) {
               try { sessionStorage.setItem(CHALLENGE_AD_FLAG, String(Date.now())); } catch { /* storage blocked */ }
             }

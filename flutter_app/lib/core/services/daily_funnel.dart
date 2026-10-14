@@ -135,11 +135,6 @@ class DailyFunnel {
 
   static void requestOpenReflection() => openReflection.value++;
 
-  /// Direct-open bridge for prayer "Continue" -> quiz (web: `navigate("/quiz?auto=daily")`).
-  static final autoStartQuiz = ValueNotifier<int>(0);
-
-  static void requestAutoStartQuiz() => autoStartQuiz.value++;
-
   /* ---------- auto-open silencing (back-button loop guard) ---------- */
 
   static int _silenceUntilMs = 0;

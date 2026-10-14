@@ -26,7 +26,7 @@ const fil = {
   "premium.benefit.dailyVerse.title": "Talata Araw-Araw",
   "premium.benefit.dailyVerse.sub": "Nagpapalit ang wallpaper araw-araw",
   "premium.benefit.journeys.title": "75 Araw ng Liwanag",
-  "premium.benefit.journeys.sub": "Walang ad, na may 3 garapon ng langis ng biyaya",
+  "premium.benefit.journeys.sub": "Walang ad, may 3 angkla ng biyaya",
   "premium.benefit.prayerAudio.title": "Audio na Panalangin",
   "premium.benefit.prayerAudio.sub": "Binibigkas gamit ang pangalan mo",
   "premium.review.1.text": "Umiyak ako nung unang umagang lumabas ang talata sa lock screen ko. Ginagamit ng Diyos ang app na ito para ibalik ako sa Kanya.",

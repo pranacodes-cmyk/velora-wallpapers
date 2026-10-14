@@ -4,25 +4,23 @@ import 'package:flutter/services.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/analytics.dart';
 import '../../core/services/challenge_circle_service.dart';
-import '../../core/services/challenge_reminders.dart';
 import '../../core/services/challenge_store.dart';
 import '../../core/services/haptics.dart';
 import '../../core/theme/app_colors.dart';
-import 'challenge_screen.dart' show TimeChips;
 import 'challenge_widgets.dart';
+import 'journey_avatar.dart';
 
 /* ── settings: reminders · path · restart ───────────────────────────────── */
 
-Future<void> showChallengeSettings(BuildContext context, {required String lang}) => showChallengeSheet<void>(
+Future<void> showChallengeSettings(BuildContext context) => showChallengeSheet<void>(
       context,
       title: t('ch.hub.settings'),
       closeLabel: t('ch.settings.done'),
-      builder: (_) => _SettingsBody(lang: lang),
+      builder: (_) => const _SettingsBody(),
     );
 
 class _SettingsBody extends StatefulWidget {
-  const _SettingsBody({required this.lang});
-  final String lang;
+  const _SettingsBody();
   @override
   State<_SettingsBody> createState() => _SettingsBodyState();
 }
@@ -36,64 +34,9 @@ class _SettingsBodyState extends State<_SettingsBody> {
       valueListenable: ChallengeStore.revision,
       builder: (context, _, __) {
         final s = ChallengeStore.state;
-        final r = s.reminders;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: chCard(radius: 18, color: AppColors.background.withValues(alpha: 0.5)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      LucideIconLite('bell', size: 18, color: AppColors.primary),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(t('ch.settings.reminders'),
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.foreground)),
-                      ),
-                      ChSwitch(
-                        on: r.enabled,
-                        label: t('ch.settings.reminders'),
-                        onToggle: () {
-                          final enabled = !r.enabled;
-                          ChallengeStore.setReminders(enabled: enabled);
-                          if (enabled) ChallengeReminderService.requestPermission().then((_) => ChallengeReminderService.sync());
-                          Analytics.capture('challenge_reminders_toggled', {'enabled': enabled});
-                        },
-                      ),
-                    ],
-                  ),
-                  if (r.enabled) ...[
-                    const SizedBox(height: 16),
-                    Text(upper(t('ch.settings.morning')), style: ChInk.eyebrow(12.5, AppColors.mutedForeground, tracking: 0.14)),
-                    const SizedBox(height: 8),
-                    TimeChips(
-                      times: const ['06:00', '07:00', '08:00', '09:00'],
-                      selected: r.morning,
-                      lang: widget.lang,
-                      onSelect: (v) => ChallengeStore.setReminders(morning: v),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(t('ch.settings.evening'), style: TextStyle(fontSize: 14, height: 1.3, color: AppColors.foreground)),
-                        ),
-                        ChSwitch(
-                          on: r.evening,
-                          label: t('ch.settings.evening'),
-                          onToggle: () => ChallengeStore.setReminders(evening: !r.evening),
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(height: 18),
             Text(upper(t('ch.settings.path')), style: ChInk.eyebrow(12.5, AppColors.mutedForeground, tracking: 0.14)),
             const SizedBox(height: 8),
             IntrinsicHeight(
@@ -197,11 +140,11 @@ class _SettingsBodyState extends State<_SettingsBody> {
 /// Returns the circle id once created or joined, else null.
 Future<String?> showCircleFlow(BuildContext context, String flow, {required String lang, String initialCode = ''}) {
   final hasIdentity = ChallengeCircleService.identity != null;
-  final title = !hasIdentity
-      ? t('ch.circle.youTitle')
+  final title = flow == 'profile' || !hasIdentity
+      ? t('ch.profile.title')
       : flow == 'create'
           ? t('ch.circle.newTitle')
-          : t('ch.circle.joinTitle');
+          : t('ch.buddy.joinTitle');
   return showChallengeSheet<String>(
     context,
     title: title,
@@ -220,7 +163,7 @@ class _CircleFlowBody extends StatefulWidget {
 }
 
 class _CircleFlowBodyState extends State<_CircleFlowBody> {
-  late bool _profile = ChallengeCircleService.identity == null;
+  late bool _profile = widget.flow == 'profile' || ChallengeCircleService.identity == null;
   late final _name = TextEditingController(text: ChallengeCircleService.identity?.name ?? '');
   late String _avatar = ChallengeCircleService.identity?.avatar ?? kCircleAvatars.first;
   final _circleName = TextEditingController();
@@ -248,7 +191,10 @@ class _CircleFlowBodyState extends State<_CircleFlowBody> {
       await ChallengeCircleService.ensureIdentity(clean, _avatar, widget.lang);
       Analytics.capture('challenge_circle_profile_saved');
       haptic(HapticStyle.soft);
-      if (mounted) setState(() => _profile = false);
+      if (mounted) {
+        if (widget.flow == 'profile') Navigator.of(context).pop('profile_saved');
+        else setState(() => _profile = false);
+      }
     } catch (e) {
       if (mounted) setState(() => _error = circleErrorKey(e));
     } finally {
@@ -350,19 +296,56 @@ class _CircleFlowBodyState extends State<_CircleFlowBody> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Row(children: [
+            JourneyAvatar(avatar: _avatar, size: 48),
+            const SizedBox(width: 16),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(_name.text.trim().isEmpty ? t('ch.circle.yourName') : _name.text.trim(),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.foreground)),
+              const SizedBox(height: 4),
+              Text(t('ch.profile.sub'), style: TextStyle(fontSize: 13, height: 1.3, color: AppColors.mutedForeground)),
+            ])),
+          ]),
+          const SizedBox(height: 14),
           _label(t('ch.circle.yourName')),
           TextField(
             controller: _name,
             maxLength: 24,
-            autofocus: true,
+            autofocus: false,
             style: style,
             onChanged: (_) => setState(() {}),
             decoration: _field(t('ch.circle.yourNamePlaceholder')),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
           _label(t('ch.circle.avatar')),
-          _emojiGrid(kCircleAvatars, _avatar, (v) => setState(() => _avatar = v), columns: 6),
-          const SizedBox(height: 18),
+          Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 240), child: GridView.count(
+            crossAxisCount: 4, shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 10, crossAxisSpacing: 10,
+            children: [for (var i = 0; i < kCircleAvatars.length; i++)
+              Semantics(
+                button: true, selected: _avatar == kCircleAvatars[i],
+                label: '${t('ch.circle.avatar')} ${i + 1}',
+                child: GestureDetector(
+                  onTap: () { haptic(HapticStyle.light); setState(() => _avatar = kCircleAvatars[i]); },
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(shape: BoxShape.circle,
+                      border: Border.all(color: _avatar == kCircleAvatars[i] ? AppColors.primary : AppColors.border, width: _avatar == kCircleAvatars[i] ? 2 : 1)),
+                    child: Stack(fit: StackFit.expand, children: [
+                      JourneyAvatar(avatar: kCircleAvatars[i]),
+                      if (_avatar == kCircleAvatars[i]) Positioned(bottom: 0, right: 0,
+                        child: Container(width: 20, height: 20,
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.primary,
+                            border: Border.all(color: AppColors.background, width: 2)),
+                          child: Icon(Icons.check, size: 12, color: AppColors.primaryForeground))),
+                    ]),
+                  ),
+                ),
+              ),
+            ],
+          ))),
+          const SizedBox(height: 14),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(color: AppColors.muted.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(16)),
@@ -371,7 +354,7 @@ class _CircleFlowBodyState extends State<_CircleFlowBody> {
               children: [
                 LucideIconLite('shield-check', size: 16, color: AppColors.primary),
                 const SizedBox(width: 8),
-                Expanded(child: Text(t('ch.circle.privacy'), style: TextStyle(fontSize: 12.5, height: 1.35, color: AppColors.mutedForeground))),
+                Expanded(child: Text(t('ch.profile.privacy'), style: TextStyle(fontSize: 12.5, height: 1.35, color: AppColors.mutedForeground))),
               ],
             ),
           ),

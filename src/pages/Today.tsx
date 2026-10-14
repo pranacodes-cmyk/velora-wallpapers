@@ -1045,6 +1045,7 @@ export default function Today() {
   const greeting = useGreeting();
   const { isPremium, unlock } = usePremium();
   const [showPremium, setShowPremium] = useState(false);
+  const [giftSeen, setGiftSeen] = useState(() => { try { return localStorage.getItem("prayly_gift_seen_v1") === "1"; } catch { return true; } });
   const [showLifeCalendar, setShowLifeCalendar] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showExit, setShowExit] = useState(false);
@@ -1094,16 +1095,25 @@ export default function Today() {
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 shrink-0 rounded-full border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary [&_svg]:size-5"
-              aria-label="Life Calendar"
+            <button
+              type="button"
+              aria-label="Life Calendar gift"
               title="Life Calendar"
-              onClick={() => { haptic("soft"); setShowLifeCalendar(true); }}
+              onClick={() => {
+                haptic("soft");
+                setShowLifeCalendar(true);
+                if (!giftSeen) { setGiftSeen(true); try { localStorage.setItem("prayly_gift_seen_v1", "1"); } catch { /* storage blocked */ } }
+              }}
+              className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-primary/80 to-primary text-primary-foreground shadow-[0_4px_14px_hsl(var(--primary)/0.45)] ring-1 ring-primary/50 transition-transform active:scale-90"
             >
-              <Gift strokeWidth={1.8} />
-            </Button>
+              <Gift className="h-[22px] w-[22px]" strokeWidth={2.2} />
+              {!giftSeen && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-70" />
+                  <span className="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-background bg-destructive" />
+                </span>
+              )}
+            </button>
             <div className="leading-none min-w-0">
               <div className="flex items-center gap-1.5">
                 <greeting.Icon className="w-3 h-3 text-primary" strokeWidth={2.4} />

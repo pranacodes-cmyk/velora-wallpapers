@@ -29,7 +29,7 @@ const en = {
   "premium.benefit.dailyVerse.title": "Daily Verse",
   "premium.benefit.dailyVerse.sub": "Wallpaper changes every day",
   "premium.benefit.journeys.title": "75 Days of Light",
-  "premium.benefit.journeys.sub": "Ad-free, with 3 jars of grace oil",
+  "premium.benefit.journeys.sub": "Ad-free, with 3 grace anchors",
   "premium.benefit.prayerAudio.title": "Prayer Audio",
   "premium.benefit.prayerAudio.sub": "Spoken over your name",
 

@@ -29,7 +29,7 @@ const fr = {
   "premium.benefit.dailyVerse.title": "Verset du Jour",
   "premium.benefit.dailyVerse.sub": "Le fond change chaque jour",
   "premium.benefit.journeys.title": "75 jours de lumière",
-  "premium.benefit.journeys.sub": "Sans publicité, avec 3 jarres d'huile de grâce",
+  "premium.benefit.journeys.sub": "Sans publicité, avec 3 ancres de grâce",
   "premium.benefit.prayerAudio.title": "Prières Audio",
   "premium.benefit.prayerAudio.sub": "Prononcées sur ton nom",
   "premium.review.1.text": "Le premier matin où mon verset est apparu sur mon écran, j'ai pleuré. Dieu se sert de cette appli pour me ramener à Lui.",

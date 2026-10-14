@@ -29,6 +29,7 @@ export type CircleMember = {
   lastLitOn: string | null;
   isMe: boolean;
   sentToday: string[];
+  isPro: boolean;
 };
 
 export type Circle = {
@@ -47,7 +48,7 @@ export type Cheer = { id: string; kind: CheerKind; circleId: string; fromName: s
 export type CheerKind = "cheer" | "pray" | "nudge";
 export type CircleOverview = { circles: Circle[]; cheers: Cheer[]; fetchedAt: number };
 
-export const AVATARS = ["🕊️", "🦁", "🌿", "🌸", "⭐", "🔥", "🐑", "🌻", "🌊", "⛰️", "🌙", "☀️"];
+export const AVATARS = ["🐑", "🕊️", "🦁", "⭐", "🌊", "🌿", "🔥", "🌻", "⛰️", "🌸", "🌙", "☀️"];
 export const CIRCLE_EMOJIS = ["🪔", "🏡", "❤️", "⛪", "🙏", "✨", "🌿", "👨‍👩‍👧"];
 
 export class CircleError extends Error {
@@ -134,6 +135,7 @@ export function progressPayload(s: ChallengeState = getChallenge()) {
     todayOn: today,
     todayDone: tasksDoneToday(s, today).length,
     attempts: s.attempts,
+    isPro: (() => { try { return localStorage.getItem("cw_premium_unlocked") === "true"; } catch { return false; } })(),
   };
 }
 
@@ -203,4 +205,52 @@ export function scheduleProgressSync(delay = 1200) {
 
 export function inviteText(circleName: string, code: string, t: (k: string, v?: Record<string, string | number>) => string) {
   return t("ch.invite.share", { name: circleName, code });
+}
+
+/** Personal 6-character invite code shown in the one-tap invite share. */
+export function myInviteCode(): string {
+  const KEY = "prayly_invite_code_v1";
+  try {
+    const saved = localStorage.getItem(KEY);
+    if (saved) return saved;
+    const src = (getIdentity()?.memberId || crypto.randomUUID()).replace(/[^a-z0-9]/gi, "").toUpperCase();
+    const code = src.slice(0, 6).padEnd(6, "7");
+    localStorage.setItem(KEY, code);
+    return code;
+  } catch {
+    return "PRAYLY";
+  }
+}
+
+/* ── Journey buddies ─────────────────────────────────────────────────────── */
+// Each person owns one private "walk" circle; its code is their buddy code.
+// Everyone in any circle with me appears as a buddy.
+
+const BUDDY_CODE_KEY = "prayly_buddy_code_v1";
+const PENDING_BUDDY_KEY = "prayly_pending_buddy_v1";
+
+export type Buddy = CircleMember & { circleId: string };
+
+export function buddiesOf(o: CircleOverview | null): Buddy[] {
+  const seen = new Map<string, Buddy>();
+  for (const c of o?.circles ?? []) for (const m of c.members) {
+    if (!m.isMe && !seen.has(m.id)) seen.set(m.id, { ...m, circleId: c.id });
+  }
+  return [...seen.values()].sort((a, b) => b.completedDays - a.completedDays);
+}
+
+export async function myBuddyCode(): Promise<string> {
+  try { const saved = localStorage.getItem(BUDDY_CODE_KEY); if (saved) return saved; } catch { /* blocked */ }
+  const o = getCachedOverview() ?? (await fetchOverview().catch(() => null));
+  const own = o?.circles.find((c) => c.isOwner);
+  const code = own?.code ?? (await createCircle("Journey", "🐑")).code;
+  try { localStorage.setItem(BUDDY_CODE_KEY, code); } catch { /* blocked */ }
+  return code;
+}
+
+export function setPendingBuddy(code: string) {
+  try { localStorage.setItem(PENDING_BUDDY_KEY, code.toUpperCase()); } catch { /* blocked */ }
+}
+export function takePendingBuddy(): string | null {
+  try { const v = localStorage.getItem(PENDING_BUDDY_KEY); localStorage.removeItem(PENDING_BUDDY_KEY); return v; } catch { return null; }
 }

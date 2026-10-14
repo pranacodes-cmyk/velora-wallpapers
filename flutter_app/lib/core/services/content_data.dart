@@ -61,48 +61,6 @@ class VerseBackground {
   final String cardUrl;
 }
 
-class JourneyDay {
-  const JourneyDay({
-    required this.day,
-    required this.title,
-    required this.opening,
-    required this.verse,
-    required this.reference,
-    required this.explanation,
-    required this.prayer,
-  });
-
-  final int day;
-  final String title;
-  final String opening;
-  final String verse;
-  final String reference;
-  final String explanation;
-  final String prayer;
-}
-
-class Journey {
-  const Journey({
-    required this.id,
-    required this.title,
-    required this.subtitle,
-    required this.description,
-    required this.emoji,
-    required this.hue,
-    required this.isPremium,
-    required this.days,
-  });
-
-  final String id;
-  final String title;
-  final String subtitle;
-  final String description;
-  final String emoji;
-  final double hue;
-  final bool isPremium;
-  final List<JourneyDay> days;
-}
-
 class ContentData {
   ContentData._();
 
@@ -111,8 +69,6 @@ class ContentData {
   static List<Map<String, dynamic>> _quiz = const [];
   static Map<String, dynamic> _reflections = const {};
   static List<VerseBackground> _backgrounds = const [];
-  static List<Journey> _journeys = const [];
-  static String _journeysLang = '';
   static bool _loaded = false;
 
   static bool get isLoaded => _loaded;
@@ -157,60 +113,6 @@ class ContentData {
         'verse_reflections.json',
       );
     }
-    await _loadJourneys();
-  }
-
-  // ---------------- journeys ----------------
-  /// Localized journey files ship per language (`journeys_<lang>.json`) with
-  /// the English file as fallback — same pattern as the web app's
-  /// `src/data/journeys.ts` + per-locale overrides.
-  static Future<void> _loadJourneys() async {
-    final lang = L10n.current.lang;
-    if (_journeys.isNotEmpty && _journeysLang == lang) return;
-    List<dynamic> raw;
-    try {
-      raw = await _json<List<dynamic>>('journeys_$lang.json');
-    } catch (_) {
-      raw = await _json<List<dynamic>>('journeys_en.json');
-    }
-    _journeys = raw.cast<Map<String, dynamic>>().map(_parseJourney).toList();
-    _journeysLang = lang;
-  }
-
-  static Journey _parseJourney(Map<String, dynamic> m) {
-    final days = (m['days'] as List? ?? const [])
-        .cast<Map<String, dynamic>>()
-        .map(
-          (d) => JourneyDay(
-            day: (d['day'] as num).toInt(),
-            title: d['title'] as String? ?? '',
-            opening: d['opening'] as String? ?? '',
-            verse: d['verse'] as String? ?? '',
-            reference: d['reference'] as String? ?? '',
-            explanation: d['explanation'] as String? ?? '',
-            prayer: d['prayer'] as String? ?? '',
-          ),
-        )
-        .toList();
-    return Journey(
-      id: m['id'] as String,
-      title: m['title'] as String? ?? '',
-      subtitle: m['subtitle'] as String? ?? '',
-      description: m['description'] as String? ?? '',
-      emoji: m['emoji'] as String? ?? '',
-      hue: (m['hue'] as num? ?? 200).toDouble(),
-      isPremium: m['isPremium'] as bool? ?? false,
-      days: days,
-    );
-  }
-
-  static List<Journey> allJourneys() => _journeys;
-
-  static Journey? journeyById(String id) {
-    for (final j in _journeys) {
-      if (j.id == id) return j;
-    }
-    return null;
   }
 
   // ---------------- dates ----------------

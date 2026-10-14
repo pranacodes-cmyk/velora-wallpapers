@@ -20,10 +20,12 @@ class TodayChecklist extends ConsumerStatefulWidget {
     super.key,
     required this.onOpenDevotional,
     required this.onOpenQuiz,
+    required this.onOpenDailyQuiz,
   });
 
   final VoidCallback onOpenDevotional;
   final VoidCallback onOpenQuiz;
+  final VoidCallback onOpenDailyQuiz;
 
   @override
   ConsumerState<TodayChecklist> createState() => _TodayChecklistState();
@@ -31,34 +33,22 @@ class TodayChecklist extends ConsumerStatefulWidget {
 
 class _TodayChecklistState extends ConsumerState<TodayChecklist> {
   int _lastReflectionRequest = DailyFunnel.openReflection.value;
-  int _lastAutoStartQuiz = DailyFunnel.autoStartQuiz.value;
 
   @override
   void initState() {
     super.initState();
     // Direct-open bridge from prayer "Continue" — skip the overlay entirely.
     DailyFunnel.openReflection.addListener(_onReflectionRequested);
-    DailyFunnel.autoStartQuiz.addListener(_onAutoStartQuiz);
     DailyFunnel.revision.addListener(_onHandoffChanged);
     _onReflectionRequested();
-    _onAutoStartQuiz();
     _onHandoffChanged();
   }
 
   @override
   void dispose() {
     DailyFunnel.openReflection.removeListener(_onReflectionRequested);
-    DailyFunnel.autoStartQuiz.removeListener(_onAutoStartQuiz);
     DailyFunnel.revision.removeListener(_onHandoffChanged);
     super.dispose();
-  }
-
-  /// Prayer "Continue" -> quiz bridge (web: `navigate("/quiz?auto=daily")`).
-  void _onAutoStartQuiz() {
-    final v = DailyFunnel.autoStartQuiz.value;
-    if (v == 0 || v == _lastAutoStartQuiz) return;
-    _lastAutoStartQuiz = v;
-    widget.onOpenQuiz();
   }
 
   /// 1:1 of the simple (non-animated) parts of `FunnelHandoff.tsx` — the
@@ -84,7 +74,7 @@ class _TodayChecklistState extends ConsumerState<TodayChecklist> {
       });
     } else if (step == HandoffStep.quiz) {
       Future.delayed(const Duration(milliseconds: 60), () {
-        if (mounted) widget.onOpenQuiz();
+        if (mounted) widget.onOpenDailyQuiz();
       });
     }
   }
@@ -101,7 +91,7 @@ class _TodayChecklistState extends ConsumerState<TodayChecklist> {
   }
 
   Future<void> _openReflection() async {
-    await showGeneralRoute(context, onContinueToQuiz: widget.onOpenQuiz);
+    await showGeneralRoute(context, onContinueToQuiz: widget.onOpenDailyQuiz);
     if (mounted) setState(() {});
   }
 
@@ -153,7 +143,7 @@ class _TodayChecklistState extends ConsumerState<TodayChecklist> {
               if (tasks.quiz) {
                 widget.onOpenQuiz();
               } else {
-                DailyFunnel.requestAutoStartQuiz();
+                widget.onOpenDailyQuiz();
               }
             },
           ),

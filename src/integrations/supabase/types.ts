@@ -201,6 +201,7 @@ export type Database = {
           current_streak: number
           display_name: string
           id: string
+          is_pro: boolean
           lang: string
           last_lit_on: string | null
           mode: string
@@ -219,6 +220,7 @@ export type Database = {
           current_streak?: number
           display_name?: string
           id?: string
+          is_pro?: boolean
           lang?: string
           last_lit_on?: string | null
           mode?: string
@@ -237,6 +239,7 @@ export type Database = {
           current_streak?: number
           display_name?: string
           id?: string
+          is_pro?: boolean
           lang?: string
           last_lit_on?: string | null
           mode?: string

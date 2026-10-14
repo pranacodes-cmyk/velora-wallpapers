@@ -76,11 +76,41 @@
 - [ ] iOS release blocked: native iOS project, Apple signing and App Store Connect credentials missing.
 
 ## 75 Days of Light challenge (replaces Journeys)
-- [ ] Author 75-day NT reading plan with daily insight, prayer, live-it action and reflection (English source).
-- [ ] Generate lamp tiers, task illustrations and hero art for light and dark modes.
-- [ ] Backend: circles, members, cheers via secure device identity (no sign-up needed).
-- [ ] Web: challenge hub (lamp + 75-step path), intro/mode choice, day screen with inline chapter, circle/friends, Home card, onboarding slide, routes; remove old Journeys.
-- [ ] Translate challenge content and UI into es, pt, fil, hi, id, fr, de.
-- [ ] Morning/evening/night state-aware reminders (Flutter native + web local notifications).
-- [ ] Flutter parity: store, hub, day, circle, intro, Home card, onboarding slide, i18n export.
-- [ ] Visual verification light/dark + end-to-end circle flow with two identities.
+- [x] Replace Live it with the approved 75 practical missions and why-it-matters copy; all eight language packs independently edited, exact Flutter parity and placeholders tested, web layouts and completion/reload verified.
+- [ ] Verify practical Journey mission screens on a physical Flutter device after an explicitly approved build (blocked: build approval required).
+- [x] Replace mismatched Journey scene and lamb with a cohesive cinematic banner; matching web/Flutter assets and geometry verified, 76 route positions inspected and saved-progress arrivals checked at 0/30/60/75 days in phone preview without runtime errors. Native device check remains blocked on approved build.
+- [x] Move lamb info outside artwork with matching quiet controls in web/Flutter; preview-only reset verified at language selection, hub/help checked at 384×624 without page errors.
+- [x] Add compact name/DP setup after Begin Journey, with selected-avatar preview and no repeated friend-profile prompt in web/Flutter; web save, cancel/retry and invite handoff verified. Native device verification awaits approved build.
+- [x] Replace human avatar concepts with 12 original Christian mascot DPs, matching selection and crew displays in web/Flutter; web selection, real profile saving and image loading verified. Native verification awaits an approved build.
+- [x] Add Ecclesiastes 4:9 to invitation cards/shared text and six verified crew rules in all eight web/Flutter locales; mobile help and actual invitation text verified.
+- [x] Add localized step/milestone/crew info sheets and an inviting friends block in web + Flutter; web help and invite-form interactions verified at mobile and desktop sizes.
+- [x] 75-day NT plan, four daily steps, translations in 8 languages, reminders, crews backend, web + Flutter parity.
+- [x] Make reflection optional: day lights after Read/Pray/Live, post-lit reflection still savable, counts and stones reflect actual progress (web + Flutter).
+- [x] Redesign Journey as the approved Island Route: ship sails toward the cross, islands every 15 days, steps, crew race, logbook, celebration (web + Flutter).
+- [x] Journey becomes the fourth bottom tab; Quiz opens from Home (web + Flutter).
+- [x] Crew race groups close markers (+N); simpler crew progress header.
+- [x] Island numbers fade while the ship covers them; island 30 label sits beside its marker.
+- [x] Home card progress text fits 360dp phones; finished-journey buttons stacked.
+- [x] Ship arrival fires only after a real sail (no stray vibration); reduced motion still records arrival.
+- [x] Remove old lamp/task/hero images from Flutter.
+- [x] Remove dead old-Journeys screens, data files, cover images and translations from Flutter (~5 MB raw; no startup parse).
+- [ ] Device-check Journey reminders and lamb walk animation after an explicitly approved build (blocked: needs build approval).
+- [x] Fix Journey reminders to automatic 7 AM / 9 PM local times, remove reminder controls, and compact all Journey pages in web + Flutter.
+- [x] Refine the Journey intro with architectural double borders, ringed icons, section rules and clearer depth in web + Flutter.
+- [x] Simplify Journey into an Apple-style hierarchy with quiet surfaces, compact steps and a segmented path choice in web + Flutter.
+- [x] Remove crews entirely from Journey in web + Flutter (crew screens, cheer cards, header button, crew rules); intro step 3 rewritten as share-your-progress copy in all 8 locales; hub verified crew-free.
+- [x] Align steps counters with optional reflection: hub/day/home show "of 3" with required tasks only in web + Flutter, 8 locales; type-check and browser check clean.
+
+- [x] Replace old Journey art with approved Alpine day/night and separated lamb; trace the actual route in web/Flutter and verify movement. Full artwork framing preserves Cross and feet; actual web hub return walk and arrival verified.
+- [x] Redesign Journey hub, intro and Home artwork presentation in web/Flutter: refined day/night Alpine scene without overlays, external progress, simplified daily steps and quiet invite. Web phone/desktop, help, task navigation and saved walk arrival verified; native device checks remain blocked on approved build.
+- [x] Replace boxy/night Journey art with wide daytime scenery and an away-facing lamb in matching web/Flutter; traced road checked visually, phone light/dark and desktop layouts verified, actual saved-progress walk arrived without runtime errors. Native device verification awaits an approved build.
+- [x] Fix Flutter daily quiz navigation with route-local start intent; checklist, reflection and prayer paths checked with four passing source-contract regression tests. Native end-to-end verification requires an approved Flutter CI/device run (Flutter SDK unavailable here).
+- [x] Replace photographic Journey banner with reference-inspired illustrated scenery and matching shadow-free lamb; retraced all 76 day positions on the actual road, checked phone/desktop saved-progress arrivals at 0/30/60/75 without page errors, mirrored assets/geometry to Flutter. Native verification awaits an approved build.
+- [x] Journey redo: new dawn scene + standing/walking lamb poses synced to the road (web + Flutter)
+- [ ] Verify new lamb walk on a physical device after an explicitly approved Flutter build.
+
+- [x] Journey Buddy: invite code join, buddy progress, Pray for friend (web + Flutter)
+- [ ] Verify Journey Buddy on device after an approved Flutter build
+- [x] Add a cinematic Journey buddy walkthrough and visible Pro badges in web + Flutter; preview local data reset for review.
+- [x] Refine the three-slide Journey tour: lamb toward the Cross, merged invitation/shared road, milestone badges and prayer encouragement; remove Skip/close, mirror Flutter and verify all eight web languages.
+- [ ] Verify Journey walkthrough and Pro buddy badge on a physical device after an approved Flutter build.

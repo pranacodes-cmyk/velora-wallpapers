@@ -29,14 +29,14 @@ public final class ContentPushScheduler {
     private static final int BASE_RC = 8200;
     private static final int MAX_SLOTS = 8;
 
-    /** 8:00 Verse · 12:30 Quiz · 15:00 Companion · 20:00 Journey. */
+    /** 11:00 Verse (only when no Journey is active) · 12:30 Quiz · 18:00 Quiz.
+     *  With the 07:00 + 21:00 Journey reminders this caps a day at 4. */
     static JSONArray defaultConfig() {
         JSONArray a = new JSONArray();
         try {
-            a.put(new JSONObject().put("kind", ContentPushReceiver.KIND_VERSE).put("hour", 8).put("minute", 0));
+            a.put(new JSONObject().put("kind", ContentPushReceiver.KIND_VERSE).put("hour", 11).put("minute", 0));
             a.put(new JSONObject().put("kind", ContentPushReceiver.KIND_QUIZ).put("hour", 12).put("minute", 30));
-            a.put(new JSONObject().put("kind", ContentPushReceiver.KIND_COMPANION).put("hour", 15).put("minute", 0));
-            a.put(new JSONObject().put("kind", ContentPushReceiver.KIND_JOURNEY).put("hour", 20).put("minute", 0));
+            a.put(new JSONObject().put("kind", ContentPushReceiver.KIND_QUIZ).put("hour", 18).put("minute", 0));
         } catch (Exception ignored) { /* never fails */ }
         return a;
     }
@@ -70,6 +70,13 @@ public final class ContentPushScheduler {
         if (!sp.getBoolean(KEY_ENABLED, false) || json == null) {
             sp.edit().putBoolean(KEY_ENABLED, true)
                     .putString(KEY_CONFIG, defaultConfig().toString()).apply();
+            return scheduleFromPrefs(ctx);
+        }
+        // Retired slots (Companion, old evening Journey): migrate once.
+        String fresh = defaultConfig().toString();
+        if (!fresh.equals(json)) {
+            cancelAllInternal(ctx);
+            sp.edit().putString(KEY_CONFIG, fresh).apply();
             return scheduleFromPrefs(ctx);
         }
         return hasAnyArmedAlarm(ctx, json) ? 0 : scheduleFromPrefs(ctx);

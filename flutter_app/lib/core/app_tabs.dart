@@ -10,7 +10,8 @@ class AppTabs {
   static const int today = 0;
   static const int bible = 2;
   static const int wallpapers = 1;
-  static const int quiz = 3;
+  /// 75 Days of Light voyage. Quiz is a pushed page (`openQuiz`).
+  static const int journey = 3;
 
   /// Number of tabs in the shell.
   static const int count = 4;

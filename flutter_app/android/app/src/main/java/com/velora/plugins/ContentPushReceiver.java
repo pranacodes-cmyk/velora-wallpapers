@@ -47,7 +47,7 @@ public class ContentPushReceiver extends BroadcastReceiver {
     public static final String K_LAST_OPEN = "last_app_open_at";
     public static final String K_CAP_DAY = "cap_day";
     public static final String K_CAP_COUNT = "cap_count";
-    private static final int DAILY_CAP = 4;
+    private static final int DAILY_CAP = 3;
     private static final int DAILY_CAP_PRO = 2;
     private static final int QUIET_START_HOUR = 22;
     private static final int QUIET_END_HOUR = 6;
@@ -103,8 +103,12 @@ public class ContentPushReceiver extends BroadcastReceiver {
 
     /** Quiet hours + hard daily cap + Pro suppression. */
     private boolean shouldFire(Context ctx, String kind) {
+        // Bible Chat (Companion) and the old Journeys push are retired.
+        if (KIND_COMPANION.equals(kind) || KIND_JOURNEY.equals(kind)) return false;
         boolean pro = isProMode(ctx);
         if (pro && KIND_VERSE.equals(kind)) return false;
+        // Journey morning reminder already covers the day: skip the verse push.
+        if (KIND_VERSE.equals(kind) && journeyActive(ctx)) return false;
 
         Calendar now = Calendar.getInstance();
         int h = now.get(Calendar.HOUR_OF_DAY);
@@ -118,6 +122,11 @@ public class ContentPushReceiver extends BroadcastReceiver {
         int capDay = sp.getInt(K_CAP_DAY, -1);
         int capCount = capDay == today ? sp.getInt(K_CAP_COUNT, 0) : 0;
         return capCount < (pro ? DAILY_CAP_PRO : DAILY_CAP);
+    }
+
+    private static boolean journeyActive(Context ctx) {
+        String raw = ctx.getSharedPreferences("challenge_reminder", Context.MODE_PRIVATE).getString("items_json", "[]");
+        return raw != null && raw.trim().length() > 2;
     }
 
     private void bumpDailyCount(Context ctx) {

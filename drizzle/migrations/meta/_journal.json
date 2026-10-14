@@ -8,6 +8,13 @@
       "when": 1791916914550,
       "tag": "0000_challenge_circles",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791985437801,
+      "tag": "0001_add_journey_member_pro_badge",
+      "breakpoints": true
     }
   ]
 }

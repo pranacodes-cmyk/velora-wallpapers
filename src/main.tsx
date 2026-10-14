@@ -64,7 +64,7 @@ initPerf();
 // the preview starts fresh from onboarding. Bump the flag version to trigger again.
 (function fullResetOnce() {
   if (!import.meta.env.DEV) return;
-  const FLAG = "cw_dev_full_reset_v3";
+  const FLAG = "cw_dev_full_reset_v6";
   try {
     if (localStorage.getItem(FLAG)) return;
     localStorage.clear();

@@ -28,8 +28,8 @@ import {
   seedPrayerTimes,
   PRAYER_SEED_KEY,
 } from "./onboardingShared";
-import { TASK_ART, CIRCLE_ART } from "@/components/challenge/challengeAssets";
-import { ChallengeLamp } from "@/components/challenge/ChallengeLamp";
+import { BookOpen, HandHeart, Users } from "lucide-react";
+import { VoyagePoster } from "@/components/challenge/VoyagePoster";
 
 export function PrayerSlide({ active, exiting }: { active: boolean; exiting?: boolean }) {
   const { t } = useT();
@@ -295,9 +295,9 @@ export function PrayerSlide({ active, exiting }: { active: boolean; exiting?: bo
 // =============================================================================
 // 75 Days of Light preview (replaces the old multi-day Journeys list).
 const JOURNEY_CARDS = [
-  { titleKey: "onb.journeys.item1Title", metaKey: "onb.journeys.item1Meta", hue: 42, equaliser: true, art: TASK_ART.read },
-  { titleKey: "onb.journeys.item2Title", metaKey: "onb.journeys.item2Meta", hue: 28, equaliser: false, art: TASK_ART.pray },
-  { titleKey: "onb.journeys.item3Title", metaKey: "onb.journeys.item3Meta", hue: 220, equaliser: false, art: CIRCLE_ART },
+  { titleKey: "onb.journeys.item1Title", metaKey: "onb.journeys.item1Meta", hue: 42, equaliser: true, Icon: BookOpen },
+  { titleKey: "onb.journeys.item2Title", metaKey: "onb.journeys.item2Meta", hue: 28, equaliser: false, Icon: HandHeart },
+  { titleKey: "onb.journeys.item3Title", metaKey: "onb.journeys.item3Meta", hue: 220, equaliser: false, Icon: Users },
 ];
 
 function JourneyEqualiser() {
@@ -356,9 +356,10 @@ export function JourneysSlide({ active, exiting }: { active: boolean; exiting?: 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: ONB_IN_DELAY, duration: ONB_IN_DUR, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-1"
+            className="mb-4 w-full max-w-[320px] overflow-hidden rounded-[22px]"
+            style={{ border: "1px solid hsl(42 70% 55% / 0.28)", boxShadow: "0 22px 44px -20px hsl(0 0% 0% / 0.8)" }}
           >
-            <ChallengeLamp tier={2} intensity={0.85} state="lit" width={168} priority />
+            <VoyagePoster days={18} fromDays={0} sea="night" labels priority sailDelay={900} sailMs={2600} />
           </motion.div>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
@@ -414,12 +415,12 @@ export function JourneysSlide({ active, exiting }: { active: boolean; exiting?: 
                 }}
               />
               <div className="flex items-center gap-3 pl-2">
-                <img
-                  src={card.art}
-                  alt=""
-                  className="h-11 w-11 shrink-0 rounded-xl object-cover"
-                  style={{ border: `1px solid hsl(${card.hue} 70% 55% / 0.35)` }}
-                />
+                <span
+                  className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
+                  style={{ border: `1px solid hsl(${card.hue} 70% 55% / 0.35)`, background: `hsl(${card.hue} 70% 55% / 0.14)`, color: `hsl(${card.hue} 85% 66%)` }}
+                >
+                  <card.Icon className="h-5 w-5" strokeWidth={1.9} />
+                </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13.5px] font-bold leading-[1.15]" style={{ color: "hsl(40 25% 95%)" }}>
                     {t(card.titleKey)}

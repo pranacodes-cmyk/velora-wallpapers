@@ -29,7 +29,7 @@ const id = {
   "premium.benefit.dailyVerse.title": "Ayat Harian",
   "premium.benefit.dailyVerse.sub": "Wallpaper berganti setiap hari",
   "premium.benefit.journeys.title": "75 Hari Cahaya",
-  "premium.benefit.journeys.sub": "Bebas iklan, dengan 3 guci minyak anugerah",
+  "premium.benefit.journeys.sub": "Bebas iklan, dengan 3 jangkar anugerah",
   "premium.benefit.prayerAudio.title": "Audio Doa",
   "premium.benefit.prayerAudio.sub": "Diucapkan atas namamu",
   "premium.review.1.text": "Pagi pertama ayatku muncul di layar kunci, aku menangis. Rasanya Tuhan memakai aplikasi ini untuk menarikku kembali kepada-Nya.",

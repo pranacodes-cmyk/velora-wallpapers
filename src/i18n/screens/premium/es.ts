@@ -29,7 +29,7 @@ const es = {
   "premium.benefit.dailyVerse.title": "Versículo Diario",
   "premium.benefit.dailyVerse.sub": "El fondo cambia cada día",
   "premium.benefit.journeys.title": "75 Días de Luz",
-  "premium.benefit.journeys.sub": "Sin anuncios, con 3 vasijas de aceite de gracia",
+  "premium.benefit.journeys.sub": "Sin anuncios, con 3 anclas de gracia",
   "premium.benefit.prayerAudio.title": "Oraciones en Audio",
   "premium.benefit.prayerAudio.sub": "Habladas sobre tu nombre",
   "premium.review.1.text": "La primera mañana que vi mi versículo en la pantalla, lloré. Siento que Dios me está usando esta app para acercarme otra vez a Él.",

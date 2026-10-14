@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect, useState } from "react";
-import { ImageIcon, BrainCircuit, Sun, BookOpen } from "lucide-react";
+import { ImageIcon, MapPin, Sun, BookOpen } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { haptic } from "@/utils/haptics";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,7 +9,7 @@ const tabs = [
   { path: "/", icon: Sun, labelKey: "nav.today", special: true },
   { path: "/wallpapers", icon: ImageIcon, labelKey: "nav.wallpapers" },
   { path: "/bible", icon: BookOpen, labelKey: "bible.title" },
-  { path: "/quiz", icon: BrainCircuit, labelKey: "nav.quiz" },
+  { path: "/challenge", icon: MapPin, labelKey: "ch.tab" },
 ] satisfies Array<{ path: string; icon: typeof Sun; labelKey: string; special?: boolean }>;
 
 

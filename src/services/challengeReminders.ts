@@ -4,13 +4,13 @@
 import { Capacitor } from "@capacitor/core";
 import { challengeDay } from "@/data/challenge75";
 import {
-  addDays, currentDay, getChallenge, litToday, localDate, tasksDoneToday, type ChallengeState,
+  addDays, currentDay, getChallenge, litToday, localDate, type ChallengeState,
 } from "@/services/challenge";
 
 const BASE_ID = 7500;
 const DAYS_AHEAD = 3;
-const EVENING = [19, 30] as const;
-const NIGHT = [21, 30] as const;
+const MORNING = [7, 0] as const;
+const NIGHT = [21, 0] as const;
 
 type Translate = (k: string, v?: Record<string, string | number>) => string;
 
@@ -36,15 +36,13 @@ export async function syncChallengeReminders(t: Translate, state: ChallengeState
     const { LocalNotifications } = await import("@capacitor/local-notifications");
     const ids = Array.from({ length: DAYS_AHEAD * 3 }, (_, i) => ({ id: BASE_ID + i }));
     await LocalNotifications.cancel({ notifications: ids });
-    if (state.status !== "active" || !state.reminders.enabled) return;
+    if (state.status !== "active") return;
     const perm = await LocalNotifications.checkPermissions();
     if (perm.display !== "granted") return;
 
     const today = localDate();
     const lit = litToday(state, today);
     const pending = lit ? currentDay(state, today) + 1 : currentDay(state, today);
-    const left = 4 - tasksDoneToday(state, today).length;
-    const [mh, mm] = state.reminders.morning.split(":").map(Number);
     const now = Date.now();
     const out: { id: number; title: string; body: string; schedule: { at: Date; allowWhileIdle: boolean }; extra: { route: string } }[] = [];
 
@@ -53,7 +51,7 @@ export async function syncChallengeReminders(t: Translate, state: ChallengeState
       // Days after today assume the pending day is still waiting.
       const day = i === 0 ? pending : pending + (lit ? i - 1 : 0);
       if (day > 75) break;
-      const morning = at(date, mh, mm);
+      const morning = at(date, MORNING[0], MORNING[1]);
       if (morning.getTime() > now && !(i === 0 && lit)) {
         out.push({
           id: BASE_ID + i * 3,
@@ -63,21 +61,11 @@ export async function syncChallengeReminders(t: Translate, state: ChallengeState
           extra: { route: "/challenge" },
         });
       }
-      if (!state.reminders.evening || (i === 0 && lit)) continue;
-      const evening = at(date, EVENING[0], EVENING[1]);
-      if (evening.getTime() > now) {
-        out.push({
-          id: BASE_ID + i * 3 + 1,
-          title: t("ch.notif.evening.title"),
-          body: t("ch.notif.evening.body", { left: i === 0 ? left : 4, day }),
-          schedule: { at: evening, allowWhileIdle: true },
-          extra: { route: "/challenge/day" },
-        });
-      }
+      if (i === 0 && lit) continue;
       const night = at(date, NIGHT[0], NIGHT[1]);
       if (night.getTime() > now) {
         out.push({
-          id: BASE_ID + i * 3 + 2,
+          id: BASE_ID + i * 3 + 1,
           title: t("ch.notif.night.title"),
           body: state.mode === "covenant" ? t("ch.notif.night.covenant", { day }) : t("ch.notif.night.body", { day }),
           schedule: { at: night, allowWhileIdle: true },

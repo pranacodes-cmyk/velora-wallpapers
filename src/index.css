@@ -45,6 +45,9 @@
     --premium-gold: 42 85% 55%;
     --premium-gold-glow: 38 100% 65%;
     --paywall-cta-foreground: 222 35% 9%;
+    --poster-ink: 0 0% 100%;
+    --poster-scrim: 222 50% 8%;
+    --voyage-gold: 42 92% 58%;
     --paywall-selected: 42 85% 52% / 0.1;
     --paywall-selected-shadow: 0 8px 24px -18px hsl(var(--primary) / 0.7), inset 0 1px 0 hsl(var(--primary) / 0.16);
     --nav-blur: 222 25% 4% / 0.94;
@@ -969,62 +972,71 @@ html.android-device .onb-storm-badge,
   .paywall-layout { max-height: 940px; }
 }
 
-/* ── 75 Days of Light: lamp flame ─────────────────────────────────────── */
-.challenge-halo {
-  background: radial-gradient(circle, hsl(42 100% 70% / 0.85) 0%, hsl(36 100% 58% / 0.42) 26%, hsl(30 100% 50% / 0.14) 52%, transparent 70%);
-  filter: blur(2px);
-  animation: challenge-halo 3.4s ease-in-out infinite;
+/* ── 75 Days of Light: voyage ─────────────────────────────────────────── */
+.voyage-route-ahead {
+  fill: none; stroke: hsl(var(--poster-ink) / 0.9); stroke-width: 4.2; stroke-linecap: round;
+  stroke-dasharray: 0.1 13; filter: drop-shadow(0 1px 1.5px hsl(var(--poster-scrim) / 0.45));
 }
-.light .challenge-halo {
-  background: radial-gradient(circle, hsl(44 100% 66% / 0.95) 0%, hsl(36 100% 56% / 0.5) 24%, hsl(30 100% 55% / 0.16) 50%, transparent 70%);
+.voyage-route-glow { fill: none; stroke: hsl(var(--voyage-gold) / 0.32); stroke-width: 11; stroke-linecap: round; }
+.voyage-route-done {
+  fill: none; stroke: hsl(var(--voyage-gold)); stroke-width: 5.2; stroke-linecap: round;
+  stroke-dasharray: 9 7; filter: drop-shadow(0 0 3px hsl(var(--voyage-gold) / 0.8));
 }
-.challenge-rays {
-  background: repeating-conic-gradient(from 0deg, hsl(44 100% 72% / 0.28) 0deg 5deg, transparent 5deg 22deg);
-  -webkit-mask: radial-gradient(circle, #000 18%, transparent 68%);
-  mask: radial-gradient(circle, #000 18%, transparent 68%);
-  animation: challenge-rays 28s linear infinite;
+.voyage-node { fill: hsl(var(--poster-ink) / 0.92); stroke: hsl(var(--poster-scrim) / 0.25); stroke-width: 1.5; }
+.voyage-node-next { fill: hsl(var(--poster-scrim) / 0.35); stroke: hsl(var(--poster-ink)); stroke-width: 3; }
+.voyage-node-done { fill: hsl(var(--voyage-gold)); stroke: hsl(var(--poster-ink)); stroke-width: 2.5; filter: drop-shadow(0 0 4px hsl(var(--voyage-gold) / 0.9)); }
+.voyage-node-check { fill: none; stroke: hsl(var(--paywall-cta-foreground)); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.voyage-node-pulse {
+  fill: none; stroke: hsl(var(--poster-ink) / 0.85); stroke-width: 2;
+  transform-box: fill-box; transform-origin: center; animation: voyage-pulse 2.4s ease-out infinite;
 }
-.challenge-flame { transform-origin: 50% 100%; filter: drop-shadow(0 0 6px hsl(38 100% 60% / 0.85)); }
-.challenge-flame-outer { transform-origin: 20px 62px; animation: challenge-flicker 1.9s ease-in-out infinite alternate; }
-.challenge-flame-inner { transform-origin: 20px 60px; animation: challenge-flicker 1.3s ease-in-out infinite alternate-reverse; }
-.challenge-flame--ember { opacity: 0.55; filter: drop-shadow(0 0 3px hsl(28 100% 55% / 0.6)); }
-.challenge-spark {
-  width: 3px; height: 3px;
-  background: hsl(44 100% 78%);
-  box-shadow: 0 0 6px 2px hsl(40 100% 62% / 0.8);
-  animation: challenge-spark 2.8s ease-out infinite;
-  opacity: 0;
+.voyage-label {
+  border-radius: 999px; padding: 1px 7px; font-size: 11px; font-weight: 800; line-height: 16px;
+  font-variant-numeric: tabular-nums; color: hsl(var(--poster-ink));
+  background: hsl(var(--poster-scrim) / 0.42); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  box-shadow: inset 0 0 0 1px hsl(var(--poster-ink) / 0.18);
 }
-@keyframes challenge-flicker {
-  0% { transform: scale(1, 1) skewX(0deg); }
-  30% { transform: scale(0.95, 1.06) skewX(1.6deg); }
-  60% { transform: scale(1.04, 0.97) skewX(-1.2deg); }
-  100% { transform: scale(0.98, 1.03) skewX(0.8deg); }
+.voyage-label--done { color: hsl(var(--paywall-cta-foreground)); background: hsl(var(--voyage-gold) / 0.95); box-shadow: none; }
+.voyage-label { transition: opacity 0.22s ease; }
+.voyage-label--hidden { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .voyage-label { transition: none; } }
+.voyage-lamb {
+  transform-origin: 50% 100%;
+  animation: lamb-breathe 4.2s ease-in-out infinite;
 }
-@keyframes challenge-halo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
-@keyframes challenge-rays { to { transform: rotate(360deg); } }
-@keyframes challenge-spark {
-  0% { transform: translate(0, 0) scale(1); opacity: 0; }
-  15% { opacity: 1; }
-  100% { transform: translate(6px, -46px) scale(0.3); opacity: 0; }
+.voyage-lamb-contact {
+  position: absolute; left: 6%; right: 2%; bottom: -3%; height: 9%; border-radius: 50%;
+  background: radial-gradient(closest-side, hsl(25 45% 18% / 0.42), hsl(25 45% 18% / 0.14) 60%, transparent);
+  filter: blur(1px);
 }
-@keyframes challenge-node-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.55); }
-  50% { box-shadow: 0 0 0 9px hsl(var(--primary) / 0); }
+.voyage-lamb--walking { animation: lamb-walk 0.28s ease-in-out infinite; }
+.voyage-lamb-shadow {
+  position: absolute; left: 8%; right: 4%; bottom: 1%; height: 16%; border-radius: 50%;
+  background: radial-gradient(closest-side, hsl(var(--poster-scrim) / 0.42), hsl(var(--poster-scrim) / 0.12) 58%, transparent);
+  animation: lamb-shadow 3.8s ease-in-out infinite;
 }
-.challenge-node-current { animation: challenge-node-pulse 2.2s ease-in-out infinite; }
-@keyframes challenge-ignite {
-  0% { transform: scale(0.2); opacity: 0; }
-  60% { transform: scale(1.25); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+.voyage-lamb-shadow--walking { animation-duration: 0.66s; }
+.voyage-cross-glow {
+  background: radial-gradient(closest-side, hsl(var(--voyage-gold) / 0.75), hsl(var(--voyage-gold) / 0.25) 45%, transparent);
+  mix-blend-mode: screen; animation: voyage-glow 3.2s ease-in-out infinite;
 }
-.challenge-ignite { animation: challenge-ignite 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.voyage-scrim-top { background: linear-gradient(180deg, hsl(var(--background) / 0.72) 0%, hsl(var(--background) / 0.3) 55%, transparent 100%); }
+.voyage-scrim-bottom { background: linear-gradient(0deg, hsl(var(--poster-scrim) / 0.78) 0%, hsl(var(--poster-scrim) / 0.38) 55%, transparent 100%); }
+.voyage-progress { background: linear-gradient(90deg, hsl(var(--voyage-gold)), hsl(var(--premium-gold-glow))); box-shadow: 0 0 10px hsl(var(--voyage-gold) / 0.7); }
+@keyframes lamb-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.006, 1.018); }
+}
+@keyframes lamb-walk { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.6%); } }
+@keyframes lamb-shadow { 0%, 100% { transform: scaleX(1); opacity: 0.72; } 50% { transform: scaleX(0.88); opacity: 0.42; } }
+@keyframes voyage-pulse { 0% { transform: scale(0.55); opacity: 0.95; } 100% { transform: scale(1.5); opacity: 0; } }
+@keyframes voyage-glow { 0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); } }
 @keyframes challenge-rise { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
 .challenge-rise { animation: challenge-rise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes challenge-pop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
+.challenge-pop { animation: challenge-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
 @media (prefers-reduced-motion: reduce) {
-  .challenge-halo, .challenge-rays, .challenge-flame-outer, .challenge-flame-inner, .challenge-spark,
-  .challenge-node-current, .challenge-ignite, .challenge-rise { animation: none !important; }
-  .challenge-spark { display: none; }
+  .voyage-lamb, .voyage-lamb-shadow, .voyage-node-pulse, .voyage-cross-glow, .challenge-rise, .challenge-pop { animation: none !important; }
 }
 
 /* Devanagari breaks apart when letter-spaced — keep Hindi eyebrows/labels un-tracked. */
@@ -1034,3 +1046,31 @@ html:lang(hi) .tracking-wider,
 html:lang(hi) .tracking-widest {
   letter-spacing: 0 !important;
 }
+
+/* Journey gamification */
+.today-path-fill { background: linear-gradient(90deg, hsl(var(--primary) / 0.7), hsl(var(--primary))); box-shadow: 0 0 10px hsl(var(--primary) / 0.55); transition: width 0.7s cubic-bezier(.2,.8,.2,1); }
+.today-stone-lit { box-shadow: 0 0 0 4px hsl(var(--primary) / 0.15), 0 6px 18px -6px hsl(var(--primary) / 0.8); }
+.today-stone-pulse { animation: stone-pulse 2s ease-out infinite; box-shadow: 0 0 0 0 hsl(var(--primary) / 0.5); }
+@keyframes stone-pulse { 0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.45); } 100% { box-shadow: 0 0 0 12px hsl(var(--primary) / 0); } }
+.milestone-earned { box-shadow: 0 0 16px -2px hsl(var(--primary) / 0.7); }
+.streak-flame { animation: streak-flicker 1.6s ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes streak-flicker { 0%,100% { transform: scale(1) rotate(-2deg); } 50% { transform: scale(1.12) rotate(2deg); } }
+.cele-rays { background: repeating-conic-gradient(from 0deg at 50% 50%, hsl(var(--primary) / 0.10) 0deg 8deg, transparent 8deg 22deg); animation: cele-spin 40s linear infinite; mask-image: radial-gradient(circle, #000 20%, transparent 65%); }
+@keyframes cele-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .today-stone-pulse, .streak-flame, .cele-rays { animation: none !important; } }
+
+/* Journey intro — architectural gold framing */
+.gold-frame {
+  position: relative; border-radius: 20px; padding: 1.5px;
+  background: linear-gradient(140deg, hsl(var(--primary) / 0.85), hsl(var(--primary) / 0.12) 38%, hsl(var(--border) / 0.5) 62%, hsl(var(--primary) / 0.55));
+  box-shadow: 0 18px 40px -26px hsl(var(--primary) / 0.55);
+}
+.gold-frame > .gold-frame-inner { border-radius: 18.5px; overflow: hidden; background: hsl(var(--card)); }
+.gold-frame--soft { background: linear-gradient(140deg, hsl(var(--primary) / 0.45), hsl(var(--border) / 0.45) 45%, hsl(var(--primary) / 0.25)); box-shadow: none; }
+.gold-ornament { display: flex; align-items: center; gap: 10px; color: hsl(var(--primary)); }
+.gold-ornament::before, .gold-ornament::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.5), transparent); }
+.icon-ring { box-shadow: 0 0 0 1px hsl(var(--primary) / 0.35), 0 0 0 4px hsl(var(--primary) / 0.07); }
+.corner-frame { position: relative; }
+.corner-frame::before, .corner-frame::after { content: ""; position: absolute; width: 18px; height: 18px; border-color: hsl(var(--primary) / 0.6); }
+.corner-frame::before { top: 0; left: 0; border-top: 1.5px solid; border-left: 1.5px solid; border-top-left-radius: 10px; }
+.corner-frame::after { bottom: 0; right: 0; border-bottom: 1.5px solid; border-right: 1.5px solid; border-bottom-right-radius: 10px; }

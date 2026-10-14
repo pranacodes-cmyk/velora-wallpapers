@@ -17,7 +17,7 @@ import 'bible_chat/bible_chat_screen.dart';
 import 'bible_reader/bible_reader_screen.dart';
 import 'challenge/challenge_day_screen.dart';
 import 'challenge/challenge_screen.dart';
-import 'quiz/quiz_screen.dart';
+import 'quiz/quiz_route.dart';
 import 'pray_screen/pray_screen_screen.dart';
 import 'today/today_screen.dart';
 import 'devotional/devotional_screen.dart';
@@ -92,11 +92,11 @@ class _AppShellState extends ConsumerState<AppShell>
       Analytics.capture('pray_screen_opened_from_reminder');
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const DevotionalScreen(musicEnabled: false)));
     } else if (route.startsWith('/quiz')) {
-      ref.read(activeTabProvider.notifier).state = AppTabs.quiz;
+      openQuiz(context);
     } else if (route.startsWith('/challenge/day')) {
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ChallengeDayScreen()));
     } else if (route.startsWith('/challenge') || route.startsWith('/journeys')) {
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ChallengeScreen()));
+      ref.read(activeTabProvider.notifier).state = AppTabs.journey;
     } else if (route.startsWith('/bible')) {
       ref.read(activeTabProvider.notifier).state = AppTabs.bible;
     } else if (route.startsWith('/companion')) {
@@ -134,13 +134,6 @@ class _AppShellState extends ConsumerState<AppShell>
         // guard both handlers fired: the overlay closed *and* the shell jumped
         // to Today, leaving the tab bar hidden.
         if (ref.read(fullscreenOverlayProvider)) return;
-        // Quiz tab handles its own back first (abandon a running quiz, leave
-        // results) — only when it has nothing left to undo do we fall back to
-        // the tab-level behaviour.
-        if (index == AppTabs.quiz) {
-          final quizBack = ref.read(quizBackHandlerProvider);
-          if (quizBack != null && quizBack()) return;
-        }
         if (index != AppTabs.today) {
           ref.read(activeTabProvider.notifier).state = AppTabs.today;
           return;
@@ -163,16 +156,15 @@ class _AppShellState extends ConsumerState<AppShell>
                   enabled: index == AppTabs.bible,
                   child: const BibleReaderScreen(inTab: true),
                 ),
-                TickerMode(enabled: index == 3, child: const QuizScreen()),
+                TickerMode(
+                  enabled: index == AppTabs.journey,
+                  child: const ChallengeScreen(inTab: true),
+                ),
               ],
             ),
             // Keyboard open → the floating tab bar would sit on top of the
             // input the user is typing into, so it steps aside.
-            // The quiz's hide-nav flag may only ever hide the bar while the
-            // Quiz tab is actually visible. The IndexedStack keeps Quiz alive,
-            // so a stale `true` used to strand the user with no tab bar at all.
-            if (!(index == AppTabs.quiz && ref.watch(quizNavHiddenProvider)) &&
-                !ref.watch(fullscreenOverlayProvider) &&
+            if (!ref.watch(fullscreenOverlayProvider) &&
                 MediaQuery.viewInsetsOf(context).bottom < 80)
               BottomNavBar(
                 activeIndex: index,

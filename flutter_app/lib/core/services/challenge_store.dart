@@ -208,14 +208,15 @@ class CompletionResult {
     required this.day,
     required this.streak,
     this.graceEarned = false,
-    this.lampUpgraded = false,
+    this.islandReached = false,
     this.finished = false,
   });
   final bool lit;
   final int day;
   final int streak;
   final bool graceEarned;
-  final bool lampUpgraded;
+  /// The ship reached a new island (every 15 days, before the cross).
+  final bool islandReached;
   final bool finished;
 }
 
@@ -229,8 +230,6 @@ class ChallengeView {
     required this.lit,
     required this.done,
     required this.streak,
-    required this.tier,
-    required this.intensity,
   });
   final ChallengeState state;
   final String today;
@@ -239,8 +238,6 @@ class ChallengeView {
   final bool lit;
   final List<String> done;
   final int streak;
-  final int tier;
-  final double intensity;
 
   bool get idle => state.status == 'idle';
   bool get finished => state.status == 'finished';
@@ -319,7 +316,11 @@ class ChallengeStore {
 
   static List<String> tasksDoneToday(ChallengeState s, [String? today]) {
     final t = today ?? localDate();
-    if (litToday(s, t)) return List.of(kTaskIds);
+    if (litToday(s, t)) {
+      // Reflection is optional — only show what was actually completed.
+      final td = s.today;
+      return td != null && td.date == t ? List.of(td.done) : List.of(kRequiredTasks);
+    }
     final td = s.today;
     return td != null && td.date == t ? td.done : const [];
   }
@@ -350,14 +351,12 @@ class ChallengeStore {
       lit: litToday(st, today),
       done: tasksDoneToday(st, today),
       streak: liveStreak(st, today),
-      tier: lampTierFor(completed),
-      intensity: math.min(1.0, 0.22 + (completed / kChallengeDays) * 0.78),
     );
   }
 
   /* ── actions ─────────────────────────────────────────────────────────── */
 
-  static void start(String mode, String morning, bool evening) {
+  static void start(String mode) {
     final today = localDate();
     final prev = state;
     _write(ChallengeState(
@@ -367,7 +366,7 @@ class ChallengeStore {
       attempts: prev.status == 'idle' ? prev.attempts : prev.attempts + 1,
       bestStreak: prev.bestStreak,
       lastCheckOn: today,
-      reminders: ChallengeReminders(enabled: true, morning: morning, evening: evening),
+      reminders: const ChallengeReminders(enabled: true, morning: '07:00', evening: true),
     ));
   }
 
@@ -419,19 +418,28 @@ class ChallengeStore {
     _write(next);
   }
 
-  /// Mark a practice done for today. Lights the day when all four are done.
+  /// Mark a practice done for today. Lights the day when read, pray and live
+  /// it are done — reflection is optional and can also be recorded after the
+  /// day lit.
   static CompletionResult completeTask(String task, bool isPremium) {
     final today = localDate();
     final s = state;
     final day = currentDay(s, today);
     final empty = CompletionResult(lit: false, day: day, streak: liveStreak(s, today));
-    if (s.status != 'active' || litToday(s, today)) return empty;
+    if (s.status != 'active') return empty;
+    if (litToday(s, today)) {
+      if (task != 'reflect') return empty;
+      final td = s.today;
+      if (td == null || td.date != today || td.done.contains(task)) return empty;
+      _write(s.copyWith(today: ChallengeToday(td.date, td.day, [...td.done, task])));
+      return empty;
+    }
 
     final done = <String>{...(s.today != null && s.today!.date == today ? s.today!.done : const <String>[]), task};
     final ordered = kTaskIds.where(done.contains).toList();
     final nextToday = ChallengeToday(today, day, ordered);
 
-    if (ordered.length < kTaskIds.length) {
+    if (!kRequiredTasks.every(done.contains)) {
       _write(s.copyWith(today: nextToday));
       return empty;
     }
@@ -459,7 +467,7 @@ class ChallengeStore {
       day: day,
       streak: streak,
       graceEarned: graceEarned,
-      lampUpgraded: after ~/ 15 > before ~/ 15 && after < kChallengeDays,
+      islandReached: after ~/ 15 > before ~/ 15 && after < kChallengeDays,
       finished: finished,
     );
   }

@@ -154,9 +154,9 @@ final prayScreenLaunchTokenProvider = StateProvider<int>((_) => 0);
 /// the web's `document.body.dataset.hideNav` toggle in `src/pages/Quiz.tsx`.
 final quizNavHiddenProvider = StateProvider<bool>((_) => false);
 
-/// Set by the Quiz tab so Android's hardware back first steps *inside* the
+/// Set by the Quiz page so Android's hardware back first steps *inside* the
 /// quiz (abandon run / leave results) exactly like the web history stack,
-/// instead of the shell jumping straight to Today.
+/// before the page itself closes (`QuizRoutePage`).
 final quizBackHandlerProvider = StateProvider<bool Function()?>((_) => null);
 
 /// True while a root-level fullscreen preview (wallpaper detail / live preview)

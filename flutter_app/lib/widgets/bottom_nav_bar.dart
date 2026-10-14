@@ -8,7 +8,7 @@ import '../core/theme/app_colors.dart';
 import 'lucide.dart';
 
 /// 1:1 port of `src/components/BottomNav.tsx`:
-/// floating glass pill, 4 tabs (Today / Wallpapers / Journeys / Quiz),
+/// floating glass pill, 4 tabs (Today / Wallpapers / Bible / Journey),
 /// 20x3 gold indicator line on top of the active tab, radial glow behind the
 /// active icon, 9px bold labels, soft haptic on tap and on drag-over.
 class NavTab {
@@ -22,7 +22,7 @@ const kNavTabs = <NavTab>[
   NavTab('sun', 'nav.today', fillWhenActive: true),
   NavTab('image', 'nav.wallpapers'),
   NavTab('book-open', 'bible.title'),
-  NavTab('brain-circuit', 'nav.quiz'),
+  NavTab('map-pin', 'ch.tab'),
 ];
 
 class BottomNavBar extends StatelessWidget {
