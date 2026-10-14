@@ -15,7 +15,8 @@ import '../widgets/exit_confirm_dialog.dart';
 import '../widgets/premium_sheet.dart';
 import 'bible_chat/bible_chat_screen.dart';
 import 'bible_reader/bible_reader_screen.dart';
-import 'journeys/journeys_screen.dart';
+import 'challenge/challenge_day_screen.dart';
+import 'challenge/challenge_screen.dart';
 import 'quiz/quiz_screen.dart';
 import 'pray_screen/pray_screen_screen.dart';
 import 'today/today_screen.dart';
@@ -92,8 +93,10 @@ class _AppShellState extends ConsumerState<AppShell>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const DevotionalScreen(musicEnabled: false)));
     } else if (route.startsWith('/quiz')) {
       ref.read(activeTabProvider.notifier).state = AppTabs.quiz;
-    } else if (route.startsWith('/journeys')) {
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const JourneysScreen(showBackButton: true)));
+    } else if (route.startsWith('/challenge/day')) {
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ChallengeDayScreen()));
+    } else if (route.startsWith('/challenge') || route.startsWith('/journeys')) {
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ChallengeScreen()));
     } else if (route.startsWith('/bible')) {
       ref.read(activeTabProvider.notifier).state = AppTabs.bible;
     } else if (route.startsWith('/companion')) {

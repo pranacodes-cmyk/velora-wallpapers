@@ -43,6 +43,7 @@ const PrayerSetupSheet = lazyPage(() =>
 const ParallaxRail = lazyPage(() =>
   import("@/components/ParallaxRail").then((m) => ({ default: m.ParallaxRail })),
 );
+const ChallengeHomeCard = lazyPage(() => import("@/components/challenge/ChallengeHomeCard"));
 const PrayScreenFeatureCard = lazyPage(() =>
   import("@/components/prayscreen/PrayScreenFeatureCard").then((m) => ({ default: m.PrayScreenFeatureCard })),
 );
@@ -94,7 +95,6 @@ function useOpenReflectionFromQuery() {
 }
 import TodayChecklist from "@/components/today/TodayChecklist";
 import TodayPrayerCard from "@/components/today/TodayPrayerCard";
-import PersonalizedJourneyCard from "@/components/today/PersonalizedJourneyCard";
 import DailyQuestionCard from "@/components/today/DailyQuestionCard";
 import {
   SectionLabel,
@@ -1151,7 +1151,10 @@ export default function Today() {
           <ParallaxRail />
         </Suspense>
 
-        <PersonalizedJourneyCard />
+        {/* 75 Days of Light — replaces the old Journey card. Height reserved so scroll does not jump. */}
+        <Suspense fallback={<div className="mx-3 mb-6 h-[172px] rounded-[26px] border border-primary/20" aria-hidden />}>
+          <ChallengeHomeCard />
+        </Suspense>
 
         {/* Below-fold: lazy chunk. Placeholder holds space so LCP is stable. */}
         <Suspense fallback={<div className="min-h-24" aria-hidden />}>

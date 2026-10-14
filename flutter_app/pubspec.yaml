@@ -83,6 +83,7 @@ flutter:
     - assets/images/journeys/journey-money-provision.jpg
     - assets/images/journeys/journey-rest-sleep.jpg
     - assets/images/prayscreen/
+    - assets/images/challenge/
     - assets/data/
     - assets/bible/en/
     - assets/bible/es/

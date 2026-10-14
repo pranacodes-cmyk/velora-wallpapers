@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791916914550,
+      "tag": "0000_challenge_circles",
+      "breakpoints": true
+    }
+  ]
+}

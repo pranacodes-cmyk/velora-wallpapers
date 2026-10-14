@@ -68,6 +68,186 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_cheers: {
+        Row: {
+          circle_id: string
+          created_at: string
+          from_member: string
+          id: string
+          kind: string
+          seen_at: string | null
+          sent_on: string
+          to_member: string
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          from_member: string
+          id?: string
+          kind: string
+          seen_at?: string | null
+          sent_on?: string
+          to_member: string
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          from_member?: string
+          id?: string
+          kind?: string
+          seen_at?: string | null
+          sent_on?: string
+          to_member?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_cheers_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_circles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenge_cheers_from_member_fkey"
+            columns: ["from_member"]
+            isOneToOne: false
+            referencedRelation: "challenge_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenge_cheers_to_member_fkey"
+            columns: ["to_member"]
+            isOneToOne: false
+            referencedRelation: "challenge_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenge_circle_members: {
+        Row: {
+          circle_id: string
+          joined_at: string
+          member_id: string
+        }
+        Insert: {
+          circle_id: string
+          joined_at?: string
+          member_id: string
+        }
+        Update: {
+          circle_id?: string
+          joined_at?: string
+          member_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_circle_members_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_circles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenge_circle_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenge_circles: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          emoji: string
+          id: string
+          name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by: string
+          emoji?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          emoji?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_circles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "challenge_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenge_members: {
+        Row: {
+          attempts: number
+          avatar: string
+          best_streak: number
+          completed_days: number
+          created_at: string
+          current_streak: number
+          display_name: string
+          id: string
+          lang: string
+          last_lit_on: string | null
+          mode: string
+          secret_hash: string
+          started_on: string | null
+          today_done: number
+          today_on: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          avatar?: string
+          best_streak?: number
+          completed_days?: number
+          created_at?: string
+          current_streak?: number
+          display_name?: string
+          id?: string
+          lang?: string
+          last_lit_on?: string | null
+          mode?: string
+          secret_hash: string
+          started_on?: string | null
+          today_done?: number
+          today_on?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          avatar?: string
+          best_streak?: number
+          completed_days?: number
+          created_at?: string
+          current_streak?: number
+          display_name?: string
+          id?: string
+          lang?: string
+          last_lit_on?: string | null
+          mode?: string
+          secret_hash?: string
+          started_on?: string | null
+          today_done?: number
+          today_on?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       live_wallpapers: {
         Row: {
           category: string

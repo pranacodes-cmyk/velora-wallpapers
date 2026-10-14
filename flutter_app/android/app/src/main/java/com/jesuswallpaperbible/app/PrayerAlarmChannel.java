@@ -102,6 +102,13 @@ public class PrayerAlarmChannel implements MethodChannel.MethodCallHandler {
                 result.success(true);
                 break;
             }
+            case "challengeReminderSync": {
+                String items = call.argument("items");
+                String channel = call.argument("channel");
+                com.velora.plugins.ChallengeReminderScheduler.save(ctx(), items, channel);
+                result.success(com.velora.plugins.ChallengeReminderScheduler.scheduleFromPrefs(ctx()));
+                break;
+            }
             case "dailyReminderPreview": {
                 Intent i = new Intent(ctx(), com.velora.plugins.DailyReminderActivity.class);
                 String slot = call.argument("slot");

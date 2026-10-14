@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import PerfProbe from "@/components/PerfProbe";
 import { BottomNav } from "@/components/BottomNav";
 import { Capacitor } from "@capacitor/core";
@@ -30,8 +30,9 @@ const TermsOfService = lazyPage(() => import("./pages/TermsOfService"));
 const Favorites = lazyPage(() => import("./pages/Favorites"));
 const Quiz = lazyPage(() => import("./pages/Quiz"));
 const DailyVerse = lazyPage(() => import("./pages/DailyVerse"));
-const Journeys = lazyPage(() => import("./pages/Journeys"));
-const JourneyDay = lazyPage(() => import("./pages/JourneyDay"));
+const Challenge = lazyPage(() => import("./pages/Challenge"));
+const ChallengeDay = lazyPage(() => import("./pages/ChallengeDay"));
+const ChallengeCircle = lazyPage(() => import("./pages/ChallengeCircle"));
 const AlarmPreview = lazyPage(() => import("./pages/AlarmPreview"));
 const Companion = lazyPage(() => import("./pages/Companion"));
 const BibleReader = lazyPage(() => import("./pages/BibleReader"));
@@ -71,7 +72,7 @@ function RoutePrefetch() {
     const warm = () => {
       prefetch(() => import("./pages/DailyVerse"));
       prefetch(() => import("./pages/Quiz"));
-      prefetch(() => import("./pages/Journeys"));
+      prefetch(() => import("./pages/Challenge"));
       prefetch(() => import("./pages/Devotional"));
       prefetch(() => import("./pages/Wallpapers"));
       prefetch(() => import("./pages/PrayScreen"));
@@ -306,8 +307,13 @@ function AppShell() {
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/daily-verse" element={<DailyVerse />} />
-          <Route path="/journeys" element={<Journeys />} />
-          <Route path="/journeys/:id" element={<JourneyDay />} />
+          <Route path="/challenge" element={<Challenge />} />
+          <Route path="/challenge/day" element={<ChallengeDay />} />
+          <Route path="/challenge/day/:n" element={<ChallengeDay />} />
+          <Route path="/challenge/circle" element={<ChallengeCircle />} />
+          {/* Old Journeys links (notifications, shares) land on the new challenge. */}
+          <Route path="/journeys" element={<Navigate to="/challenge" replace />} />
+          <Route path="/journeys/:id" element={<Navigate to="/challenge" replace />} />
           <Route path="/companion" element={<Companion />} />
           <Route path="/bible" element={<BibleReader />} />
 

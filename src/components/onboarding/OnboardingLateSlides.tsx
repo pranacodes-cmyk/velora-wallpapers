@@ -28,6 +28,8 @@ import {
   seedPrayerTimes,
   PRAYER_SEED_KEY,
 } from "./onboardingShared";
+import { TASK_ART, CIRCLE_ART } from "@/components/challenge/challengeAssets";
+import { ChallengeLamp } from "@/components/challenge/ChallengeLamp";
 
 export function PrayerSlide({ active, exiting }: { active: boolean; exiting?: boolean }) {
   const { t } = useT();
@@ -291,10 +293,11 @@ export function PrayerSlide({ active, exiting }: { active: boolean; exiting?: bo
 // =============================================================================
 // SLIDE — GUIDED JOURNEYS: multi-day walks with God through every season
 // =============================================================================
+// 75 Days of Light preview (replaces the old multi-day Journeys list).
 const JOURNEY_CARDS = [
-  { titleKey: "onb.journeys.item1Title", metaKey: "onb.journeys.item1Meta", hue: 42, equaliser: true },
-  { titleKey: "onb.journeys.item2Title", metaKey: "onb.journeys.item2Meta", hue: 28, equaliser: false },
-  { titleKey: "onb.journeys.item3Title", metaKey: "onb.journeys.item3Meta", hue: 220, equaliser: false },
+  { titleKey: "onb.journeys.item1Title", metaKey: "onb.journeys.item1Meta", hue: 42, equaliser: true, art: TASK_ART.read },
+  { titleKey: "onb.journeys.item2Title", metaKey: "onb.journeys.item2Meta", hue: 28, equaliser: false, art: TASK_ART.pray },
+  { titleKey: "onb.journeys.item3Title", metaKey: "onb.journeys.item3Meta", hue: 220, equaliser: false, art: CIRCLE_ART },
 ];
 
 function JourneyEqualiser() {
@@ -349,6 +352,14 @@ export function JourneysSlide({ active, exiting }: { active: boolean; exiting?: 
 
       <div className="relative z-10 flex max-h-full w-full flex-col items-center overflow-y-auto px-7 pb-36 pt-[max(env(safe-area-inset-top),40px)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex w-full max-w-[420px] flex-col items-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: ONB_IN_DELAY, duration: ONB_IN_DUR, ease: [0.22, 1, 0.36, 1] }}
+            className="mb-1"
+          >
+            <ChallengeLamp tier={2} intensity={0.85} state="lit" width={168} priority />
+          </motion.div>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 0.75, y: 0 }}
@@ -403,18 +414,12 @@ export function JourneysSlide({ active, exiting }: { active: boolean; exiting?: 
                 }}
               />
               <div className="flex items-center gap-3 pl-2">
-                <span
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                  style={{
-                    background: `linear-gradient(135deg, hsl(${card.hue} 85% 55% / 0.22), hsl(${card.hue} 85% 45% / 0.04))`,
-                    border: `1px solid hsl(${card.hue} 70% 55% / 0.3)`,
-                  }}
-                >
-                  <svg width="13" height="18" viewBox="0 0 13 18" fill="none" aria-hidden>
-                    <rect x="4.65" y="0" width="3.7" height="18" rx="1" fill={`hsl(${card.hue} 85% 62%)`} />
-                    <rect x="0" y="4.5" width="13" height="3.7" rx="1" fill={`hsl(${card.hue} 85% 62%)`} />
-                  </svg>
-                </span>
+                <img
+                  src={card.art}
+                  alt=""
+                  className="h-11 w-11 shrink-0 rounded-xl object-cover"
+                  style={{ border: `1px solid hsl(${card.hue} 70% 55% / 0.35)` }}
+                />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13.5px] font-bold leading-[1.15]" style={{ color: "hsl(40 25% 95%)" }}>
                     {t(card.titleKey)}

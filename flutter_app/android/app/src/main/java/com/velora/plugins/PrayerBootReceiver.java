@@ -25,6 +25,9 @@ public class PrayerBootReceiver extends BroadcastReceiver {
                         DailyReminderScheduler.scheduleFromPrefs(appContext);
                     } catch (Throwable ignored) { /* best-effort */ }
                     try {
+                        ChallengeReminderScheduler.scheduleFromPrefs(appContext);
+                    } catch (Throwable ignored) { /* best-effort */ }
+                    try {
                         ContentPushScheduler.scheduleFromPrefs(appContext);
                     } catch (Throwable ignored) { /* pushes are best-effort */ }
                 } finally {

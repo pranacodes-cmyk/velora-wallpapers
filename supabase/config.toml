@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.posthog-4d-exindia]
 verify_jwt = false
+
+[functions.challenge-circle]
+verify_jwt = false

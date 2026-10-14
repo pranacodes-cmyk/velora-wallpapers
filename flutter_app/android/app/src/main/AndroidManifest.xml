@@ -103,6 +103,11 @@
             android:name="com.velora.plugins.DailyReminderReceiver"
             android:exported="false" />
 
+        <!-- 75 Days of Light morning / evening / night reminders -->
+        <receiver
+            android:name="com.velora.plugins.ChallengeReminderReceiver"
+            android:exported="false" />
+
         <!-- Daily content pushes (Verse / Quiz / Companion / Journey) -->
         <receiver
             android:name="com.velora.plugins.ContentPushReceiver"

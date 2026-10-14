@@ -23,13 +23,12 @@ import '../../widgets/streak_badge.dart';
 import '../pray_screen/pray_screen_screen.dart';
 import '../daily_verse/daily_verse_screen.dart';
 import '../devotional/devotional_screen.dart';
-import '../journeys/journeys_screen.dart';
+import '../challenge/challenge_home_card.dart';
 import '../parallax/parallax_preview_screen.dart';
 import 'prayer_alarm_toggles.dart';
 import 'notification_permission_card.dart';
 import '../settings/settings_screen.dart';
 import 'daily_question_card.dart';
-import 'journey_card.dart';
 import 'parallax_rail.dart';
 import 'premium_nudge.dart';
 import 'today_checklist.dart';
@@ -308,17 +307,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                   ),
                 ),
 
-                app_keep_alive.KeepAlive(
-                  child: PersonalizedJourneyCard(
-                    onOpenJourney: (_) => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const JourneysScreen(
-                          showBackButton: true,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                const app_keep_alive.KeepAlive(child: ChallengeHomeCard()),
 
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),

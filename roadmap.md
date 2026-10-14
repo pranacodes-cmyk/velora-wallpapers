@@ -72,4 +72,15 @@
 - [ ] Verify cleaned Flutter build size, native paywall and frame performance after an explicitly approved CI build; no native build requested for this audit.
 - [x] Gift tap opens Life Calendar wallpaper preview, app name and Install action in matching web/Flutter; web preview and exact Play listing verified, native store launch awaits approved device build.
 - [x] Cancel requested Play build before store upload and restore repository private; do not restart without approval.
+- [x] Release Prayly 1.0.1201 (30100166) to Play Internal Testing; run 38260726966 and store upload succeeded, GitHub repository restored private.
 - [ ] iOS release blocked: native iOS project, Apple signing and App Store Connect credentials missing.
+
+## 75 Days of Light challenge (replaces Journeys)
+- [ ] Author 75-day NT reading plan with daily insight, prayer, live-it action and reflection (English source).
+- [ ] Generate lamp tiers, task illustrations and hero art for light and dark modes.
+- [ ] Backend: circles, members, cheers via secure device identity (no sign-up needed).
+- [ ] Web: challenge hub (lamp + 75-step path), intro/mode choice, day screen with inline chapter, circle/friends, Home card, onboarding slide, routes; remove old Journeys.
+- [ ] Translate challenge content and UI into es, pt, fil, hi, id, fr, de.
+- [ ] Morning/evening/night state-aware reminders (Flutter native + web local notifications).
+- [ ] Flutter parity: store, hub, day, circle, intro, Home card, onboarding slide, i18n export.
+- [ ] Visual verification light/dark + end-to-end circle flow with two identities.

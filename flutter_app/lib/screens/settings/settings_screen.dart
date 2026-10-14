@@ -178,6 +178,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final theme = Prefs.getString('cw-theme');
       await Prefs.clearExcept(const {'cw-theme'});
       if (theme != null) await Prefs.setString('cw-theme', theme);
+      ChallengeStore.reload();
       if (mounted) AppToast.success(context, t('settings.delete.success'));
     } catch (_) {
       if (mounted) AppToast.error(context, t('settings.delete.error'));

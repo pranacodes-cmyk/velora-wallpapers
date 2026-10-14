@@ -968,3 +968,69 @@ html.android-device .onb-storm-badge,
   .paywall-cinema { justify-content: center; }
   .paywall-layout { max-height: 940px; }
 }
+
+/* ── 75 Days of Light: lamp flame ─────────────────────────────────────── */
+.challenge-halo {
+  background: radial-gradient(circle, hsl(42 100% 70% / 0.85) 0%, hsl(36 100% 58% / 0.42) 26%, hsl(30 100% 50% / 0.14) 52%, transparent 70%);
+  filter: blur(2px);
+  animation: challenge-halo 3.4s ease-in-out infinite;
+}
+.light .challenge-halo {
+  background: radial-gradient(circle, hsl(44 100% 66% / 0.95) 0%, hsl(36 100% 56% / 0.5) 24%, hsl(30 100% 55% / 0.16) 50%, transparent 70%);
+}
+.challenge-rays {
+  background: repeating-conic-gradient(from 0deg, hsl(44 100% 72% / 0.28) 0deg 5deg, transparent 5deg 22deg);
+  -webkit-mask: radial-gradient(circle, #000 18%, transparent 68%);
+  mask: radial-gradient(circle, #000 18%, transparent 68%);
+  animation: challenge-rays 28s linear infinite;
+}
+.challenge-flame { transform-origin: 50% 100%; filter: drop-shadow(0 0 6px hsl(38 100% 60% / 0.85)); }
+.challenge-flame-outer { transform-origin: 20px 62px; animation: challenge-flicker 1.9s ease-in-out infinite alternate; }
+.challenge-flame-inner { transform-origin: 20px 60px; animation: challenge-flicker 1.3s ease-in-out infinite alternate-reverse; }
+.challenge-flame--ember { opacity: 0.55; filter: drop-shadow(0 0 3px hsl(28 100% 55% / 0.6)); }
+.challenge-spark {
+  width: 3px; height: 3px;
+  background: hsl(44 100% 78%);
+  box-shadow: 0 0 6px 2px hsl(40 100% 62% / 0.8);
+  animation: challenge-spark 2.8s ease-out infinite;
+  opacity: 0;
+}
+@keyframes challenge-flicker {
+  0% { transform: scale(1, 1) skewX(0deg); }
+  30% { transform: scale(0.95, 1.06) skewX(1.6deg); }
+  60% { transform: scale(1.04, 0.97) skewX(-1.2deg); }
+  100% { transform: scale(0.98, 1.03) skewX(0.8deg); }
+}
+@keyframes challenge-halo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes challenge-rays { to { transform: rotate(360deg); } }
+@keyframes challenge-spark {
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(6px, -46px) scale(0.3); opacity: 0; }
+}
+@keyframes challenge-node-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.55); }
+  50% { box-shadow: 0 0 0 9px hsl(var(--primary) / 0); }
+}
+.challenge-node-current { animation: challenge-node-pulse 2.2s ease-in-out infinite; }
+@keyframes challenge-ignite {
+  0% { transform: scale(0.2); opacity: 0; }
+  60% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.challenge-ignite { animation: challenge-ignite 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+@keyframes challenge-rise { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+.challenge-rise { animation: challenge-rise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .challenge-halo, .challenge-rays, .challenge-flame-outer, .challenge-flame-inner, .challenge-spark,
+  .challenge-node-current, .challenge-ignite, .challenge-rise { animation: none !important; }
+  .challenge-spark { display: none; }
+}
+
+/* Devanagari breaks apart when letter-spaced — keep Hindi eyebrows/labels un-tracked. */
+html:lang(hi) [class*="tracking-["],
+html:lang(hi) .tracking-wide,
+html:lang(hi) .tracking-wider,
+html:lang(hi) .tracking-widest {
+  letter-spacing: 0 !important;
+}
