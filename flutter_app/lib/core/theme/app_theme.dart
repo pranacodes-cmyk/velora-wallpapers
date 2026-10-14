@@ -38,9 +38,41 @@ class AppTheme {
     );
   }
 
+  // Pair surface and foreground instead of Material's inverse-surface defaults.
+  static SnackBarThemeData _snackBarTheme({
+    required Color background,
+    required Color foreground,
+    required Color accent,
+    required Color border,
+  }) => SnackBarThemeData(
+    backgroundColor: background,
+    contentTextStyle: TextStyle(
+      fontFamily: _bodyFamily,
+      color: foreground,
+      fontSize: 13,
+      fontWeight: FontWeight.w600,
+      height: 1.35,
+    ),
+    actionTextColor: accent,
+    disabledActionTextColor: foreground.withValues(alpha: 0.6),
+    closeIconColor: foreground,
+    behavior: SnackBarBehavior.floating,
+    elevation: 0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+      side: BorderSide(color: border),
+    ),
+  );
+
   static ThemeData dark() {
     final base = ThemeData.dark(useMaterial3: true);
     return base.copyWith(
+      snackBarTheme: _snackBarTheme(
+        background: AppColors.darkCard,
+        foreground: AppColors.darkForeground,
+        accent: AppColors.darkPrimary,
+        border: AppColors.darkBorder,
+      ),
       scaffoldBackgroundColor: AppColors.background,
       canvasColor: AppColors.background,
       colorScheme: base.colorScheme.copyWith(
@@ -105,6 +137,12 @@ class AppTheme {
   static ThemeData light() {
     final base = ThemeData.light(useMaterial3: true);
     return base.copyWith(
+      snackBarTheme: _snackBarTheme(
+        background: AppColors.lightCard,
+        foreground: AppColors.lightForeground,
+        accent: AppColors.lightPrimary,
+        border: AppColors.lightBorder,
+      ),
       scaffoldBackgroundColor: AppColors.lightBackground,
       colorScheme: base.colorScheme.copyWith(
         brightness: Brightness.light,

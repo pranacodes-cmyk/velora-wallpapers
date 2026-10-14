@@ -71,6 +71,7 @@ const en: Record<string, string> = {
 
   "ch.hub.settings": "Challenge settings",
   "ch.hub.completed": "{{n}} days complete",
+  "ch.hub.completedOne": "{{n}} day complete",
 
 
   "ch.notice.grace": "A grace anchor held your streak for {{n}} missed day(s).",
@@ -278,5 +279,6 @@ const en: Record<string, string> = {
   "ch.crew.rule.support.body": "Send Cheer, Pray or Remind from the crew page. Each can be sent once per person per day. Remind is available only while their day is unfinished.",
   "ch.crew.rule.limits.title": "Limits and privacy",
   "ch.crew.rule.limits.body": "Up to 30 people per crew and 6 crews per person. Share codes only with people you want to invite. You can leave and rejoin with the code; your local journey stays.",
+
 };
 export default en;

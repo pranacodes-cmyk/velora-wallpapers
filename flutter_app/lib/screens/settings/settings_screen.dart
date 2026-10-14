@@ -9,6 +9,7 @@ import '../../core/services/challenge_store.dart';
 import '../../core/services/daily_reminder_service.dart';
 import '../../core/services/haptics.dart';
 import '../../core/services/prefs.dart';
+import '../../core/services/pro_journeys.dart';
 import '../../core/services/share_service.dart';
 import '../../core/services/user_profile.dart';
 import '../../core/theme/app_colors.dart';
@@ -137,16 +138,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
-  Future<void> _redoOnboarding() async {
-    await Prefs.setString(StorageKeys.onboardingReplay, '1');
-    await Prefs.remove(StorageKeys.onboardingDoneAt);
-    await Prefs.remove('cw_post_onboarding_premium_shown');
-    if (!mounted) return;
-    final controller = ref.read(onboardingDoneProvider.notifier);
-    Navigator.of(context).popUntil((route) => route.isFirst);
-    await controller.replay();
-  }
-
   Future<void> _deleteData() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -180,6 +171,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await Prefs.clearExcept(const {'cw-theme'});
       if (theme != null) await Prefs.setString('cw-theme', theme);
       ChallengeStore.reload();
+      ProJourneyStore.reload();
       if (mounted) AppToast.success(context, t('settings.delete.success'));
     } catch (_) {
       if (mounted) AppToast.error(context, t('settings.delete.error'));
@@ -948,14 +940,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               title: t('settings.section.support'),
               child: Column(
                 children: [
-                  _Row(
-                    icon: Icons.replay_rounded,
-                    iconColor: AppColors.primary,
-                    label: t('settings.redoOnboarding'),
-                    desc: t('settings.redoOnboardingDesc'),
-                    onTap: _redoOnboarding,
-                  ),
-                  const _Divider(),
                   _Row(
                     icon: Icons.star_rounded,
                     iconColor: AppColors.primary,

@@ -66,6 +66,7 @@ const dict: Record<string, string> = {
   "ch.intro.lit": "Começando…",
   "ch.hub.settings": "Configurações do desafio",
   "ch.hub.completed": "{{n}} dias concluídos",
+  "ch.hub.completedOne": "{{n}} dia concluído",
   "ch.notice.grace": "Uma âncora da graça manteve sua sequência por {{n}} dia(s) perdido(s).",
   "ch.notice.reset": "Sua sequência recomeçou porque você deixou de completar um dia. Seus {{done}} dias concluídos continuam salvos — continue caminhando.",
   "ch.notice.restart": "Caminho da Aliança: sua jornada voltou ao dia 1. Da última vez você chegou ao dia {{n}} — caminhe mais longe.",
@@ -264,5 +265,6 @@ const dict: Record<string, string> = {
   "ch.crew.rule.support.body": "Envie Incentivar, Orar ou Lembrar na página do grupo. Cada tipo pode ser enviado uma vez por pessoa por dia. Lembrar só aparece se o dia ainda não terminou.",
   "ch.crew.rule.limits.title": "Limites e privacidade",
   "ch.crew.rule.limits.body": "Até 30 pessoas por grupo e 6 grupos por pessoa. Compartilhe códigos só com quem deseja convidar. Pode sair e voltar com o código; sua jornada local permanece.",
+
 };
 export default dict;

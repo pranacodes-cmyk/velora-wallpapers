@@ -32,6 +32,8 @@ const Quiz = lazyPage(() => import("./pages/Quiz"));
 const DailyVerse = lazyPage(() => import("./pages/DailyVerse"));
 const Challenge = lazyPage(() => import("./pages/Challenge"));
 const ChallengeDay = lazyPage(() => import("./pages/ChallengeDay"));
+const ProJourney = lazyPage(() => import("./pages/ProJourney"));
+const ProJourneyDay = lazyPage(() => import("./pages/ProJourneyDay"));
 const AlarmPreview = lazyPage(() => import("./pages/AlarmPreview"));
 const Companion = lazyPage(() => import("./pages/Companion"));
 const BibleReader = lazyPage(() => import("./pages/BibleReader"));
@@ -309,6 +311,8 @@ function AppShell() {
           <Route path="/challenge" element={<Challenge />} />
           <Route path="/challenge/day" element={<ChallengeDay />} />
           <Route path="/challenge/day/:n" element={<ChallengeDay />} />
+          <Route path="/challenge/pro/:id" element={<ProJourney />} />
+          <Route path="/challenge/pro/:id/day" element={<ProJourneyDay />} />
           {/* Old Journeys links (notifications, shares) land on the new challenge. */}
           <Route path="/journeys" element={<Navigate to="/challenge" replace />} />
           <Route path="/journeys/:id" element={<Navigate to="/challenge" replace />} />

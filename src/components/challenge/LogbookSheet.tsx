@@ -19,7 +19,7 @@ export function LogbookSheet({ open, completed, currentDay, lit, onClose }: Prop
 
   return (
     <BottomSheet open={open} title={t("ch.logbook")} onClose={onClose} closeLabel={t("ch.settings.done")}>
-      <p className="-mt-2 mb-4 text-[13.5px] text-muted-foreground">{t("ch.hub.completed", { n: completed })}</p>
+      <p className="-mt-2 mb-4 text-[13.5px] text-muted-foreground">{t(completed === 1 ? "ch.hub.completedOne" : "ch.hub.completed", { n: completed })}</p>
       <div className="space-y-4">
         {STAGES.map((s, i) => (
           <section key={s.key}>

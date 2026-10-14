@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../widgets/lucide.dart';
 import 'today_ink.dart';
 
 /// Home gift shortcut — gold gradient circle with a notification dot that
@@ -65,16 +66,17 @@ class _GiftButtonState extends State<GiftButton> with SingleTickerProviderStateM
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Color.lerp(gold, Colors.white, 0.25)!, gold],
+                    colors: [gold.withValues(alpha: 0.8), gold],
                   ),
+                  border: Border.all(color: gold.withValues(alpha: 0.5)),
                   boxShadow: [BoxShadow(color: gold.withValues(alpha: 0.45), blurRadius: 14, offset: const Offset(0, 4))],
                 ),
-                child: Icon(Icons.card_giftcard_rounded, size: 22, color: AppColors.primaryForeground),
+                child: LucideIcon('gift', size: 22, strokeWidth: 2.2, color: AppColors.primaryForeground),
               ),
               if (!_seen)
                 Positioned(
-                  top: -1,
-                  right: -1,
+                  top: -2,
+                  right: -2,
                   child: AnimatedBuilder(
                     animation: _pulse,
                     builder: (_, __) {
@@ -92,8 +94,8 @@ class _GiftButtonState extends State<GiftButton> with SingleTickerProviderStateM
                             ),
                           ),
                           Container(
-                            width: 13,
-                            height: 13,
+                            width: 14,
+                            height: 14,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: AppColors.destructive,

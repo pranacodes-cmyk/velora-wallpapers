@@ -276,7 +276,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
     final messenger = ScaffoldMessenger.maybeOf(context);
     messenger?.showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(message, style: TextStyle(color: _foreground)),
         behavior: SnackBarBehavior.floating,
         backgroundColor: _card,
       ),

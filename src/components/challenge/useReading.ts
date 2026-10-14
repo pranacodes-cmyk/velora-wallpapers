@@ -74,3 +74,34 @@ export function formatCountdown(ms: number, t: (k: string, v?: Record<string, st
   const m = total % 60;
   return h > 0 ? t("ch.time.hm", { h, m }) : t("ch.time.m", { m });
 }
+
+export type PassageRef = { book: number; chapter: number; from: number; to: number };
+export type PassageState = { status: "loading" | "ready" | "error"; verses: string[]; label: string };
+
+/** A short verse range (e.g. Matthew 11:28–30) from the offline Bible. */
+export function usePassage(lang: LangCode, ref: PassageRef | null) {
+  const [state, setState] = useState<PassageState>({ status: "loading", verses: [], label: "" });
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (!ref) return;
+    let alive = true;
+    setState((s) => ({ ...s, status: "loading" }));
+    (async () => {
+      try {
+        const e = await edition(lang);
+        const index = bookFileIndex(lang, ref.book, e.books);
+        const chapters = await loadBibleBook(lang, index);
+        const verses = (chapters[ref.chapter - 1] ?? []).slice(ref.from - 1, ref.to).filter(Boolean);
+        if (!verses.length) throw new Error("empty passage");
+        const name = e.books[index]?.name ?? "";
+        const label = `${name} ${ref.chapter}:${ref.from}${ref.to > ref.from ? `–${ref.to}` : ""}`;
+        if (alive) setState({ status: "ready", verses, label });
+      } catch {
+        if (alive) setState({ status: "error", verses: [], label: "" });
+      }
+    })();
+    return () => { alive = false; };
+  }, [lang, ref?.book, ref?.chapter, ref?.from, ref?.to, attempt]); // eslint-disable-line react-hooks/exhaustive-deps
+  const retry = useCallback(() => setAttempt((a) => a + 1), []);
+  return { ...state, retry };
+}

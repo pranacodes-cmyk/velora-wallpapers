@@ -9,6 +9,7 @@ import { CHALLENGE_AD_FLAG, clearNotice, msUntilMidnight, resetChallenge, startC
 import { tryShowInterstitial } from "@/services/ad-cooldown";
 import { buddiesOf, CIRCLE_EVENT, getCachedOverview, getIdentity, setPendingBuddy, takePendingBuddy } from "@/services/challengeCircle";
 import { JourneyBuddies } from "@/components/challenge/JourneyBuddies";
+import { ProJourneysSection } from "@/components/projourney/ProJourneysSection";
 import { requestChallengeNotificationPermission, syncChallengeReminders } from "@/services/challengeReminders";
 import { track } from "@/services/analytics";
 import { haptic } from "@/utils/haptics";
@@ -241,7 +242,10 @@ export default function Challenge() {
 
         <MilestoneShelf completed={completed} streak={streak} />
 
+        <ProJourneysSection isPremium={isPremium} />
+
         <JourneyBuddies isPremium={isPremium} onJoin={() => { setJoinCode(""); setCircleFlow("join"); }} onNeedProfile={() => setCircleFlow("profile")} />
+
 
         {/* Logbook */}
         <Button
@@ -251,7 +255,7 @@ export default function Challenge() {
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><BookOpen className="h-5 w-5" /></span>
           <span className="min-w-0 flex-1">
             <span className="block text-[15px] font-semibold text-foreground">{t("ch.logbook")}</span>
-            <span className="block text-[12.5px] text-muted-foreground">{t("ch.hub.completed", { n: completed })}</span>
+            <span className="block text-[12.5px] text-muted-foreground">{t(completed === 1 ? "ch.hub.completedOne" : "ch.hub.completed", { n: completed })}</span>
           </span>
           <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
         </Button>

@@ -66,6 +66,7 @@ const dict: Record<string, string> = {
   "ch.intro.lit": "Memulai perjalanan…",
   "ch.hub.settings": "Pengaturan tantangan",
   "ch.hub.completed": "{{n}} hari selesai",
+  "ch.hub.completedOne": "{{n}} hari selesai",
   "ch.notice.grace": "Jangkar anugerah menahan rangkaianmu untuk {{n}} hari yang terlewat.",
   "ch.notice.reset": "Hitungan hari berturut-turutmu dimulai lagi karena satu hari terlewat. {{done}} hari yang sudah kamu selesaikan tetap tersimpan — teruslah melangkah.",
   "ch.notice.restart": "Jalur Perjanjian: perjalananmu kembali ke Hari 1. Terakhir kamu sampai Hari {{n}} — melangkahlah lebih jauh.",
@@ -264,5 +265,6 @@ const dict: Record<string, string> = {
   "ch.crew.rule.support.body": "Kirim Semangat, Doa atau Ingatkan dari halaman kelompok. Setiap jenis sekali per orang per hari. Ingatkan hanya tersedia jika harinya belum selesai.",
   "ch.crew.rule.limits.title": "Batas dan privasi",
   "ch.crew.rule.limits.body": "Maksimal 30 orang per kelompok dan 6 kelompok per orang. Bagikan kode hanya kepada yang ingin diundang. Bisa keluar dan bergabung lagi dengan kode; perjalanan lokal tetap tersimpan.",
+
 };
 export default dict;

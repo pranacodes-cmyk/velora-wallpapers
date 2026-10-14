@@ -66,6 +66,7 @@ const dict: Record<string, string> = {
   "ch.intro.lit": "Der Weg beginnt…",
   "ch.hub.settings": "Herausforderungs-Einstellungen",
   "ch.hub.completed": "{{n}} Tage geschafft",
+  "ch.hub.completedOne": "{{n}} Tag geschafft",
   "ch.notice.grace": "Ein Gnadenanker hat deine Serie für {{n}} verpasste(n) Tag(e) gehalten.",
   "ch.notice.reset": "Nach einem verpassten Tag hat deine Serie neu begonnen. Deine {{done}} abgeschlossenen Tage bleiben erhalten – geh weiter.",
   "ch.notice.restart": "Bundespfad: Dein Weg begann wieder bei Tag 1. Letztes Mal hast du Tag {{n}} erreicht – geh weiter.",
@@ -264,5 +265,6 @@ const dict: Record<string, string> = {
   "ch.crew.rule.support.body": "Sende Ermutigen, Beten oder Erinnern auf der Gruppenseite. Jede Art ist einmal pro Person und Tag möglich. Erinnern ist nur bei einem unvollständigen Tag verfügbar.",
   "ch.crew.rule.limits.title": "Grenzen und Privatsphäre",
   "ch.crew.rule.limits.body": "Bis zu 30 Personen pro Gruppe und 6 Gruppen pro Person. Teile Codes nur mit gewünschten Gästen. Du kannst austreten und mit dem Code zurückkehren; deine lokale Reise bleibt.",
+
 };
 export default dict;

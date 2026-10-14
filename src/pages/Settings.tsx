@@ -1,8 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { usePremium } from "@/hooks/usePremium";
 import { PrayerAlarmToggles } from "@/components/prayer/PrayerAlarmToggles";
-import { Button } from "@/components/ui/button";
-import { REDO_ONBOARDING_EVENT } from "@/components/onboarding/OnboardingFlow";
 
 import { useNavigate } from "react-router-dom";
 import { haptic } from "@/utils/haptics";
@@ -24,6 +22,7 @@ import { LANGUAGES } from "@/i18n/config";
 import { showPrivacyOptionsForm } from "@/services/ads";
 import { Capacitor } from "@capacitor/core";
 import promoLifeCalendar from "@/assets/promo-life-calendar.png";
+import { reloadProJourneys } from "@/services/proJourneys";
 
 const LIFE_CALENDAR_URL = "https://play.google.com/store/apps/details?id=com.mylifecalendar.app";
 
@@ -430,15 +429,6 @@ export default function Settings() {
         </SettingSection>
 
         <SettingSection title={t("settings.section.support")}>
-          <Button variant="ghost" className="w-full h-auto justify-start gap-3.5 rounded-none px-4 py-3.5 text-left whitespace-normal" onClick={() => { haptic("soft"); window.dispatchEvent(new Event(REDO_ONBOARDING_EVENT)); }}>
-            <RotateCcw className="w-[18px] h-[18px] text-primary shrink-0" />
-            <span className="flex-1 min-w-0">
-              <span className="block text-[13px] font-semibold text-foreground">{t("settings.redoOnboarding")}</span>
-              <span className="block text-[10px] text-muted-foreground mt-0.5">{t("settings.redoOnboardingDesc")}</span>
-            </span>
-            <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-          </Button>
-          {divider}
           <SettingRow icon={Star} label={t("settings.rate")} desc={t("settings.rateDesc")} iconColor="hsl(var(--primary))" onClick={() => window.open(PLAY_STORE_URL, "_blank")} trailing={<ExternalLink className="w-3.5 h-3.5 text-muted-foreground/40" />} />
           {divider}
           <SettingRow icon={Share2} label={t("settings.share")} desc={t("settings.shareDesc")} iconColor="hsl(160 55% 45%)" onClick={handleShare} trailing={null} />
@@ -503,6 +493,7 @@ export default function Settings() {
                 const theme = localStorage.getItem("cw-theme");
                 localStorage.clear();
                 if (theme) localStorage.setItem("cw-theme", theme);
+                reloadProJourneys();
                 toast.success(t("settings.delete.success"));
               } catch {
                 toast.error(t("settings.delete.error"));

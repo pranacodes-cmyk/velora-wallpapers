@@ -14,8 +14,10 @@
 - Export Flutter copy from web dictionaries; keep resolved keys and drop retired families to prevent missing copy and dead weight.
 - Build Flutter localization from bundled English + selected language, then accept only non-empty, non-literal OTA values so stale content can never expose raw keys.
 - Sync native Android reminder copy from Flutter's active dictionary so scheduled lock-screen UI follows in-app language changes.
-- Prototype major onboarding concepts in the web preview first, then mirror the approved interaction and composition in Flutter so both remain visually aligned.
-- Expose onboarding replay in Settings using the existing replay handoff in web and Flutter without clearing user data or entitlements; this lets the complete flow be reviewed safely.
+- Prototype onboarding on web, then mirror approved visuals in Flutter for parity.
+- Keep replay handling independent of Settings; hiding it must not clear progress or entitlements.
+- Pair Flutter SnackBar surface/text tokens in both themes, overriding scoped paywall text; avoids unreadable inverse-surface defaults.
+- Use shared Lucide geometry for the Home gift; preserves web/Flutter parity.
 - Produce standalone PrayScreen feature films as deterministic 9:16 Remotion compositions; frame-controlled UI motion keeps the product interaction and copy exact.
 ## GitHub Actions releases
 - Keep the GitHub repository public only while an explicitly requested workflow runs, then restore private immediately; this avoids private-runner billing failures.
@@ -24,10 +26,10 @@
 - Start buffering the paywall film when its view mounts, cache the native poster, and skip video initialization for reduced motion; this reduces startup delay without background playback or purchase changes.
 - Keep the post-onboarding paywall in the midnight palette, while paywalls opened inside the app follow the active light/dark theme; this preserves onboarding continuity without breaking in-app theme expectations.
 
-- Keep Yearly/Weekly plan selection pinned beside the purchase CTA while film/benefits scroll; both choices stay visible on short phones.
-- Let paywall content shrink to its natural height with bounded scrolling rather than expanding the benefits region; this prevents empty space above plans on tall devices.
+- Keep paywall content naturally sized with bounded scrolling and pin plan selection beside the purchase CTA; both stay usable on short phones.
 - Bundle only AdMob ad-serving adapters in both Android targets; keep purchase and attribution services separate from ad mediation.
 - Mirror Journey geometry/assets in web and Flutter: rear-facing lamb frames on traced quadratic road, perspective day spacing, road crop and external progress; keeps feet on-road and scenery clear.
 - Keep Journey reminders automatic at 07:00 and 21:00 local time with no user-facing schedule controls; fixed cadence keeps onboarding and settings compact.
 - Use one localized Bible/Prayer sacred-pause route with bundled Bible chapters and independent local progress; switching modes must never dismiss the native guard handoff.
 - Journey buddies reuse the existing circle backend and sync progress plus a server-derived Pro display flag; each owner's circle code is their buddy code, with no new auth.
+- Pro Journeys keep device-local, calendar-gated Word→Practice→Mission progress under `prayly_pro_journeys_v1` (same JSON in web + Flutter), load NT passages from the bundled Bible and gate Pro at the UI only, so lapsed Pro never deletes progress.

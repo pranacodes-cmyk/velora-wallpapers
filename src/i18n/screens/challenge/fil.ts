@@ -66,6 +66,7 @@ const dict: Record<string, string> = {
   "ch.intro.lit": "Nagsisimula na…",
   "ch.hub.settings": "Mga setting ng Hamon",
   "ch.hub.completed": "{{n}} araw na tapos",
+  "ch.hub.completedOne": "{{n}} araw na tapos",
   "ch.notice.grace": "Pinanatili ng angkla ng biyaya ang streak mo sa {{n}} na-miss na araw.",
   "ch.notice.reset": "Nagsimula ulit ang streak mo dahil may araw kang hindi nakumpleto. Naka-save pa rin ang {{done}} araw na natapos mo — tuloy lang sa paglalakad.",
   "ch.notice.restart": "Landas ng Tipan: bumalik sa Araw 1 ang paglalakbay mo. Huling beses, umabot ka sa Araw {{n}} — humakbang pa.",
@@ -264,5 +265,6 @@ const dict: Record<string, string> = {
   "ch.crew.rule.support.body": "Magpadala ng Suporta, Dasal o Paalala sa pahina ng grupo. Bawat uri ay isang beses bawat tao bawat araw. Paalala ay available lang kung hindi pa tapos ang araw nila.",
   "ch.crew.rule.limits.title": "Limitasyon at privacy",
   "ch.crew.rule.limits.body": "Hanggang 30 tao bawat grupo at 6 grupo bawat tao. Ibahagi ang code sa nais mong imbitahan lang. Puwedeng umalis at sumali muli gamit ang code; mananatili ang lokal mong paglalakbay.",
+
 };
 export default dict;

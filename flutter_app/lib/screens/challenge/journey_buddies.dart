@@ -126,12 +126,12 @@ class _JourneyBuddiesState extends State<JourneyBuddies> {
         ],
         if (buddies.isEmpty)
           Column(children: [
-            SizedBox(width: 100, height: 56, child: Stack(children: [
-              Positioned(left: 0, child: Stack(clipBehavior: Clip.none, children: [
+            SizedBox(width: 104, height: 64, child: Stack(clipBehavior: Clip.none, children: [
+              Positioned(left: 0, top: 2, child: Stack(clipBehavior: Clip.none, children: [
                 _ring(ClipOval(child: JourneyAvatar(avatar: ChallengeCircleService.identity?.avatar ?? '🐑', size: 56))),
                 if (widget.isPremium) Positioned(left: -2, bottom: -4, child: _proBadge()),
               ])),
-              Positioned(right: 0, child: _ring(Container(
+              Positioned(right: 0, top: 2, child: _ring(Container(
                 width: 56, height: 56, alignment: Alignment.center,
                 decoration: BoxDecoration(shape: BoxShape.circle, color: gold.withValues(alpha: 0.06), border: Border.all(color: gold.withValues(alpha: 0.5), width: 2)),
                 child: Text('+', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300, color: gold)),

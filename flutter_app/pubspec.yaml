@@ -71,6 +71,7 @@ flutter:
     - assets/images/prayscreen/
     - assets/images/challenge/
     - assets/images/journey/avatars/
+    - assets/images/projourney/
     - assets/data/
     - assets/bible/en/
     - assets/bible/es/

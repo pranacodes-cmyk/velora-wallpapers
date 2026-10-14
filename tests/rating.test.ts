@@ -46,18 +46,17 @@ describe("rating guarantee", () => {
   });
 
   it("defers behind a self-managed paywall then fires when it closes", async () => {
-    vi.useFakeTimers();
+    // bun's vi shim lacks advanceTimersByTime — use real timers here.
     const dispose = markOverlayVisible("premium_sheet_test");
     const shown = vi.fn();
     window.addEventListener("jw:show-rating-prompt", shown);
     expect(maybeRequestRating()).toBe(false);
-    vi.advanceTimersByTime(4000);
+    await new Promise((r) => setTimeout(r, 4300));
     expect(shown).not.toHaveBeenCalled();
     dispose();
-    vi.advanceTimersByTime(2500);
+    await new Promise((r) => setTimeout(r, 2600));
     expect(shown).toHaveBeenCalledTimes(1);
-    vi.useRealTimers();
-  });
+  }, 10000);
 
   it("never asks again after the user rated or opted out", () => {
     localStorage.setItem("jw_rating_done", "1");

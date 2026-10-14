@@ -1,3 +1,6 @@
+- [x] Add Pro-only bonus challenges (7-day Gratitude, 7-day Courage, 14-day Peace) with locked teaser + paywall for free users, calendar-gated daily missions and localized copy in 8 languages on web and Flutter; web flows verified in browser, Flutter awaits an approved build.
+- [x] Match Flutter Home gift to web Lucide shape/colors, pair message surface/text in both themes and scoped paywall, remove Redo Onboarding from both Settings; source tests and web Settings verified.
+- [ ] Verify gift and message contrast on a Flutter device (blocked: requires an explicitly approved build).
 - [x] Implement localized Bible reader in web and Flutter with feed/chapter modes, typography, likes, sharing and private notes; web language switching and persistence verified.
 - [ ] Add licensed Indonesian Old Testament (current clearly labelled edition is New Testament only).
 - [x] Lock trial transition to onboarding colors and add timed haptics in web and Flutter.
@@ -114,3 +117,11 @@
 - [x] Add a cinematic Journey buddy walkthrough and visible Pro badges in web + Flutter; preview local data reset for review.
 - [x] Refine the three-slide Journey tour: lamb toward the Cross, merged invitation/shared road, milestone badges and prayer encouragement; remove Skip/close, mirror Flutter and verify all eight web languages.
 - [ ] Verify Journey walkthrough and Pro buddy badge on a physical device after an approved Flutter build.
+
+## Pro Journeys
+- [x] Replace the shallow Pro bonus list with four researched Pro Journeys (Who God Says I Am 7d, Fear Not 14d, Break Free 21d, Prayer Warrior 14d): daily Word → Practice → Mission, free Day 1, cinematic covers, 8 languages (web).
+- [x] Mirror Pro Journeys in Flutter (shelf, detail, three-beat day, breath prayer, Stand Firm rescue, prayer list, battle plan, celebration) with the same storage.
+- [ ] Release the Pro Journeys build to the Play internal track and confirm it reaches the track.
+- [ ] Native-speaker review of the Pro Journeys copy in hi/es/pt/fil/id/fr/de (blocked: needs a qualified reviewer).
+- [ ] Device-check Pro Journeys after the internal-track build (blocked: needs the user's phone).
+- [ ] Optional reminder for an in-progress Pro Journey within the existing 4-a-day notification cap (idea; needs user approval since notifications were deliberately reduced).

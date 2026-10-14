@@ -92,7 +92,11 @@ export function BottomNav() {
     return () => obs.disconnect();
   }, []);
 
-  if (location.pathname.startsWith("/admin") || location.pathname.startsWith("/challenge/day")) return null;
+  if (
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/challenge/day") ||
+    location.pathname.startsWith("/challenge/pro/")
+  ) return null;
 
   return (
     <AnimatePresence>

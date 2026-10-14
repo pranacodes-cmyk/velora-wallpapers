@@ -26,6 +26,7 @@ import 'voyage.dart';
 import 'journey_avatar.dart';
 import 'journey_buddies.dart';
 import 'journey_walkthrough.dart';
+import '../projourney/pro_journeys_section.dart';
 
 /// Journey tab — 75 Days of Light as a lamb-led path to the cross.
 /// Web mirror: `src/pages/Challenge.tsx`.
@@ -228,6 +229,8 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> with WidgetsB
                           v.finished ? _finished() : _steps(v, plan, cap, isPremium),
                           const SizedBox(height: 16),
                           MilestoneShelf(completed: v.completed, streak: v.streak),
+                          const SizedBox(height: 24),
+                          ProJourneysSection(isPremium: isPremium),
                           const SizedBox(height: 16),
                           JourneyBuddies(
                             isPremium: isPremium,
@@ -576,7 +579,7 @@ class _ChallengeScreenState extends ConsumerState<ChallengeScreen> with WidgetsB
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(t('ch.logbook'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.foreground)),
-                      Text(t('ch.hub.completed', {'n': v.completed}), style: TextStyle(fontSize: 12.5, color: AppColors.mutedForeground)),
+                      Text(t(v.completed == 1 ? 'ch.hub.completedOne' : 'ch.hub.completed', {'n': v.completed}), style: TextStyle(fontSize: 12.5, color: AppColors.mutedForeground)),
                     ],
                   ),
                 ),
@@ -607,7 +610,7 @@ Future<void> showLogbook(
     builder: (sheet) => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(t('ch.hub.completed', {'n': completed}), style: TextStyle(fontSize: 13.5, color: AppColors.mutedForeground)),
+        Text(t(completed == 1 ? 'ch.hub.completedOne' : 'ch.hub.completed', {'n': completed}), style: TextStyle(fontSize: 13.5, color: AppColors.mutedForeground)),
         const SizedBox(height: 16),
         for (var i = 0; i < kStages.length; i++) ...[
           if (i > 0) const SizedBox(height: 16),

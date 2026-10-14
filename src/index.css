@@ -1035,8 +1035,21 @@ html.android-device .onb-storm-badge,
 .challenge-rise { animation: challenge-rise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 @keyframes challenge-pop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
 .challenge-pop { animation: challenge-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+/* Pro Journeys — cover scrims, glow and the breath-prayer orb. */
+.pj-scrim { background: linear-gradient(0deg, hsl(var(--poster-scrim) / 0.92) 0%, hsl(var(--poster-scrim) / 0.55) 42%, hsl(var(--poster-scrim) / 0) 72%); }
+.pj-scrim-top { background: linear-gradient(180deg, hsl(var(--poster-scrim) / 0.55) 0%, hsl(var(--poster-scrim) / 0) 100%); }
+.pj-hero-fade { background: linear-gradient(0deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.65) 22%, hsl(var(--poster-scrim) / 0.25) 55%, hsl(var(--poster-scrim) / 0) 78%); }
+.pj-orb { background: radial-gradient(circle at 50% 42%, hsl(var(--premium-gold-glow) / 0.95), hsl(var(--premium-gold) / 0.75) 45%, hsl(var(--premium-gold) / 0.12) 72%, transparent 74%); box-shadow: 0 0 60px hsl(var(--premium-gold) / 0.35); }
+.pj-orb-ring { box-shadow: inset 0 0 0 1.5px hsl(var(--primary) / 0.25); }
+/* Soft decorative glow without filter blur (Android web strips blur classes). */
+.pj-halo { background: radial-gradient(circle, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.06) 45%, transparent 70%); }
+@keyframes pj-glow { 0%, 100% { opacity: 0.55; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
+.pj-glow { animation: pj-glow 3.2s ease-in-out infinite; }
+@keyframes pj-shine { 0% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+.pj-shine::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, hsl(var(--poster-ink) / 0.35) 50%, transparent 70%); animation: pj-shine 2.8s ease-in-out infinite; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
-  .voyage-lamb, .voyage-lamb-shadow, .voyage-node-pulse, .voyage-cross-glow, .challenge-rise, .challenge-pop { animation: none !important; }
+  .voyage-lamb, .voyage-lamb-shadow, .voyage-node-pulse, .voyage-cross-glow, .challenge-rise, .challenge-pop, .pj-glow { animation: none !important; }
+  .pj-shine::after { display: none; }
 }
 
 /* Devanagari breaks apart when letter-spaced — keep Hindi eyebrows/labels un-tracked. */
