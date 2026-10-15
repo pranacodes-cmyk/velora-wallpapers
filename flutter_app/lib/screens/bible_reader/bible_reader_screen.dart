@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/ads_service.dart';
+import '../../core/services/analytics.dart';
 import '../../core/services/bible_reader_service.dart';
 import '../../core/services/prefs.dart';
 import '../../core/services/share_service.dart';
@@ -40,6 +41,7 @@ class _BibleReaderScreenState extends State<BibleReaderScreen> {
   @override
   void initState() {
     super.initState();
+    Analytics.capture('bible_opened');
     final savedLanguage = Prefs.getString('prayly_bible_language_v1');
     _language = kLanguages.any((l) => l.code == savedLanguage) ? savedLanguage! : L10n.current.lang;
     try {
@@ -69,6 +71,7 @@ class _BibleReaderScreenState extends State<BibleReaderScreen> {
       final c = await BibleReaderService.book(_language, _book);
       if (!mounted || token != _loadToken) return;
       setState(() { _edition = e; _chapters = c; _chapter = _chapter.clamp(0, c.length - 1); _verse = _verse.clamp(0, _verses.length - 1); _loading = false; });
+      Analytics.capture('bible_chapter_viewed', {'lang': _language, 'book': _book, 'book_name': e.books[_book].name, 'chapter': _chapter + 1});
       _persist();
     } catch (_) { if (mounted && token == _loadToken) setState(() { _loading = false; _error = true; }); }
   }
@@ -76,6 +79,7 @@ class _BibleReaderScreenState extends State<BibleReaderScreen> {
   void dispose() { _pages?.dispose(); super.dispose(); }
 
   void _like(int i) {
+    Analytics.capture('bible_verse_liked', {'ref': _key(i), 'liked': !_likes.contains(_key(i))});
     HapticFeedback.lightImpact();
     setState(() { if (!_likes.add(_key(i))) _likes.remove(_key(i)); });
     Prefs.setString(_likesKey, jsonEncode(_likes.toList()));
@@ -102,7 +106,7 @@ class _BibleReaderScreenState extends State<BibleReaderScreen> {
     final controls = <Widget>[
       IconButton(tooltip: t('bible.like'), onPressed: () => _like(i), icon: Icon(_likes.contains(_key(i)) ? Icons.favorite : Icons.favorite_border, color: _likes.contains(_key(i)) ? _gold : _fg, size: 26)),
       IconButton(tooltip: t('bible.notes'), onPressed: () => _note(i), icon: Icon(_notes.containsKey(_key(i)) ? Icons.mode_comment : Icons.mode_comment_outlined, color: _notes.containsKey(_key(i)) ? _gold : _fg, size: 25)),
-      IconButton(tooltip: t('bible.share'), onPressed: () => ShareService.share(title: 'Prayly: Bible Prayer & Verse', text: '${_verses[i]}\n\n${_reference(i)} · ${_edition?.name}\nPrayly: Bible Prayer & Verse'), icon: Icon(Icons.share_outlined, color: _fg, size: 24)),
+      IconButton(tooltip: t('bible.share'), onPressed: () { Analytics.capture('bible_verse_shared', {'book': _book, 'chapter': _chapter + 1, 'verse': i + 1}); ShareService.share(title: 'Prayly: Bible Prayer & Verse', text: '${_verses[i]}\n\n${_reference(i)} · ${_edition?.name}\nPrayly: Bible Prayer & Verse'); }, icon: Icon(Icons.share_outlined, color: _fg, size: 24)),
     ];
     return vertical ? Column(mainAxisSize: MainAxisSize.min, children: controls.expand((w) => [w, const SizedBox(height: 16)]).toList()) : Row(mainAxisSize: MainAxisSize.min, children: controls);
   }

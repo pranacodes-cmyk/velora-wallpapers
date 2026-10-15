@@ -9,6 +9,7 @@ import { haptic } from "@/utils/haptics";
 import { initialReader, loadEdition, loadBibleBook, readLocal, writeLocal, verseKey, READER_KEY, LIKES_KEY, NOTES_KEY, type BibleEdition, type ReaderPrefs } from "@/services/bibleReader";
 import { usePremium } from "@/hooks/usePremium";
 import { recordBibleVerseView, recordBibleChapterDone } from "@/services/bibleAds";
+import { track } from "@/services/analytics";
 import scenery from "@/assets/onboarding-bg-sunrise.webp";
 
 export default function BibleReader() {
@@ -62,7 +63,10 @@ export default function BibleReader() {
     if (el && target) el.scrollTop = target.offsetTop - el.offsetTop;
   }, [loading, prefs.chapter, prefs.mode, savedOnly]);
 
+  useEffect(() => { track("bible_opened", { lang: language }); }, []);
+  useEffect(() => { if (!loading && !error && edition) track("bible_chapter_viewed", { lang: language, book: prefs.book, book_name: edition.books[prefs.book]?.name, chapter: prefs.chapter + 1, mode: prefs.mode }); }, [loading, error, edition, prefs.book, prefs.chapter]);
   const like = (id: string) => {
+    track("bible_verse_liked", { ref: id, liked: !likes.includes(id) });
     haptic("light");
     const next = likes.includes(id) ? likes.filter(k => k !== id) : [...likes, id];
     setLikes(next); writeLocal(LIKES_KEY, next);
@@ -75,14 +79,15 @@ export default function BibleReader() {
     const next = { ...notes };
     if (draft.trim()) next[key] = draft.trim(); else delete next[key];
     writeLocal(NOTES_KEY, next); setNotes(next); setPanel(null); haptic("light");
+    track("bible_note_saved", { has_text: !!draft.trim() });
   };
-  const share = (index: number) => nativeShare({ title: "Prayly: Bible Prayer & Verse", text: `${verses[index]}\n\n${edition?.books[prefs.book]?.name} ${prefs.chapter + 1}:${index + 1} · ${edition?.name}\nPrayly: Bible Prayer & Verse` });
+  const share = (index: number) => { track("bible_verse_shared", { book: prefs.book, chapter: prefs.chapter + 1, verse: index + 1 }); return nativeShare({ title: "Prayly: Bible Prayer & Verse", text: `${verses[index]}\n\n${edition?.books[prefs.book]?.name} ${prefs.chapter + 1}:${index + 1} · ${edition?.name}\nPrayly: Bible Prayer & Verse` }); };
   const moveChapter = (direction: number) => {
     let book = prefs.book; let chapter = prefs.chapter + direction;
     if (chapter >= chapters.length) { book++; chapter = 0; }
     if (chapter < 0) { book--; chapter = (edition?.books[book]?.chapters ?? 1) - 1; }
     if (book < 0 || book >= (edition?.books.length ?? 66)) return;
-    if (direction > 0) recordBibleChapterDone(!!isPremium);
+    if (direction > 0) { recordBibleChapterDone(!!isPremium); track("bible_chapter_completed", { book: prefs.book, chapter: prefs.chapter + 1 }); }
     lastVerse.current = -1;
     update({ book, chapter, verse: 0 });
   };
@@ -150,7 +155,7 @@ export default function BibleReader() {
     {panel && <div className="fixed inset-0 z-30 flex items-end justify-center bg-background/80" onClick={() => setPanel(null)}><section role="dialog" aria-modal="true" aria-label={t(`bible.${panel === "style" ? "appearance" : panel}`)} className="max-h-[85dvh] w-full max-w-xl overflow-y-auto rounded-t-lg border border-border bg-card p-6 pb-[max(24px,env(safe-area-inset-bottom))] shadow-xl" onClick={e => e.stopPropagation()}>
       <div className="mb-5 flex items-center justify-between"><h2 className="text-lg font-semibold">{t(`bible.${panel === "style" ? "appearance" : panel}`)}</h2><Button variant="ghost" size="icon" aria-label={t("bible.close")} onClick={() => setPanel(null)}><X className="h-5 w-5" /></Button></div>
       {panel === "style" && <div className="space-y-6">
-        <label className="block text-sm">{t("bible.language")}<select value={language} onChange={e => { setLanguage(e.target.value as LangCode); update({book: 0, chapter: 0, verse: 0}); writeLocal("prayly_bible_language_v1", e.target.value); }} className="mt-2 w-full rounded-md border border-border bg-background p-3">{LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.native}</option>)}</select></label>
+        <label className="block text-sm">{t("bible.language")}<select value={language} onChange={e => { track("bible_language_changed", { lang: e.target.value }); setLanguage(e.target.value as LangCode); update({book: 0, chapter: 0, verse: 0}); writeLocal("prayly_bible_language_v1", e.target.value); }} className="mt-2 w-full rounded-md border border-border bg-background p-3">{LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.native}</option>)}</select></label>
         <div><p className="mb-2 text-sm">{t("bible.font")}</p><div className="flex gap-2">{(["serif", "sans"] as const).map(font => <Button key={font} variant={prefs.font === font ? "default" : "outline"} onClick={() => update({ font })}>{t(`bible.${font}`)}</Button>)}</div></div>
         <label className="block text-sm">{t("bible.size")} · {prefs.size}<input className="mt-4 w-full accent-primary" aria-label={t("bible.size")} type="range" min="18" max="34" step="2" value={prefs.size} onChange={e => update({ size: Number(e.target.value) })} /></label>
         <div><p className="mb-2 text-sm">{t("bible.theme")}</p><div className="flex gap-2">{(["night", "paper"] as const).map(theme => <Button key={theme} variant={prefs.theme === theme ? "default" : "outline"} onClick={() => update({ theme })}>{t(`bible.${theme}`)}</Button>)}</div></div>
