@@ -74,6 +74,15 @@ public class PrayerAlarmActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // The takeover screen is showing — remove any safety-net alarm card so
+        // the user never sees the alarm twice (screen + notification).
+        try {
+            android.app.NotificationManager nm = (android.app.NotificationManager)
+                    getSystemService(Context.NOTIFICATION_SERVICE);
+            if (nm != null) nm.cancel(9710);
+        } catch (Exception ignored) { /* ignore */ }
+
+
         // Edge-to-edge + show-over-lockscreen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true);

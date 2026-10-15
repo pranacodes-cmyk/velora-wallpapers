@@ -155,8 +155,7 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
             // allowed to start activities from the background when the keyguard
             // is showing, so we launch the takeover directly. The notification
             // is posted silently as a safety net for OEMs that block the start.
-            ensureAlarmChannel(context, CHANNEL_SILENT, false);
-            postFullScreenAlarm(context, label, sound, false, false, formatAlarmTime(intent), hour, minute, followUp);
+            boolean launched = false;
             try {
                 Intent activity = new Intent(context, PrayerAlarmActivity.class);
                 activity.putExtra("label", label);
@@ -165,7 +164,12 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
                         | Intent.FLAG_ACTIVITY_CLEAR_TOP
                         | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
                 context.startActivity(activity);
-            } catch (Exception ignored) { /* FSI fallback handles it */ }
+                launched = true;
+            } catch (Exception ignored) { /* fall through to notification */ }
+            if (!launched) {
+                ensureAlarmChannel(context, CHANNEL_SILENT, false);
+                postFullScreenAlarm(context, label, sound, false, false, formatAlarmTime(intent), hour, minute, followUp);
+            }
         } else {
             // When the phone is in use, the heads-up notification rings the
             // bell. If Android promotes it to full-screen, the activity opens
