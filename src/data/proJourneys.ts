@@ -56,9 +56,9 @@ export const PRO_JOURNEYS: ProJourney[] = [
     id: "peace", days: 14, emoji: "🕊️", practice: "breathe", cover: peaceCover,
     passages: [
       p(B.matt, 11, 28), p(B.john, 14, 27), p(B.pet1, 5, 7), p(B.matt, 6, 34),
-      p(B.matt, 6, 26), p(B.phil, 4, 6), p(B.phil, 4, 8), p(B.mark, 4, 39),
-      p(B.matt, 11, 29, 30), p(B.heb, 13, 5, 6), p(B.john, 16, 33), p(B.john3, 1, 2),
-      p(B.rom, 15, 13), p(B.phil, 4, 7),
+      p(B.luke, 12, 24), p(B.phil, 4, 6), p(B.rom, 12, 2), p(B.mark, 4, 39),
+      p(B.mark, 6, 31), p(B.heb, 13, 5, 6), p(B.john, 16, 33), p(B.cor1, 6, 19, 20),
+      p(B.rom, 15, 13), p(B.col, 3, 15),
     ],
     missionEmoji: ["📝", "🔕", "🎒", "📅", "🌿", "🙏", "🧠", "📞", "🌙", "💬", "🧾", "💧", "🎵", "🛡️"],
   },
@@ -66,7 +66,7 @@ export const PRO_JOURNEYS: ProJourney[] = [
     id: "freedom", days: 21, emoji: "🔓", practice: "battle", cover: freedomCover,
     passages: [
       p(B.john, 8, 36), p(B.cor1, 10, 13), p(B.gal, 5, 1), p(B.rom, 12, 2),
-      p(B.jas, 5, 16), p(B.jas, 4, 7, 8), p(B.titus, 2, 11, 12), p(B.gal, 5, 16),
+      p(B.jas, 5, 16), p(B.jas, 4, 7, 8), p(B.titus, 2, 11, 12), p(B.rom, 8, 14),
       p(B.cor1, 6, 12), p(B.matt, 26, 41), p(B.cor2, 12, 9), p(B.john1, 1, 9),
       p(B.eph, 4, 22, 24), p(B.heb, 12, 1), p(B.rom, 13, 14), p(B.phil, 3, 13, 14),
       p(B.pet2, 1, 3), p(B.jas, 1, 12), p(B.gal, 6, 2), p(B.thes1, 5, 23, 24),
@@ -80,8 +80,8 @@ export const PRO_JOURNEYS: ProJourney[] = [
   {
     id: "prayer", days: 14, emoji: "🛡️", practice: "intercede", cover: prayerCover,
     passages: [
-      p(B.matt, 6, 6), p(B.matt, 6, 9, 10), p(B.matt, 6, 11), p(B.matt, 6, 12),
-      p(B.luke, 11, 9, 10), p(B.eph, 3, 16, 19), p(B.mark, 11, 24), p(B.matt, 5, 44),
+      p(B.matt, 6, 6), p(B.luke, 11, 2), p(B.phil, 4, 19), p(B.col, 3, 13),
+      p(B.luke, 18, 1), p(B.eph, 3, 16, 19), p(B.mark, 11, 24), p(B.luke, 6, 27, 28),
       p(B.rom, 8, 26), p(B.thes1, 5, 16, 18), p(B.matt, 18, 19, 20), p(B.tim1, 2, 1, 2),
       p(B.luke, 22, 42), p(B.col, 4, 2),
     ],
@@ -106,6 +106,11 @@ export type ProJourneyDay = {
   day: number;
   title: string;
   word: string;
+  context: string;
+  teaching: string;
+  reflect: string;
+  guide: string;
+  exercise: string;
   /** Practice copy: declaration / battle prayer / prayer prompt. */
   practice: string;
   /** Breath prayer phrases (breathe journeys only). */
@@ -126,6 +131,12 @@ export function proJourneyDay(j: ProJourney, day: number): ProJourneyDay {
     day: n,
     title: t(`${k}.t`),
     word: t(`${k}.w`),
+    context: t(`${k}.context`),
+    teaching: t(`${k}.teaching`),
+    reflect: t(`${k}.reflect`),
+    guide: t(`${k}.guide`),
+    exercise: t(`${k}.exercise`),
+
     practice: practiceKey ? t(`${k}.${practiceKey}`) : "",
     breatheIn: j.practice === "breathe" ? t(`${k}.in`) : "",
     breatheOut: j.practice === "breathe" ? t(`${k}.out`) : "",

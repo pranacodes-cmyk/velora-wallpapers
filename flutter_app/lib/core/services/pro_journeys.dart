@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../localization/app_localizations.dart';
 import 'challenge_store.dart';
 import 'prefs.dart';
+import 'pro_journey_study.dart';
 
 /// Pro Journeys — four guided premium journeys beside 75 Days of Light.
 ///
@@ -73,9 +74,9 @@ const List<ProJourneyDef> kProJourneys = [
     id: 'peace', days: 14, emoji: '🕊️', practice: PracticeKind.breathe,
     passages: [
       Passage(_B.matt, 11, 28), Passage(_B.john, 14, 27), Passage(_B.pet1, 5, 7), Passage(_B.matt, 6, 34),
-      Passage(_B.matt, 6, 26), Passage(_B.phil, 4, 6), Passage(_B.phil, 4, 8), Passage(_B.mark, 4, 39),
-      Passage(_B.matt, 11, 29, 30), Passage(_B.heb, 13, 5, 6), Passage(_B.john, 16, 33), Passage(_B.john3, 1, 2),
-      Passage(_B.rom, 15, 13), Passage(_B.phil, 4, 7),
+      Passage(_B.luke, 12, 24), Passage(_B.phil, 4, 6), Passage(_B.rom, 12, 2), Passage(_B.mark, 4, 39),
+      Passage(_B.mark, 6, 31), Passage(_B.heb, 13, 5, 6), Passage(_B.john, 16, 33), Passage(_B.cor1, 6, 19, 20),
+      Passage(_B.rom, 15, 13), Passage(_B.col, 3, 15),
     ],
     missionEmoji: ['📝', '🔕', '🎒', '📅', '🌿', '🙏', '🧠', '📞', '🌙', '💬', '🧾', '💧', '🎵', '🛡️'],
   ),
@@ -83,7 +84,7 @@ const List<ProJourneyDef> kProJourneys = [
     id: 'freedom', days: 21, emoji: '🔓', practice: PracticeKind.battle,
     passages: [
       Passage(_B.john, 8, 36), Passage(_B.cor1, 10, 13), Passage(_B.gal, 5, 1), Passage(_B.rom, 12, 2),
-      Passage(_B.jas, 5, 16), Passage(_B.jas, 4, 7, 8), Passage(_B.titus, 2, 11, 12), Passage(_B.gal, 5, 16),
+      Passage(_B.jas, 5, 16), Passage(_B.jas, 4, 7, 8), Passage(_B.titus, 2, 11, 12), Passage(_B.rom, 8, 14),
       Passage(_B.cor1, 6, 12), Passage(_B.matt, 26, 41), Passage(_B.cor2, 12, 9), Passage(_B.john1, 1, 9),
       Passage(_B.eph, 4, 22, 24), Passage(_B.heb, 12, 1), Passage(_B.rom, 13, 14), Passage(_B.phil, 3, 13, 14),
       Passage(_B.pet2, 1, 3), Passage(_B.jas, 1, 12), Passage(_B.gal, 6, 2), Passage(_B.thes1, 5, 23, 24),
@@ -97,8 +98,8 @@ const List<ProJourneyDef> kProJourneys = [
   ProJourneyDef(
     id: 'prayer', days: 14, emoji: '🛡️', practice: PracticeKind.intercede,
     passages: [
-      Passage(_B.matt, 6, 6), Passage(_B.matt, 6, 9, 10), Passage(_B.matt, 6, 11), Passage(_B.matt, 6, 12),
-      Passage(_B.luke, 11, 9, 10), Passage(_B.eph, 3, 16, 19), Passage(_B.mark, 11, 24), Passage(_B.matt, 5, 44),
+      Passage(_B.matt, 6, 6), Passage(_B.luke, 11, 2), Passage(_B.phil, 4, 19), Passage(_B.col, 3, 13),
+      Passage(_B.luke, 18, 1), Passage(_B.eph, 3, 16, 19), Passage(_B.mark, 11, 24), Passage(_B.luke, 6, 27, 28),
       Passage(_B.rom, 8, 26), Passage(_B.thes1, 5, 16, 18), Passage(_B.matt, 18, 19, 20), Passage(_B.tim1, 2, 1, 2),
       Passage(_B.luke, 22, 42), Passage(_B.col, 4, 2),
     ],
@@ -127,6 +128,12 @@ class ProJourneyDayPlan {
     required this.day,
     required this.title,
     required this.word,
+    required this.context,
+    required this.teaching,
+    required this.reflect,
+    required this.guide,
+    required this.exercise,
+
     required this.practice,
     required this.breatheIn,
     required this.breatheOut,
@@ -138,6 +145,12 @@ class ProJourneyDayPlan {
   final int day;
   final String title;
   final String word;
+  final String context;
+  final String teaching;
+  final String reflect;
+  final String guide;
+  final String exercise;
+
 
   /// Declaration / battle prayer / prayer prompt.
   final String practice;
@@ -163,6 +176,12 @@ ProJourneyDayPlan proJourneyDay(ProJourneyDef j, int day) {
     day: n,
     title: t('$k.t'),
     word: t('$k.w'),
+    context: t('$k.context'),
+    teaching: t('$k.teaching'),
+    reflect: t('$k.reflect'),
+    guide: t('$k.guide'),
+    exercise: t('$k.exercise'),
+
     practice: practiceKey.isEmpty ? '' : t('$k.$practiceKey'),
     breatheIn: breathe ? t('$k.in') : '',
     breatheOut: breathe ? t('$k.out') : '',
@@ -471,6 +490,7 @@ class ProJourneyStore {
 
   /// Back to Day 1. Badges, the prayer list and the freedom plan stay.
   static void restart(String id) {
+    ProJourneyStudy.resetReading(id);
     final journeys = Map.of(state.journeys)..remove(id);
     final freedom = id == 'freedom' ? state.freedom.copyWith(checkins: const {}, sos: 0) : state.freedom;
     _write(state.copyWith(journeys: journeys, freedom: freedom));

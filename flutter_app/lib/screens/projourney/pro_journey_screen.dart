@@ -160,7 +160,7 @@ class _ProJourneyScreenState extends ConsumerState<ProJourneyScreen> {
                         const SizedBox(height: 12),
                       ],
                       _cta(status, isPremium, name),
-                      ..._tool(isPremium),
+                      if (status.kind != JourneyStatusKind.fresh) ..._tool(isPremium),
                       const SizedBox(height: 24),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -468,7 +468,6 @@ class _ProJourneyScreenState extends ConsumerState<ProJourneyScreen> {
   /* ── path ── */
 
   Widget _pathRow(int day, bool isPremium) {
-    final plan = proJourneyDay(j, day);
     final isDone = ProJourneyStore.isDayDone(j.id, day);
     final open = ProJourneyStore.isDayOpen(j.id, day);
     final proLocked = !isPremium && proJourneyRequiresPro(day) && !isDone;
@@ -523,7 +522,7 @@ class _ProJourneyScreenState extends ConsumerState<ProJourneyScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(plan.title,
+                Text(t('pj.progress', {'n': day, 'total': j.days}),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -531,7 +530,7 @@ class _ProJourneyScreenState extends ConsumerState<ProJourneyScreen> {
                       fontWeight: FontWeight.w600,
                       color: isDone || current ? AppColors.foreground : AppColors.foreground.withValues(alpha: 0.7),
                     )),
-                Text('${t('pj.progress', {'n': day, 'total': j.days})} · $sub',
+                Text(sub,
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: proLocked ? FontWeight.w700 : FontWeight.w400,

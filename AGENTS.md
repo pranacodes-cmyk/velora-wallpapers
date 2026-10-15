@@ -2,7 +2,7 @@
 - Keep practical missions in a dedicated eight-language screen dictionary separate from chapter/prayer content, retaining the `live` completion ID to preserve saved progress and web/Flutter parity.
 - Render Journey member avatars through shared web/Flutter mascot registries using existing emoji wire IDs and matching bundled portraits; this preserves current profiles without changing backend contracts.
 - Reuse the circle profile flow after Journey's explicit start intent and start progress/reminders only after profile confirmation; existing identities bypass setup and cancelling leaves the intro retryable.
-- Keep Journey help in localized sheets and its tour completion-gated with a versioned seen flag in web/Flutter; explains progress without clutter or resetting saved days.
+- Keep Journey help in localized sheets and completion-gated tours with versioned flags; avoid clutter and preserve saved days.
 - Load the Life Calendar promotion on explicit gift tap using CDN-hosted official store screenshots; keep store launch behind Install and prefer Android market links with HTTPS fallback to avoid unexpected redirects.
 
 - Keep the full Bible reader in bottom navigation and Settings (no duplicate Today button), with book-wise compressed licensed texts and local positions, likes and notes; avoids redundant entry points and bounds cache memory.
@@ -18,7 +18,7 @@
 - Keep replay handling independent of Settings; hiding it must not clear progress or entitlements.
 - Pair Flutter SnackBar surface/text tokens in both themes, overriding scoped paywall text; avoids unreadable inverse-surface defaults.
 - Use shared Lucide geometry for the Home gift; preserves web/Flutter parity.
-- Produce standalone PrayScreen feature films as deterministic 9:16 Remotion compositions; frame-controlled UI motion keeps the product interaction and copy exact.
+- Use deterministic 9:16 Remotion for PrayScreen films; preserve exact interaction and copy.
 ## GitHub Actions releases
 - Keep the GitHub repository public only while an explicitly requested workflow runs, then restore private immediately; this avoids private-runner billing failures.
 
@@ -32,4 +32,4 @@
 - Keep Journey reminders automatic at 07:00 and 21:00 local time with no user-facing schedule controls; fixed cadence keeps onboarding and settings compact.
 - Use one localized Bible/Prayer sacred-pause route with bundled Bible chapters and independent local progress; switching modes must never dismiss the native guard handoff.
 - Journey buddies reuse the existing circle backend and sync progress plus a server-derived Pro display flag; each owner's circle code is their buddy code, with no new auth.
-- Pro Journeys keep device-local, calendar-gated Word→Practice→Mission progress under `prayly_pro_journeys_v1` (same JSON in web + Flutter), load NT passages from the bundled Bible and gate Pro at the UI only, so lapsed Pro never deletes progress.
+- Pro Journeys reveal full NT chapter→insight→practice→mission inside sessions only; preserve calendar-gated `word/practice/mission` IDs in `prayly_pro_journeys_v1` and use matching web/Flutter `prayly_pro_journey_study_v2` JSON for reading/notes, keeping saved progress intact.

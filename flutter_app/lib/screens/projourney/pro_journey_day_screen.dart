@@ -15,10 +15,13 @@ import '../challenge/challenge_widgets.dart';
 import 'battle_setup.dart';
 import 'breath_prayer.dart';
 import 'day_complete_overlay.dart';
-import 'passage_card.dart';
+import 'chapter_reading.dart';
+import '../../core/services/pro_journey_study.dart';
 import 'pj_ui.dart';
 import 'prayer_list.dart';
 import 'pro_journey_screen.dart' show openProJourneyPaywall;
+
+const _sessionSteps = <String>['read', 'word', 'practice', 'mission'];
 
 /// One Pro Journey day as a three-beat session: Word → Practice → Mission.
 /// Beats persist, so a user can finish the real-life mission later today.
@@ -41,6 +44,8 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
   }();
   late final bool _reviewAtOpen = ProJourneyStore.isDayDone(j.id, day);
   late int _step;
+  bool _read = false;
+  final _note = TextEditingController();
   ProDayResult? _result;
   bool _leaving = false;
   final _scroll = ScrollController();
@@ -55,7 +60,10 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
     final gated = !_review && proJourneyRequiresPro(day) && !isPremium;
     final steps = ProJourneyStore.stepsFor(j.id, day);
     final firstOpen = kJourneySteps.indexWhere((s) => !steps.contains(s));
-    _step = _review ? 0 : (firstOpen == -1 ? 2 : firstOpen);
+    final study = ProJourneyStudy.entry(j.id, day);
+    _read = _review || steps.contains('word') || study['read'] == true;
+    _note.text = study['note'] is String ? study['note'] as String : '';
+    _step = _review ? 0 : (!_read ? 0 : firstOpen == -1 ? 3 : firstOpen + 1);
     if (!_review && (!open || gated)) {
       _leaving = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -70,6 +78,7 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
   @override
   void dispose() {
     _scroll.dispose();
+    _note.dispose();
     super.dispose();
   }
 
@@ -77,10 +86,10 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
   bool _has(String s) => _steps.contains(s);
   int get _firstOpen {
     final i = kJourneySteps.indexWhere((s) => !_steps.contains(s));
-    return i == -1 ? 2 : i;
+    return !_read ? 0 : i == -1 ? 3 : i + 1;
   }
 
-  bool _reachable(int i) => _review || i <= _firstOpen || _has(kJourneySteps[i]);
+  bool _reachable(int i) => _review || i <= _firstOpen;
 
   void _go(int i) {
     setState(() => _step = i);
@@ -133,8 +142,13 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
                         child: PjRise(
                           key: ValueKey(_step),
                           child: switch (_step) {
-                            0 => _word(plan),
-                            1 => _practice(plan),
+                            0 => _reading(plan),
+                            1 => _word(plan),
+                            2 => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                              Text(t('pj.step.practice'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.foreground)),
+                              for (final line in plan.exercise.split('\n').where((line) => line.isNotEmpty)) Padding(padding: const EdgeInsets.only(top: 16), child: Text(line, style: TextStyle(fontSize: 16, height: 1.75, color: AppColors.foreground))),
+                              const SizedBox(height: 20), Divider(color: AppColors.border), const SizedBox(height: 20), _practice(plan),
+                            ]),
                             _ => _mission(plan, allDone),
                           },
                         ),
@@ -197,7 +211,7 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.foreground)),
-              Text('${t('pj.progress', {'n': day, 'total': j.days})} · ${t('pj.stepOf', {'n': _step + 1})}',
+              Text('${t('pj.progress', {'n': day, 'total': j.days})} · ${t('pj.depth.stepOf', {'n': _step + 1})}',
                   style: TextStyle(fontSize: 12, color: AppColors.mutedForeground)),
             ]),
           ),
@@ -205,7 +219,7 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
         ]),
         const SizedBox(height: 12),
         Row(children: [
-          for (var i = 0; i < kJourneySteps.length; i++) ...[
+          for (var i = 0; i < _sessionSteps.length; i++) ...[
             if (i > 0) const SizedBox(width: 6),
             Expanded(child: _stepTab(i)),
           ],
@@ -215,15 +229,15 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
   }
 
   Widget _stepTab(int i) {
-    final s = kJourneySteps[i];
+    final s = _sessionSteps[i];
     final reachable = _reachable(i);
-    final done = _has(s);
+    final done = s == 'read' ? _read : _has(s);
     final current = i == _step;
     return Semantics(
       button: true,
       enabled: reachable,
       selected: current,
-      label: t('pj.step.$s'),
+      label: t(s == 'read' ? 'pj.depth.read' : s == 'word' ? 'pj.depth.insight' : 'pj.step.$s'),
       excludeSemantics: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -244,8 +258,8 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
             ),
           ),
           const SizedBox(height: 4),
-          Text(upper(t('pj.step.$s')),
-              maxLines: 1, overflow: TextOverflow.ellipsis, style: ChInk.eyebrow(10.5, current ? AppColors.primary : AppColors.mutedForeground, tracking: 0.12)),
+          Text(upper(t(s == 'read' ? 'pj.depth.read' : s == 'word' ? 'pj.depth.insight' : 'pj.step.$s')),
+              maxLines: 3, overflow: TextOverflow.ellipsis, style: ChInk.eyebrow(10.5, current ? AppColors.primary : AppColors.mutedForeground, tracking: 0.12)),
         ]),
       ),
     );
@@ -260,6 +274,12 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
         },
       );
 
+  Widget _reading(ProJourneyDayPlan plan) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+    Text(plan.title, style: ChInk.serif(30, height: 1.15)), const SizedBox(height: 16),
+    Text(plan.context, style: TextStyle(fontSize: 16, height: 1.6, color: AppColors.mutedForeground)), const SizedBox(height: 24),
+    ChapterReading(passage: plan.passage, onRead: () { setState(() => _read = true); ProJourneyStudy.save(j.id, day, true, _note.text); _go(1); }),
+  ]);
+
   /* ── Word ── */
 
   Widget _word(ProJourneyDayPlan plan) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -272,12 +292,15 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
           ]),
         ),
         const SizedBox(height: 16),
-        PassageCard(passage: plan.passage),
-        const SizedBox(height: 16),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Text(plan.word, style: TextStyle(fontSize: 16, height: 1.6, color: AppColors.foreground.withValues(alpha: 0.9))),
-        ),
+        for (final paragraph in plan.teaching.split('\n\n')) Padding(padding: const EdgeInsets.only(bottom: 20), child: Text(paragraph, style: TextStyle(fontSize: 17, height: 1.8, color: AppColors.foreground))),
+        Divider(color: AppColors.border), const SizedBox(height: 16),
+        Text(t('pj.depth.reflect'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.primary)), const SizedBox(height: 12),
+        Text(plan.reflect, style: TextStyle(fontSize: 16, height: 1.6, color: AppColors.foreground)), const SizedBox(height: 16),
+        TextField(controller: _note, minLines: 4, maxLines: 8, maxLength: 4000,
+          style: TextStyle(fontSize: 16, color: AppColors.foreground),
+          decoration: InputDecoration(labelText: t('pj.depth.note'), hintText: t('pj.depth.noteHint')),
+          onChanged: (value) => ProJourneyStudy.save(j.id, day, _read, value)),
+        Text(t('pj.depth.private'), style: TextStyle(fontSize: 12, color: AppColors.mutedForeground)),
         const SizedBox(height: 16),
         GoldButton(
           label: t('pj.next'),
@@ -285,7 +308,7 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
           onTap: () {
             haptic(HapticStyle.light);
             _mark('word');
-            _go(1);
+            _go(2);
           },
         ),
       ]);
@@ -494,6 +517,9 @@ class _ProJourneyDayScreenState extends ConsumerState<ProJourneyDayScreen> {
           ExcludeSemantics(child: Text(plan.emoji, style: const TextStyle(fontSize: 40, height: 1))),
           const SizedBox(height: 12),
           Text(plan.mission, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, height: 1.35, color: AppColors.foreground)),
+          const SizedBox(height: 20),
+          Text(t('pj.depth.guide'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.primary)),
+          for (final line in plan.guide.split('\n').where((line) => line.isNotEmpty)) Padding(padding: const EdgeInsets.only(top: 12), child: Text(line, style: TextStyle(fontSize: 15, height: 1.6, color: AppColors.foreground))),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.only(left: 12),

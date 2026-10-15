@@ -119,6 +119,7 @@
 - [ ] Verify Journey walkthrough and Pro buddy badge on a physical device after an approved Flutter build.
 
 ## Pro Journeys
+- [x] Deepen all 56 Pro Journey days with full relevant chapters, distinct substantial teaching, private reflection and guided practice/mission in eight languages; reveal stages only inside sessions in matching web/Flutter. Four web completion flows and eight-language screens verified; 18 regression tests pass. Native-speaker review and Flutter device checks remain separately blocked below; no release requested.
 - [x] Replace the shallow Pro bonus list with four researched Pro Journeys (Who God Says I Am 7d, Fear Not 14d, Break Free 21d, Prayer Warrior 14d): daily Word → Practice → Mission, free Day 1, cinematic covers, 8 languages (web).
 - [x] Mirror Pro Journeys in Flutter (shelf, detail, three-beat day, breath prayer, Stand Firm rescue, prayer list, battle plan, celebration) with the same storage.
 - [x] Release the Pro Journeys build to the Play internal track (v1.0.1205, code 30100170; commit fdd4a536; repo back to private).
@@ -126,3 +127,10 @@
 - [ ] Device-check Pro Journeys after the internal-track build (blocked: needs the user's phone).
 - [ ] Optional reminder for an in-progress Pro Journey within the existing 4-a-day notification cap (idea; needs user approval since notifications were deliberately reduced).
 - [ ] Show the Pro Journeys shelf before the 75-day path is started (today it appears only inside an active Journey; idea, needs user approval).
+
+## Alarm ringing-screen fix
+- [x] Fix alarm: notification Dismiss/Open now silences + closes the ringing screen, volume keys mute instantly, back/power stop it, auto-stop at 60s (web parity n/a; Flutter/native Android only).
+- [x] Pushed to GitHub main (commit cd26e67); repo back to private.
+- [ ] Play internal-track build for the alarm fix (blocked: GitHub Actions refuses to start jobs — "recent account payments have failed or your spending limit needs to be increased"; needs the user to fix GitHub Billing & plans, then re-run).
+- [ ] Device-check the alarm on a phone after that build (blocked: needs the build).
+

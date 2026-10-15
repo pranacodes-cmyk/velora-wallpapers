@@ -8,6 +8,7 @@
 // Flutter mirror: `flutter_app/lib/core/services/pro_journeys.dart` (same key
 // and JSON shape).
 import { localDate } from "@/services/challenge";
+import { resetStudyReading } from "@/services/proJourneyStudy";
 import { BATTLES, FREE_DAYS, PRO_JOURNEYS, proJourneyById, type Battle, type ProJourneyId } from "@/data/proJourneys";
 
 export const PRO_JOURNEYS_KEY = "prayly_pro_journeys_v1";
@@ -222,6 +223,7 @@ export function completeDay(id: ProJourneyId, day: number, today = localDate()):
 
 /** Back to Day 1. Badges, the prayer list and the freedom plan stay. */
 export function restartJourney(id: ProJourneyId) {
+  resetStudyReading(id);
   const journeys = { ...cache.journeys };
   delete journeys[id];
   const freedom = id === "freedom" ? { ...cache.freedom, checkins: {}, sos: 0 } : cache.freedom;

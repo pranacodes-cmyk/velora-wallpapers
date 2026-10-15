@@ -19,7 +19,10 @@ import { HoldButton } from "@/components/challenge/HoldButton";
 import { LazyPremiumSheet as PremiumSheet } from "@/components/LazyPremiumSheet";
 import { Button } from "@/components/ui/button";
 import { useProJourneys } from "@/components/projourney/useProJourneys";
-import { PassageCard } from "@/components/projourney/PassageCard";
+import { ChapterReading } from "@/components/projourney/ChapterReading";
+import { readStudy, writeStudy } from "@/services/proJourneyStudy";
+import { Textarea } from "@/components/ui/textarea";
+const SESSION_STEPS = ["read", ...STEPS] as const;
 import { BreathPrayer } from "@/components/projourney/BreathPrayer";
 import { BattleSetup } from "@/components/projourney/BattleSetup";
 import { PrayerList } from "@/components/projourney/PrayerList";
@@ -33,7 +36,8 @@ const primaryBtn =
 export default function ProJourneyDay() {
   const { id } = useParams<{ id: string }>();
   if (!isProJourneyId(id)) return <Navigate to="/challenge" replace />;
-  return <Session j={proJourneyById(id)!} />;
+  const journey = proJourneyById(id);
+  return journey ? <Session j={journey} /> : <Navigate to="/challenge" replace />;
 }
 
 function Session({ j }: { j: ProJourney }) {
@@ -53,8 +57,11 @@ function Session({ j }: { j: ProJourney }) {
   const has = (s: Step) => steps.includes(s);
 
   const rawOpen = STEPS.findIndex((s) => !steps.includes(s));
-  const firstOpen = rawOpen === -1 ? 2 : rawOpen;
+  const [study, setStudy] = useState(() => readStudy(j.id, day));
+  const chapterRead = review || has("word") || study.read;
+  const firstOpen = !chapterRead ? 0 : rawOpen === -1 ? 3 : rawOpen + 1;
   const [step, setStep] = useState(review ? 0 : firstOpen);
+  const saveStudy = (next: typeof study) => { setStudy(next); writeStudy(j.id, day, next); };
   const [result, setResult] = useState<DayResult | null>(null);
   const [premiumOpen, setPremiumOpen] = useState(false);
   const top = useRef<HTMLDivElement>(null);
@@ -72,7 +79,7 @@ function Session({ j }: { j: ProJourney }) {
     requestAnimationFrame(() => top.current?.scrollTo({ top: 0, behavior: "smooth" }));
   };
   const mark = (s: Step) => { if (!review) markStep(j.id, day, s); };
-  const reachable = (i: number) => review || i <= firstOpen || has(STEPS[i]);
+  const reachable = (i: number) => review || i <= firstOpen;
   const allDone = STEPS.every((s) => has(s));
   const name = t(`pj.${j.id}.name`);
 
@@ -92,42 +99,43 @@ function Session({ j }: { j: ProJourney }) {
           <img src={j.cover} alt="" aria-hidden className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-primary/30" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-[15px] font-semibold text-foreground">{name}</p>
-            <p className="text-[12px] text-muted-foreground">{t("pj.progress", { n: day, total: j.days })} · {t("pj.stepOf", { n: step + 1 })}</p>
+            <p className="text-[12px] text-muted-foreground">{t("pj.progress", { n: day, total: j.days })} · {t("pj.depth.stepOf", { n: step + 1 })}</p>
           </div>
-          <button type="button" onClick={() => navigate(journeyPath, { replace: true })} aria-label={t("pj.close")} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-card ring-1 ring-border/60 active:scale-95">
+          <Button variant="ghost" type="button" onClick={() => navigate(journeyPath, { replace: true })} aria-label={t("pj.close")} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-card ring-1 ring-border/60 active:scale-95">
             <X className="h-5 w-5 text-foreground" />
-          </button>
+          </Button>
         </div>
-        <div className="mt-3 grid grid-cols-3 gap-1.5">
-          {STEPS.map((s, i) => (
-            <button key={s} type="button" disabled={!reachable(i)} onClick={() => { haptic("light"); go(i); }} className="group text-left disabled:cursor-default">
-              <span className={`block h-1.5 rounded-full transition-colors duration-500 ${has(s) ? "bg-gradient-to-r from-[hsl(var(--premium-gold))] to-[hsl(var(--premium-gold-glow))]" : i === step ? "bg-primary/40" : "bg-muted"}`} />
-              <span className={`mt-1 block text-[10.5px] font-bold uppercase tracking-[0.12em] ${i === step ? "text-primary" : "text-muted-foreground"}`}>{t(`pj.step.${s}`)}</span>
-            </button>
+        <div className="mt-3 grid grid-cols-4 gap-1.5">
+          {SESSION_STEPS.map((s, i) => (
+            <Button variant="ghost" key={s} type="button" disabled={!reachable(i)} onClick={() => { haptic("light"); go(i); }} className="group h-auto min-h-14 min-w-0 flex-col items-stretch justify-start gap-0 whitespace-normal px-0 py-1 text-left disabled:cursor-default">
+              <span className={`block h-1.5 rounded-full transition-colors duration-500 ${(s === "read" ? chapterRead : has(s)) ? "bg-gradient-to-r from-[hsl(var(--premium-gold))] to-[hsl(var(--premium-gold-glow))]" : i === step ? "bg-primary/40" : "bg-muted"}`} />
+              <span className={`mt-1 block break-words text-[10.5px] font-bold uppercase leading-snug tracking-normal ${i === step ? "text-primary" : "text-muted-foreground"}`}>{t(s === "read" ? "pj.depth.read" : s === "word" ? "pj.depth.insight" : `pj.step.${s}`)}</span>
+            </Button>
           ))}
         </div>
       </header>
 
       <main key={step} className="challenge-rise mx-auto max-w-[560px] px-4 pt-3">
-        {step === 0 && (
+        {step === 0 && <section className="space-y-5"><h1 className="font-serif text-[30px] leading-tight text-foreground">{plan.title}</h1><p className="text-[16px] leading-relaxed text-muted-foreground">{plan.context}</p><ChapterReading passage={plan.passage} onRead={() => { saveStudy({ ...study, read: true }); go(1); }} /></section>}
+        {step === 1 && (
           <section className="space-y-4">
             <div className="px-1">
               <p className="text-[11.5px] font-bold uppercase tracking-[0.2em] text-primary">{t("pj.progress", { n: day, total: j.days })}</p>
               <h1 className="mt-1 font-serif text-[30px] font-semibold leading-[1.1] text-foreground [text-wrap:balance]">{plan.title}</h1>
             </div>
-            <PassageCard passage={plan.passage} />
-            <p className="px-1 text-[16px] leading-relaxed text-foreground/90 [text-wrap:pretty]">{plan.word}</p>
-            <button type="button" onClick={() => { haptic("light"); mark("word"); go(1); }} className={primaryBtn}>
-              {t("pj.next")}<ChevronRight className="h-5 w-5" />
-            </button>
+            <div className="space-y-5">{plan.teaching.split("\n\n").map((paragraph, i) => <p key={i} className="text-[17px] leading-[1.8] text-foreground">{paragraph}</p>)}</div>
+            <div className="space-y-3 border-t border-border pt-5"><h2 className="text-[18px] font-semibold text-primary">{t("pj.depth.reflect")}</h2><p className="text-[16px] leading-relaxed text-foreground">{plan.reflect}</p><label htmlFor="study-note" className="block text-[14px] text-muted-foreground">{t("pj.depth.note")}</label><Textarea id="study-note" value={study.note} maxLength={4000} placeholder={t("pj.depth.noteHint")} onChange={(e) => saveStudy({ ...study, note: e.target.value })} className="min-h-32 text-[16px]" /><p className="text-[12px] text-muted-foreground">{t("pj.depth.private")}</p></div>
+            <Button variant="ghost" type="button" onClick={() => { haptic("light"); mark("word"); go(2); }} className={primaryBtn}>
+              {t("pj.depth.insightDone")}<ChevronRight className="h-5 w-5" />
+            </Button>
           </section>
         )}
 
-        {step === 1 && (
-          <Practice j={j} day={day} plan={plan} review={review} done={has("practice")} onDone={() => mark("practice")} onNext={() => go(2)} />
+        {step === 2 && (
+          <section className="space-y-5"><div className="space-y-4 border-b border-border pb-5"><h2 className="text-[20px] font-semibold text-foreground">{t("pj.step.practice")}</h2>{plan.exercise.split("\n").filter(Boolean).map((line, i) => <p key={i} className="text-[16px] leading-[1.75] text-foreground">{line}</p>)}</div><Practice j={j} day={day} plan={plan} review={review} done={has("practice")} onDone={() => mark("practice")} onNext={() => go(3)} /></section>
         )}
 
-        {step === 2 && (
+        {step === 3 && (
           <section className="space-y-4">
             <div className="rounded-[24px] bg-card p-5 ring-1 ring-border/60">
               <p className="text-[10.5px] font-bold uppercase tracking-normal text-primary">{t("pj.mi.label", { n: String(day).padStart(2, "0") })}</p>
@@ -137,7 +145,8 @@ function Session({ j }: { j: ProJourney }) {
                 <p className="text-[12px] font-semibold text-primary">{t("pj.mi.why")}</p>
                 <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">{plan.why}</p>
               </div>
-              <button
+              <div className="mt-5 space-y-3 border-t border-border pt-4"><h3 className="text-[14px] font-semibold text-primary">{t("pj.depth.guide")}</h3>{plan.guide.split("\n").filter(Boolean).map((line, i) => <p key={i} className="text-[15px] leading-relaxed text-foreground">{line}</p>)}</div>
+              <Button variant="ghost"
                 type="button"
                 disabled={review}
                 aria-pressed={has("mission")}
@@ -152,15 +161,15 @@ function Session({ j }: { j: ProJourney }) {
                   {has("mission") && <Check className="h-3.5 w-3.5" strokeWidth={3.5} />}
                 </span>
                 {t("pj.mi.done")}
-              </button>
+              </Button>
               {!review && !has("mission") && <p className="mt-2 text-center text-[12.5px] leading-relaxed text-muted-foreground">{t("pj.mi.later")}</p>}
             </div>
             {review ? (
-              <button type="button" onClick={() => navigate(journeyPath, { replace: true })} className={primaryBtn}>{t("pj.close")}</button>
+              <Button variant="ghost" type="button" onClick={() => navigate(journeyPath, { replace: true })} className={primaryBtn}>{t("pj.close")}</Button>
             ) : (
-              <button type="button" disabled={!allDone} onClick={finish} className={goldBtn}>
+              <Button variant="ghost" type="button" disabled={!allDone} onClick={finish} className={goldBtn}>
                 <Sparkles className="h-[18px] w-[18px]" />{t("pj.complete", { n: day })}
-              </button>
+              </Button>
             )}
           </section>
         )}
@@ -207,9 +216,9 @@ function Practice({ j, day, plan, review, done, onDone, onNext }: PracticeProps)
   const { t } = useT();
   const store = useProJourneys();
   const next = (
-    <button type="button" onClick={() => { haptic("light"); onNext(); }} className={primaryBtn}>
+    <Button variant="ghost" type="button" onClick={() => { haptic("light"); onNext(); }} className={primaryBtn}>
       {t("pj.next")}<ChevronRight className="h-5 w-5" />
-    </button>
+    </Button>
   );
 
   if (j.practice === "declare") {

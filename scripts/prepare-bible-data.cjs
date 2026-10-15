@@ -5,6 +5,7 @@ const path = require('path');
 const zlib = require('zlib');
 const usfm = require('usfm-js');
 const root = '/tmp/bible-source';
+const canonicalUsfm = 'GEN EXO LEV NUM DEU JOS JDG RUT 1SA 2SA 1KI 2KI 1CH 2CH EZR NEH EST JOB PSA PRO ECC SNG ISA JER LAM EZK DAN HOS JOL AMO OBA JON MIC NAM HAB ZEP HAG ZEC MAL MAT MRK LUK JHN ACT ROM 1CO 2CO GAL EPH PHP COL 1TH 2TH 1TI 2TI TIT PHM HEB JAS 1PE 2PE 1JN 2JN 3JN JUD REV'.split(' ');
 const names = {
 es: 'Génesis|Éxodo|Levítico|Números|Deuteronomio|Josué|Jueces|Rut|1 Samuel|2 Samuel|1 Reyes|2 Reyes|1 Crónicas|2 Crónicas|Esdras|Nehemías|Ester|Job|Salmos|Proverbios|Eclesiastés|Cantares|Isaías|Jeremías|Lamentaciones|Ezequiel|Daniel|Oseas|Joel|Amós|Abdías|Jonás|Miqueas|Nahúm|Habacuc|Sofonías|Hageo|Zacarías|Malaquías|Mateo|Marcos|Lucas|Juan|Hechos|Romanos|1 Corintios|2 Corintios|Gálatas|Efesios|Filipenses|Colosenses|1 Tesalonicenses|2 Tesalonicenses|1 Timoteo|2 Timoteo|Tito|Filemón|Hebreos|Santiago|1 Pedro|2 Pedro|1 Juan|2 Juan|3 Juan|Judas|Apocalipsis',
 pt: 'Gênesis|Êxodo|Levítico|Números|Deuteronômio|Josué|Juízes|Rute|1 Samuel|2 Samuel|1 Reis|2 Reis|1 Crônicas|2 Crônicas|Esdras|Neemias|Ester|Jó|Salmos|Provérbios|Eclesiastes|Cânticos|Isaías|Jeremias|Lamentações|Ezequiel|Daniel|Oseias|Joel|Amós|Obadias|Jonas|Miqueias|Naum|Habacuque|Sofonias|Ageu|Zacarias|Malaquias|Mateus|Marcos|Lucas|João|Atos|Romanos|1 Coríntios|2 Coríntios|Gálatas|Efésios|Filipenses|Colossenses|1 Tessalonicenses|2 Tessalonicenses|1 Timóteo|2 Timóteo|Tito|Filemom|Hebreus|Tiago|1 Pedro|2 Pedro|1 João|2 João|3 João|Judas|Apocalipse',
@@ -37,6 +38,9 @@ for (const lang of ['en','es','pt','fil','hi','id','fr','de']) {
   if (lang === 'hi' || lang === 'id') {
     books = walk(path.join(root, lang)).filter(f => f.endsWith('.usfm')).sort().map(f => {
       const parsed = usfm.toJSON(fs.readFileSync(f, 'utf8'));
+      const bookCode = parsed.headers.find(h => h.tag === 'id')?.content?.trim().split(/\s+/)[0];
+      const canonicalId = canonicalUsfm.indexOf(bookCode);
+      if (canonicalId < 0) throw new Error(`Unknown canonical book ${f}`);
       const name = parsed.headers.find(h => h.tag === 'toc2')?.content?.trim() ?? parsed.headers.find(h => h.tag === 'h')?.content?.trim();
       const chapters = Object.entries(parsed.chapters).filter(([c]) => /^\d+$/.test(c)).sort((a,b) => Number(a[0])-Number(b[0])).map(([,c]) => {
         const verses = [];
@@ -49,7 +53,7 @@ for (const lang of ['en','es','pt','fil','hi','id','fr','de']) {
         if (verses.some((v,i) => !v && !(lang === 'id' && /menghilangkan|Lihat catatan di ayat|Beberapa salinan kuno memiliki ayat/i.test(JSON.stringify(c[String(i+1)]))))) throw new Error(`Missing verse ${f}`);
         return verses;
       });
-      return { name, chapters };
+      return { name, chapters, canonicalId };
     });
     name = lang === 'hi' ? 'Indian Revised Version · Hindi 2017' : 'Unlocked Literal Bible · Perjanjian Baru';
     license = lang === 'hi' ? 'CC BY-SA 4.0 · © 2017–2019 Bridge Connectivity Solutions' : 'CC BY-SA 4.0 · Door43 World Missions Community';
@@ -60,7 +64,7 @@ for (const lang of ['en','es','pt','fil','hi','id','fr','de']) {
     books = source.books.map((b,i) => ({ name: names[lang]?.split('|')[i] ?? b.englishName ?? b.name, chapters: b.chapters.map(c => c.verses.map(v => v.text.trim())) }));
   }
   if (books.length !== (lang === 'id' ? 27 : 66)) throw new Error(`Incomplete ${lang}: ${books.length}`);
-  const meta = { language: lang, name, license, source: urls[lang], testament: lang === 'id' ? 'new' : 'both', books: books.map((b,i) => ({ name: b.name, canonicalId: i + (lang === 'id' ? 39 : 0), chapters: b.chapters.length })) };
+  const meta = { language: lang, name, license, source: urls[lang], testament: lang === 'id' ? 'new' : 'both', books: books.map((b,i) => ({ name: b.name, canonicalId: b.canonicalId ?? i, chapters: b.chapters.length })) };
   for (const base of ['public/bible', 'flutter_app/assets/bible']) {
     const dir = path.join(base,lang); fs.mkdirSync(dir,{recursive:true});
     fs.writeFileSync(path.join(dir,'index.json'), JSON.stringify(meta));

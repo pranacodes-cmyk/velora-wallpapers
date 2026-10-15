@@ -30,7 +30,8 @@ const primaryCta =
 export default function ProJourney() {
   const { id } = useParams<{ id: string }>();
   if (!isProJourneyId(id)) return <Navigate to="/challenge" replace />;
-  return <JourneyView j={proJourneyById(id)!} />;
+  const journey = proJourneyById(id);
+  return journey ? <JourneyView j={journey} /> : <Navigate to="/challenge" replace />;
 }
 
 function JourneyView({ j }: { j: Def }) {
@@ -148,7 +149,7 @@ function JourneyView({ j }: { j: Def }) {
         </section>
 
         {/* Journey tool */}
-        <JourneyTool j={j} isPremium={isPremium} onSos={() => { haptic("medium"); track("pro_journey_sos_opened"); setSosOpen(true); }} onEditPlan={() => setPlanOpen(true)} onBreathe={() => { haptic("light"); setBreathOpen(true); }} />
+        {status.kind !== "new" && <JourneyTool j={j} isPremium={isPremium} onSos={() => { haptic("medium"); track("pro_journey_sos_opened"); setSosOpen(true); }} onEditPlan={() => setPlanOpen(true)} onBreathe={() => { haptic("light"); setBreathOpen(true); }} />}
 
         {/* Promise + outcomes */}
         <section className="space-y-3">
@@ -221,7 +222,6 @@ function BreathNow({ j }: { j: Def }) {
 
 function PathRow({ j, day, isPremium, onOpen, onLocked }: { j: Def; day: number; isPremium: boolean; onOpen: (d: number) => void; onLocked: () => void }) {
   const { t } = useT();
-  const plan = proJourneyDay(j, day);
   const isDone = isDayDone(j.id, day);
   const open = isDayOpen(j.id, day);
   const proLocked = !isPremium && requiresPro(day) && !isDone;
@@ -242,8 +242,8 @@ function PathRow({ j, day, isPremium, onOpen, onLocked }: { j: Def; day: number;
           {isDone ? <Check className="h-4 w-4" strokeWidth={3} /> : proLocked ? <Lock className="h-3.5 w-3.5" /> : day}
         </span>
         <span className="min-w-0 flex-1">
-          <span className={`block truncate text-[15px] font-semibold ${isDone || (open && !proLocked) ? "text-foreground" : "text-foreground/70"}`}>{plan.title}</span>
-          <span className={`block text-[12px] ${proLocked ? "font-bold text-primary" : "text-muted-foreground"}`}>{t("pj.progress", { n: day, total: j.days })} · {sub}</span>
+          <span className={`block truncate text-[15px] font-semibold ${isDone || (open && !proLocked) ? "text-foreground" : "text-foreground/70"}`}>{t("pj.progress", { n: day, total: j.days })}</span>
+          <span className={`block text-[12px] ${proLocked ? "font-bold text-primary" : "text-muted-foreground"}`}>{sub}</span>
         </span>
         {tappable && <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />}
       </button>
