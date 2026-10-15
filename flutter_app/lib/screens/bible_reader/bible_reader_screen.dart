@@ -134,7 +134,7 @@ class _BibleReaderScreenState extends State<BibleReaderScreen> {
     if (direction > 0) _chapterAd();
     final changedBook = b != _book;
     setState(() { _book = b; _chapter = c; _verse = 0; });
-    if (changedBook) await _load();
+    if (changedBook) { await _load(); } else { Analytics.capture('bible_chapter_viewed', {'lang': _language, 'book': _book, 'book_name': _edition?.books[_book].name, 'chapter': _chapter + 1}); }
     _persist();
   }
   void _books() {
@@ -142,7 +142,7 @@ class _BibleReaderScreenState extends State<BibleReaderScreen> {
     showModalBottomSheet<void>(context: context, isScrollControlled: true, backgroundColor: _surface, builder: (ctx) => StatefulBuilder(builder: (ctx, refresh) => SafeArea(child: SizedBox(height: MediaQuery.sizeOf(ctx).height * .8, child: Padding(padding: const EdgeInsets.all(20), child: Column(children: [
       Row(children: [Expanded(child: Text(t('bible.books'), style: TextStyle(color: _fg, fontSize: 20, fontWeight: FontWeight.w700))), IconButton(tooltip: t('bible.close'), onPressed: () => Navigator.pop(ctx), icon: Icon(Icons.close, color: _fg))]),
       TextField(style: TextStyle(color: _fg), decoration: InputDecoration(hintText: t('bible.search'), hintStyle: TextStyle(color: _fg.withValues(alpha: .5))), onChanged: (v) => refresh(() => query = v)),
-      Expanded(child: ListView(children: [for (var b = 0; b < (_edition?.books.length ?? 0); b++) if ((_edition?.books[b].name ?? '').toLowerCase().contains(query.toLowerCase())) ExpansionTile(key: ValueKey('$_language:$b'), textColor: _gold, collapsedTextColor: _fg, iconColor: _gold, collapsedIconColor: _fg, title: Text(_edition?.books[b].name ?? ''), children: [Wrap(spacing: 6, runSpacing: 6, children: [for (var c = 0; c < (_edition?.books[b].chapters ?? 0); c++) SizedBox(width: 46, child: OutlinedButton(style: OutlinedButton.styleFrom(foregroundColor: _gold, padding: EdgeInsets.zero), onPressed: () { final changedBook = b != _book; setState(() { _book = b; _chapter = c; _verse = 0; }); Navigator.pop(ctx); if (changedBook) _load(); _persist(); }, child: Text('${c + 1}')))]), const SizedBox(height: 14)])])),
+      Expanded(child: ListView(children: [for (var b = 0; b < (_edition?.books.length ?? 0); b++) if ((_edition?.books[b].name ?? '').toLowerCase().contains(query.toLowerCase())) ExpansionTile(key: ValueKey('$_language:$b'), textColor: _gold, collapsedTextColor: _fg, iconColor: _gold, collapsedIconColor: _fg, title: Text(_edition?.books[b].name ?? ''), children: [Wrap(spacing: 6, runSpacing: 6, children: [for (var c = 0; c < (_edition?.books[b].chapters ?? 0); c++) SizedBox(width: 46, child: OutlinedButton(style: OutlinedButton.styleFrom(foregroundColor: _gold, padding: EdgeInsets.zero), onPressed: () { final changedBook = b != _book; setState(() { _book = b; _chapter = c; _verse = 0; }); Navigator.pop(ctx); if (changedBook) { _load(); } else { Analytics.capture('bible_chapter_viewed', {'lang': _language, 'book': _book, 'book_name': _edition?.books[_book].name, 'chapter': _chapter + 1}); } _persist(); }, child: Text('${c + 1}')))]), const SizedBox(height: 14)])])),
     ]))))));
   }
   void _style() {

@@ -14,7 +14,6 @@ import 'core/services/ads_service.dart';
 import 'core/services/analytics.dart';
 import 'core/services/backend_service.dart';
 import 'core/services/content_push_service.dart';
-import 'core/services/meta_capi.dart';
 import 'core/services/meta_events.dart';
 import 'core/services/ota_service.dart';
 import 'core/services/prefs.dart';
@@ -111,8 +110,8 @@ Future<void> main() async {
     // the startup path — nothing about the tracking itself changed.
     if (!kIsWeb) {
       MetaEvents.init().catchError((_) {}).whenComplete(() {
-        MetaCapi.installOnce();
-        MetaCapi.appOpen();
+        // Install + app open are auto-logged by the native Meta SDK with
+        // full attribution; no duplicate server copies.
       });
     }
 

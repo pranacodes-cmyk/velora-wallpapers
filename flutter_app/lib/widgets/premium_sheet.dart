@@ -9,7 +9,6 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import '../core/localization/app_localizations.dart';
 import '../core/services/analytics.dart';
 import '../core/services/haptics.dart';
-import '../core/services/meta_capi.dart';
 import '../core/services/meta_events.dart';
 import '../core/services/rating_service.dart';
 import 'lucide_cross.dart';
@@ -211,10 +210,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
     super.initState();
     Analytics.capture('paywall_shown', {'trigger': widget.trigger});
     // Meta funnel signal: ViewContent on premium offer view (web parity).
-    MetaCapi.viewContent(
-      contentId: 'premium_offer',
-      contentName: 'Premium Sheet',
-    );
+    MetaEvents.contentView('premium_offer');
     // Hold back any rating prompt while the paywall owns the screen — the web
     // build does the same through `overlayQueue`.
     _releaseRatingGate = RatingOverlayGate.markVisible('paywall');
@@ -320,11 +316,10 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
     });
     setState(() => _purchasing = true);
     try {
-      MetaEvents.initiatedCheckout(pkg.storeProduct.identifier);
-      MetaCapi.initiateCheckout(
+      MetaEvents.initiatedCheckout(
+        product.identifier,
         product.price,
         product.currencyCode,
-        productId: product.identifier,
       );
       final ok = await RevenueCatService.purchase(pkg);
       if (!mounted) return;

@@ -4,10 +4,11 @@
  * RevenueCat fires this for: INITIAL_PURCHASE, RENEWAL, TRIAL_CONVERSION,
  * CANCELLATION, REFUND, NON_RENEWING_PURCHASE, EXPIRATION, BILLING_ISSUE.
  *
- * We forward the monetary events (purchase / renewal / trial conversion) to
- * Meta CAPI as a "Purchase" event, and refunds as a negative-value Purchase.
- * This captures revenue Meta would otherwise miss (renewals on month 2+,
- * post-app-close completions, etc.) and improves Value Optimization.
+ * This is the SINGLE sender of StartTrial and Purchase to Meta:
+ *   - INITIAL_PURCHASE with period_type TRIAL → StartTrial (value 0)
+ *   - INITIAL_PURCHASE / RENEWAL / TRIAL_CONVERSION / NON_RENEWING → Purchase
+ * Device ids ($gpsAdId, $fbAnonId, $ip) come from RevenueCat subscriber
+ * attributes set by the app, so Meta can attribute events to the ad.
  *
  * Setup:
  *   RevenueCat dashboard → Integrations → Webhooks
@@ -63,16 +64,22 @@ type RcEvent = {
   store?: string;
   country_code?: string;
   ip?: string;
+  period_type?: string;
+  environment?: string;
+  subscriber_attributes?: Record<string, { value?: string } | undefined>;
 };
+
+function attr(ev: RcEvent, key: string): string | undefined {
+  const v = ev.subscriber_attributes?.[key]?.value;
+  return v && String(v).trim() ? String(v).trim() : undefined;
+}
 
 const REVENUE_EVENTS = new Set([
   "INITIAL_PURCHASE",
   "RENEWAL",
   "TRIAL_CONVERSION",
   "NON_RENEWING_PURCHASE",
-  "UNCANCELLATION",
 ]);
-const REFUND_EVENTS = new Set(["REFUND"]);
 
 async function fireMetaEvent(opts: {
   eventName: string;
@@ -84,9 +91,17 @@ async function fireMetaEvent(opts: {
   ip?: string;
   countryCode?: string;
   eventTimeSec: number;
+  madid?: string;
+  anonId?: string;
+  userAgent?: string;
 }) {
   const userData: Record<string, unknown> = {};
+  // Device identifiers are what let Meta attribute the event to the ad that
+  // drove the install. Meta requires madid / anon_id unhashed.
+  if (opts.madid) userData.madid = opts.madid;
+  if (opts.anonId) userData.anon_id = opts.anonId;
   if (opts.ip) userData.client_ip_address = opts.ip;
+  if (opts.userAgent) userData.client_user_agent = opts.userAgent;
   if (opts.externalId) userData.external_id = [await sha256(opts.externalId)];
   if (opts.countryCode) userData.country = [await sha256(opts.countryCode.toLowerCase())];
 
@@ -110,7 +125,7 @@ async function fireMetaEvent(opts: {
     custom_data: customData,
   };
 
-  const url = `https://graph.facebook.com/v21.0/${META_DATASET_ID}/events`;
+  const url = `https://graph.facebook.com/v26.0/${META_DATASET_ID}/events`;
   const params = new URLSearchParams({
     access_token: META_CAPI_ACCESS_TOKEN,
     data: JSON.stringify([event]),
@@ -156,7 +171,7 @@ Deno.serve(async (req) => {
     }
 
     // Never forward sandbox/test purchases to Meta.
-    const env = String((ev as any).environment ?? "").toUpperCase();
+    const env = String(ev.environment ?? "").toUpperCase();
     if (env === "SANDBOX" || ev.type === "TEST") {
       console.log(`[rc-webhook] skip sandbox/test event: ${ev.type}`);
       return new Response(JSON.stringify({ ok: true, skipped: "sandbox" }), {
@@ -164,20 +179,21 @@ Deno.serve(async (req) => {
       });
     }
 
-    const isRevenue = REVENUE_EVENTS.has(ev.type);
-    const isRefund = REFUND_EVENTS.has(ev.type);
+    const period = String(ev.period_type ?? "").toUpperCase();
+    const isTrialStart = ev.type === "INITIAL_PURCHASE" && period === "TRIAL";
+    const isRevenue = !isTrialStart && REVENUE_EVENTS.has(ev.type);
 
-    if (!isRevenue && !isRefund) {
-      // Acknowledge other event types (CANCELLATION, EXPIRATION, BILLING_ISSUE…)
-      // without firing to Meta. RevenueCat retries on non-2xx.
-      console.log(`[rc-webhook] ack non-revenue event: ${ev.type}`);
+    if (!isTrialStart && !isRevenue) {
+      // CANCELLATION, EXPIRATION, BILLING_ISSUE, REFUND, … are acknowledged
+      // without firing to Meta (Meta does not accept negative-value events).
+      console.log(`[rc-webhook] ack non-conversion event: ${ev.type}`);
       return new Response(JSON.stringify({ ok: true, skipped: ev.type }), {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const value = Number(ev.price_in_purchased_currency ?? ev.price ?? 0);
-    if (!value) {
+    const value = isTrialStart ? 0 : Number(ev.price_in_purchased_currency ?? ev.price ?? 0);
+    if (isRevenue && !(value > 0)) {
       return new Response(JSON.stringify({ ok: true, skipped: "zero-value" }), {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -187,23 +203,28 @@ Deno.serve(async (req) => {
     const eventTimeSec = Math.floor(
       (ev.event_timestamp_ms ?? ev.purchased_at_ms ?? Date.now()) / 1000
     );
-    // Stable event_id so Meta dedups against client-side native SDK Purchase
-    const eventId = ev.transaction_id || ev.original_transaction_id ||
+    // Server is the single sender of StartTrial and Purchase (the app sends
+    // neither), so a stable per-transaction event_id dedups RevenueCat retries.
+    const txn = ev.transaction_id || ev.original_transaction_id ||
       `${ev.original_app_user_id ?? ev.app_user_id ?? "anon"}-${ev.product_id ?? "p"}-${eventTimeSec}`;
+    const eventName = isTrialStart ? "StartTrial" : "Purchase";
 
     const result = await fireMetaEvent({
-      eventName: "Purchase",
-      value: isRefund ? -Math.abs(value) : value,
+      eventName,
+      value,
       currency,
       productId: ev.product_id,
       externalId: ev.original_app_user_id ?? ev.app_user_id,
-      eventId: isRefund ? `refund-${eventId}` : eventId,
-      ip: ev.ip,
+      eventId: `${eventName.toLowerCase()}-${txn}`,
+      ip: attr(ev, "$ip") ?? ev.ip,
       countryCode: ev.country_code,
       eventTimeSec,
+      madid: attr(ev, "$gpsAdId") ?? attr(ev, "$idfa"),
+      anonId: attr(ev, "$fbAnonId"),
+      userAgent: attr(ev, "$userAgent"),
     });
 
-    console.log(`[rc-webhook] forwarded ${ev.type} value=${value} ${currency}`);
+    console.log(`[rc-webhook] forwarded ${ev.type} as ${eventName} value=${value} ${currency}`);
     return new Response(JSON.stringify({ ok: true, type: ev.type, meta: result }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

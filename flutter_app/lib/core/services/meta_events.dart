@@ -49,6 +49,16 @@ class MetaEvents {
     }
   }
 
+  /// Meta's per-install anonymous id, forwarded to the server for attribution.
+  static Future<String?> anonymousId() async {
+    if (!_available) return null;
+    try {
+      return await _fb.getAnonymousId();
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Onboarding finished.
   static void completeRegistration() {
     if (!_available) return;
@@ -58,10 +68,19 @@ class MetaEvents {
   }
 
   /// Paywall opened (top-of-funnel for Value Optimization).
-  static void initiatedCheckout([String? productId]) {
+  static void initiatedCheckout([
+    String? productId,
+    double? price,
+    String? currency,
+  ]) {
     if (!_available) return;
     _fb
-        .logInitiatedCheckout(contentId: productId, numItems: 1)
+        .logInitiatedCheckout(
+          contentId: productId,
+          numItems: 1,
+          totalPrice: price,
+          currency: currency,
+        )
         .catchError((_) {});
   }
 
@@ -78,36 +97,5 @@ class MetaEvents {
   static void contentView([String? wallpaperId]) {
     if (!_available) return;
     _fb.logViewContent(id: wallpaperId).catchError((_) {});
-  }
-
-  /// Subscription signal (unchanged). Purchase is NOT sent from the app —
-  /// the RevenueCat webhook is the single Purchase sender to Meta.
-  static Future<void> subscribe(
-    double amount,
-    String currency, {
-    String? productId,
-  }) async {
-    if (!_available) return;
-    await logEvent(
-      'Subscribe',
-      valueToSum: amount,
-      params: {
-        'fb_currency': currency,
-        if (productId != null) 'fb_content_id': productId,
-      },
-    );
-  }
-
-  /// Standard Meta StartTrial event — value 0, never a Purchase.
-  static Future<void> startTrial(String currency, {String? productId}) async {
-    if (!_available) return;
-    await logEvent(
-      'StartTrial',
-      valueToSum: 0,
-      params: {
-        'fb_currency': currency,
-        if (productId != null) 'fb_content_id': productId,
-      },
-    );
   }
 }

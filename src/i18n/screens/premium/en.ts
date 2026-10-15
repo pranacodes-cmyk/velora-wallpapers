@@ -28,8 +28,8 @@ const en = {
   "premium.benefit.hdWallpapers.sub": "Live + premium, no limits",
   "premium.benefit.dailyVerse.title": "Daily Verse",
   "premium.benefit.dailyVerse.sub": "Wallpaper changes every day",
-  "premium.benefit.journeys.title": "75 Days of Light",
-  "premium.benefit.journeys.sub": "Ad-free, with 3 grace anchors",
+  "premium.benefit.journeys.title": "Guided Pro Journeys",
+  "premium.benefit.journeys.sub": "Identity, Peace, Freedom & Prayer paths",
   "premium.benefit.prayerAudio.title": "Prayer Audio",
   "premium.benefit.prayerAudio.sub": "Spoken over your name",
 

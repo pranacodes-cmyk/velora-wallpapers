@@ -93,11 +93,26 @@ class RevenueCatService {
       _configured = true;
       // Identify the RC App User ID to Meta for advanced matching (web parity).
       MetaCapi.captureAppUserId();
+      // Attach ad identifiers to the RevenueCat customer so the server can
+      // send StartTrial / Purchase to Meta with ad attribution.
+      _syncAdIdentifiers();
     } catch (e) {
       // A failed configure() leaves premium on the cached snapshot — loud in
       // debug so a broken store setup is never invisible during QA.
       if (kDebugMode) debugPrint('[revenuecat] configure failed: $e');
     }
+  }
+
+  static Future<void> _syncAdIdentifiers() async {
+    try {
+      await Purchases.collectDeviceIdentifiers();
+    } catch (_) {}
+    try {
+      final anon = await MetaEvents.anonymousId();
+      if (anon != null && anon.isNotEmpty) {
+        await Purchases.setFBAnonymousID(anon);
+      }
+    } catch (_) {}
   }
 
   static bool get _freeTestMode => Prefs.getBool(StorageKeys.freeTestMode);
@@ -219,28 +234,11 @@ class RevenueCatService {
     await _applyCustomerInfo(info);
 
     if (active) {
-      // Purchase is sent to Meta ONLY by the RevenueCat webhook (server).
-      // App sends StartTrial (value 0) for trials, Subscribe otherwise.
-      final product = package.storeProduct;
-      final isTrial = info.entitlements.active.values
-          .any((e) => e.periodType == PeriodType.trial);
-      if (isTrial) {
-        MetaEvents.startTrial(
-          product.currencyCode,
-          productId: product.identifier,
-        ).catchError((_) {});
-      } else {
-        MetaCapi.subscribe(
-          product.price,
-          product.currencyCode,
-          productId: product.identifier,
-        );
-        MetaEvents.subscribe(
-          product.price,
-          product.currencyCode,
-          productId: product.identifier,
-        ).catchError((_) {});
-      }
+      // StartTrial and Purchase are sent to Meta ONLY by the RevenueCat
+      // webhook (server), so they are never double-counted and still arrive
+      // when the app is closed or payment confirms late. Make sure the ad
+      // identifiers are on the customer before RevenueCat fires the webhook.
+      _syncAdIdentifiers();
     }
     return active;
   }
