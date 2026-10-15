@@ -16,7 +16,9 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.content.Intent;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
@@ -72,9 +74,53 @@ public class PrayerAlarmActivity extends Activity {
     private View haloInner;
     private View crossGlow;
 
+    private static java.lang.ref.WeakReference<PrayerAlarmActivity> active;
+    private boolean finished = false;
+    private long createdAt;
+
+    /** Silence + close the ringing screen from anywhere (notification buttons). */
+    public static void stopActive(Context ctx) {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            PrayerAlarmActivity a = active == null ? null : active.get();
+            if (a != null) a.safeFinish();
+        });
+    }
+
+    /** Stops sound and vibration only, keeping the screen. */
+    private void silence() {
+        try { if (player != null) { player.stop(); player.release(); player = null; } } catch (Exception ignored) {}
+        try { if (vibrator != null) { vibrator.cancel(); } } catch (Exception ignored) {}
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
+                || keyCode == KeyEvent.KEYCODE_BACK) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) safeFinish(); else silence();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        // A second launch (direct start + full-screen intent) must never stack
+        // a second bell; the existing screen keeps the single sound source.
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Power button / screen left: never keep buzzing invisibly.
+        if (!isChangingConfigurations() && System.currentTimeMillis() - createdAt > 4000) silence();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        active = new java.lang.ref.WeakReference<>(this);
+        createdAt = System.currentTimeMillis();
 
         // Edge-to-edge + show-over-lockscreen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -122,7 +168,7 @@ public class PrayerAlarmActivity extends Activity {
         startCrossGlow();
 
         // Auto-dismiss after 90s if the user walked away
-        new Handler(Looper.getMainLooper()).postDelayed(this::safeFinish, 90_000);
+        new Handler(Looper.getMainLooper()).postDelayed(this::safeFinish, 60_000);
     }
 
     private View buildUi(final String label, final String eyebrowText, final String bodyText, final String ctaText, final String route, final boolean showSnooze) {
@@ -527,8 +573,10 @@ public class PrayerAlarmActivity extends Activity {
     }
 
     private void safeFinish() {
-        try { if (player != null) { player.stop(); player.release(); player = null; } } catch (Exception ignored) {}
-        try { if (vibrator != null) { vibrator.cancel(); } } catch (Exception ignored) {}
+        if (finished) return;
+        finished = true;
+        silence();
+        if (active != null && active.get() == this) active = null;
         try { if (wakeLock != null && wakeLock.isHeld()) wakeLock.release(); } catch (Exception ignored) {}
         // Also cancel the alarm notification so the heads-up + any lingering
         // channel sound disappear with the activity.

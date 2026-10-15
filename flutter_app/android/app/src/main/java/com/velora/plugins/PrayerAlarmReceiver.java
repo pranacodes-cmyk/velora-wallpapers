@@ -324,6 +324,9 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
     }
 
     private void cancelNotification(Context ctx) {
+        // Any decision from the notification must also silence the takeover
+        // screen; otherwise its looping bell + vibration keep going.
+        PrayerAlarmActivity.stopActive(ctx);
         NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
         if (nm != null) nm.cancel(NOTIF_ID);
     }

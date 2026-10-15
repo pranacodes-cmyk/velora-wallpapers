@@ -121,7 +121,8 @@
 ## Pro Journeys
 - [x] Replace the shallow Pro bonus list with four researched Pro Journeys (Who God Says I Am 7d, Fear Not 14d, Break Free 21d, Prayer Warrior 14d): daily Word → Practice → Mission, free Day 1, cinematic covers, 8 languages (web).
 - [x] Mirror Pro Journeys in Flutter (shelf, detail, three-beat day, breath prayer, Stand Firm rescue, prayer list, battle plan, celebration) with the same storage.
-- [ ] Release the Pro Journeys build to the Play internal track and confirm it reaches the track.
+- [x] Release the Pro Journeys build to the Play internal track (v1.0.1205, code 30100170; commit fdd4a536; repo back to private).
 - [ ] Native-speaker review of the Pro Journeys copy in hi/es/pt/fil/id/fr/de (blocked: needs a qualified reviewer).
 - [ ] Device-check Pro Journeys after the internal-track build (blocked: needs the user's phone).
 - [ ] Optional reminder for an in-progress Pro Journey within the existing 4-a-day notification cap (idea; needs user approval since notifications were deliberately reduced).
+- [ ] Show the Pro Journeys shelf before the 75-day path is started (today it appears only inside an active Journey; idea, needs user approval).
