@@ -1,0 +1,101 @@
+name: Play Promote (internal → production)
+
+on:
+  workflow_dispatch:
+    inputs:
+      track_from:
+        description: Source track
+        required: true
+        default: internal
+        type: choice
+        options:
+          - internal
+          - beta
+      track_to:
+        description: Destination track
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+      release_status:
+        description: Release status on destination track
+        required: true
+        default: completed
+        type: choice
+        options:
+          - completed
+          - draft
+          - halted
+
+permissions:
+  contents: read
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write Play Store service account JSON
+        env:
+          GOOGLE_PLAY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          PLAY_STORE_UPLOAD_TOKEN: ${{ secrets.PLAY_STORE_UPLOAD_TOKEN }}
+        run: |
+          PLAY_JSON="${GOOGLE_PLAY_JSON:-$PLAY_STORE_UPLOAD_TOKEN}"
+          if [ -z "$PLAY_JSON" ]; then
+            echo "❌ Play upload credentials missing."
+            exit 1
+          fi
+          printf '%s' "$PLAY_JSON" > /tmp/play-service-account.json
+          node -e "JSON.parse(require('fs').readFileSync('/tmp/play-service-account.json','utf8'))" \
+            || { echo "❌ Service account JSON is not valid JSON."; exit 1; }
+          echo "✅ Play service account ready."
+
+      - name: Promote latest release to target track
+        env:
+          TRACK_FROM: ${{ inputs.track_from }}
+          TRACK_TO: ${{ inputs.track_to }}
+          RELEASE_STATUS: ${{ inputs.release_status }}
+        run: |
+          npm install --no-save --silent googleapis@144 >/dev/null 2>&1 || true
+          node --input-type=module -e '
+            import fs from "fs";
+            const { google } = await import("googleapis");
+            const PACKAGE_NAME = "com.jesuswallpaperbible.app";
+            const auth = new google.auth.GoogleAuth({
+              keyFile: "/tmp/play-service-account.json",
+              scopes: ["https://www.googleapis.com/auth/androidpublisher"],
+            });
+            const publisher = google.androidpublisher({ version: "v3", auth });
+            const edit = await publisher.edits.insert({ packageName: PACKAGE_NAME });
+            const editId = edit.data.id;
+            try {
+              const tracksRes = await publisher.edits.tracks.list({ packageName: PACKAGE_NAME, editId });
+              const tracks = tracksRes.data.tracks || [];
+              const from = tracks.find((t) => t.track === process.env.TRACK_FROM);
+              if (!from || !from.releases?.length) {
+                throw new Error(`No release found on "${process.env.TRACK_FROM}" track.`);
+              }
+              const releases = from.releases.sort((a, b) =>
+                Math.max(...(b.versionCodes || [0]).map(Number)) - Math.max(...(a.versionCodes || [0]).map(Number)));
+              const latest = releases[0];
+              const codes = (latest.versionCodes || []).map(String);
+              console.log(`Promoting ${latest.name || "release"} (versionCodes: ${codes.join(", ")}) -> ${process.env.TRACK_TO} [${process.env.RELEASE_STATUS}]`);
+              await publisher.edits.tracks.update({
+                packageName: PACKAGE_NAME,
+                editId,
+                track: process.env.TRACK_TO,
+                requestBody: {
+                  track: process.env.TRACK_TO,
+                  releases: [{
+                    name: latest.name,
+                    versionCodes: codes,
+                    status: process.env.RELEASE_STATUS,
+                  }],
+                },
+              });
+              await publisher.edits.commit({ packageName: PACKAGE_NAME, editId });
+              console.log(`✅ Promoted to ${process.env.TRACK_TO} (${process.env.RELEASE_STATUS}).`);
+            } finally {
+              await publisher.edits.delete({ packageName: PACKAGE_NAME, editId }).catch(() => {});
+            }
+          '
