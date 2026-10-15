@@ -27,7 +27,7 @@ const dict: Record<string, string> = {
   "pj.cta.again": "फिर से चलें",
   "pj.wait.title": "दिन {{n}} पूरा हुआ",
   "pj.wait.sub": "दिन {{next}} {{time}} में खुलेगा",
-  "pj.locked.title": "दिन 2–{{total}} Pro में शामिल हैं",
+  "pj.locked.title": "यह Journey Pro में शामिल है",
   "pj.locked.sub": "आपकी प्रगति सुरक्षित है। आगे बढ़ते रहने के लिए अनलॉक करें — हर Pro Journey शामिल है।",
   "pj.day.locked": "दिन {{n}} के बाद खुलेगा",
   "pj.day.pro": "Pro",

@@ -77,11 +77,12 @@ class _ShelfCard extends StatelessWidget {
     final status = ProJourneyStore.status(j.id);
     final done = ProJourneyStore.doneCount(j.id);
     final active = status.kind == JourneyStatusKind.today || status.kind == JourneyStatusKind.wait;
-    final locked = !isPremium && active && proJourneyRequiresPro(status.day);
+    final locked = !isPremium && status.kind != JourneyStatusKind.done &&
+        (status.kind == JourneyStatusKind.fresh || proJourneyRequiresPro(status.day));
     final line = switch (status.kind) {
       JourneyStatusKind.done => t('pj.status.done'),
       _ when locked => t('pj.status.locked'),
-      JourneyStatusKind.fresh => isPremium ? t('pj.status.new') : t('pj.free1'),
+      JourneyStatusKind.fresh => t('pj.status.new'),
       JourneyStatusKind.today => t('pj.status.next', {'n': status.day}),
       JourneyStatusKind.wait => t('pj.status.wait', {'n': status.day}),
     };
@@ -130,7 +131,7 @@ class _ShelfCard extends StatelessWidget {
                   child: const LucideIconLite('check', size: 16, color: ChInk.ctaForeground, strokeWidth: 3),
                 ),
               )
-            else if (!isPremium && status.kind != JourneyStatusKind.fresh)
+            else if (!isPremium)
               Positioned(
                 right: 10,
                 top: 10,

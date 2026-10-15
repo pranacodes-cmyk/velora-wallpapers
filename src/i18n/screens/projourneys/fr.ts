@@ -27,7 +27,7 @@ const dict: Record<string, string> = {
   "pj.cta.again": "Refaire le parcours",
   "pj.wait.title": "Jour {{n}} terminé",
   "pj.wait.sub": "Le Jour {{next}} s'ouvre dans {{time}}",
-  "pj.locked.title": "Les jours 2 à {{total}} font partie de Pro",
+  "pj.locked.title": "Ce parcours fait partie de Pro",
   "pj.locked.sub": "Ta progression est enregistrée. Débloque pour continuer à marcher — tous les Parcours Pro inclus.",
   "pj.day.locked": "S'ouvre après le Jour {{n}}",
   "pj.day.pro": "Pro",

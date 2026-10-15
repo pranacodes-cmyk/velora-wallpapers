@@ -27,7 +27,7 @@ const dict: Record<string, string> = {
   "pj.cta.again": "Lakarin ulit",
   "pj.wait.title": "Tapos na ang Araw {{n}}",
   "pj.wait.sub": "Magbubukas ang Araw {{next}} sa {{time}}",
-  "pj.locked.title": "Bahagi ng Pro ang Araw 2–{{total}}",
+  "pj.locked.title": "Bahagi ng Pro ang Journey na ito",
   "pj.locked.sub": "Naka-save ang progreso mo. I-unlock para magpatuloy — kasama na ang bawat Pro Journey.",
   "pj.day.locked": "Magbubukas pagkatapos ng Araw {{n}}",
   "pj.day.pro": "Pro",

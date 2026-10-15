@@ -207,7 +207,7 @@ class _ProJourneyScreenState extends ConsumerState<ProJourneyScreen> {
     final size = MediaQuery.sizeOf(context);
     final pad = MediaQuery.paddingOf(context);
     final h = math.min(size.height * 0.58, 440.0);
-    final chip = '${t('pj.days', {'n': j.days})}${!isPremium && status.kind == JourneyStatusKind.fresh ? ' · ${t('pj.free1')}' : ''}';
+    final chip = '${t('pj.days', {'n': j.days})}${!isPremium && status.kind == JourneyStatusKind.fresh ? ' · ${t('pj.status.locked')}' : ''}';
     return SizedBox(
       height: h,
       child: Stack(fit: StackFit.expand, children: [

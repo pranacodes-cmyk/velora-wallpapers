@@ -27,7 +27,7 @@ const dict: Record<string, string> = {
   "pj.cta.again": "Jalani lagi",
   "pj.wait.title": "Hari {{n}} selesai",
   "pj.wait.sub": "Hari {{next}} terbuka dalam {{time}}",
-  "pj.locked.title": "Hari 2–{{total}} adalah bagian dari Pro",
+  "pj.locked.title": "Journey ini adalah bagian dari Pro",
   "pj.locked.sub": "Kemajuanmu sudah tersimpan. Buka untuk terus melangkah — semua Pro Journey termasuk di dalamnya.",
   "pj.day.locked": "Terbuka setelah Hari {{n}}",
   "pj.day.pro": "Pro",

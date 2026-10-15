@@ -35,12 +35,12 @@ function ShelfCard({ j, isPremium }: { j: ProJourney; isPremium: boolean }) {
   const navigate = useNavigate();
   const status = journeyStatus(j.id);
   const done = doneCount(j.id);
-  const locked = !isPremium && status.kind !== "done" && status.kind !== "new" && requiresPro(status.day);
+  const locked = !isPremium && status.kind !== "done" && (status.kind === "new" || requiresPro(status.day));
 
   const line =
     status.kind === "done" ? t("pj.status.done")
       : locked ? t("pj.status.locked")
-        : status.kind === "new" ? (isPremium ? t("pj.status.new") : t("pj.free1"))
+        : status.kind === "new" ? t("pj.status.new")
           : status.kind === "today" ? t("pj.status.next", { n: status.day })
             : t("pj.status.wait", { n: status.day });
 
@@ -57,7 +57,7 @@ function ShelfCard({ j, isPremium }: { j: ProJourney; isPremium: boolean }) {
       </span>
       {status.kind === "done" ? (
         <span className="absolute right-2.5 top-2.5 grid h-7 w-7 place-items-center rounded-full bg-[hsl(var(--voyage-gold))] text-[hsl(var(--paywall-cta-foreground))]"><Check className="h-4 w-4" strokeWidth={3} /></span>
-      ) : !isPremium && status.kind !== "new" ? (
+      ) : !isPremium ? (
         <span className="absolute right-2.5 top-2.5 grid h-7 w-7 place-items-center rounded-full bg-[hsl(var(--poster-scrim)/0.55)] text-[hsl(var(--poster-ink))] backdrop-blur-md"><Lock className="h-3.5 w-3.5" /></span>
       ) : null}
       <span className="absolute inset-x-0 bottom-0 p-3">

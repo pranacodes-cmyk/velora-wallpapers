@@ -30,7 +30,7 @@ const en: Record<string, string> = {
   "pj.cta.again": "Walk it again",
   "pj.wait.title": "Day {{n}} complete",
   "pj.wait.sub": "Day {{next}} opens in {{time}}",
-  "pj.locked.title": "Days 2–{{total}} are part of Pro",
+  "pj.locked.title": "This journey is part of Pro",
   "pj.locked.sub": "Your progress is saved. Unlock to keep walking — every Pro Journey included.",
   "pj.day.locked": "Opens after Day {{n}}",
   "pj.day.pro": "Pro",

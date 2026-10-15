@@ -13,13 +13,13 @@ import 'pro_journey_study.dart';
 /// Every day has three beats: Word (a New Testament passage from the bundled
 /// Bible of the active language + a short insight), Practice (an interaction
 /// unique to the journey) and Mission (one practical real-life step). Each
-/// journey moves one day per calendar day; Day 1 is a free sample and later
+/// journey moves one day per calendar day; every day (including Day 1) needs
 /// days need Pro (gated in the UI — progress is never deleted if Pro lapses).
 ///
 /// Web mirrors: `src/data/proJourneys.ts` + `src/services/proJourneys.ts`
 /// (same storage key and JSON shape, so data is portable between builds).
 const kProJourneysKey = 'prayly_pro_journeys_v1';
-const kProJourneyFreeDays = 1;
+const kProJourneyFreeDays = 0;
 const kPrayerListMax = 20;
 const kJourneySteps = <String>['word', 'practice', 'mission'];
 

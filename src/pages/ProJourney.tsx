@@ -128,7 +128,7 @@ function JourneyView({ j }: { j: Def }) {
         </button>
         <span className="absolute right-4 top-[max(16px,calc(env(safe-area-inset-top)+4px))] rounded-full bg-gradient-to-r from-[hsl(var(--premium-gold))] to-[hsl(var(--premium-gold-glow))] px-2.5 py-1 text-[10px] font-black tracking-[0.1em] text-[hsl(var(--paywall-cta-foreground))]">{t("pj.pro")}</span>
         <div className="absolute inset-x-0 bottom-0 px-5 pb-4">
-          <p className="inline-flex rounded-full bg-background/85 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-primary shadow-sm backdrop-blur-md">{t("pj.days", { n: j.days })}{!isPremium && status.kind === "new" ? ` · ${t("pj.free1")}` : ""}</p>
+          <p className="inline-flex rounded-full bg-background/85 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-primary shadow-sm backdrop-blur-md">{t("pj.days", { n: j.days })}{!isPremium && status.kind === "new" ? ` · ${t("pj.status.locked")}` : ""}</p>
           <h1 className="mt-1 font-serif text-[34px] font-semibold leading-[1.05] text-foreground [text-wrap:balance]"><span aria-hidden className="mr-1.5">{j.emoji}</span>{name}</h1>
           <p className="mt-1.5 max-w-[440px] text-[15px] leading-snug text-foreground/80 [text-wrap:pretty]">{t(`pj.${j.id}.tag`)}</p>
         </div>

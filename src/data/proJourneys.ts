@@ -147,5 +147,5 @@ export function proJourneyDay(j: ProJourney, day: number): ProJourneyDay {
   };
 }
 
-/** Day 1 of every journey is a free sample; the rest needs Pro. */
-export const FREE_DAYS = 1;
+/** Pro Journeys are fully paid — every day, including Day 1, needs Pro. */
+export const FREE_DAYS = 0;
