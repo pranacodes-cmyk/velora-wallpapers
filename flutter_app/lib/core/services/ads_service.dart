@@ -200,6 +200,10 @@ class AdsService {
     var ad = _warmRewarded;
     _warmRewarded = null;
 
+    final hadWarm = ad != null;
+    int? failCode;
+    String? failMsg;
+    final loadStart = DateTime.now();
     if (ad == null) {
       final loaded = Completer<RewardedAd?>();
       try {
@@ -208,9 +212,17 @@ class AdsService {
           request: const AdRequest(),
           rewardedAdLoadCallback: RewardedAdLoadCallback(
             onAdLoaded: (a) {
-              if (!loaded.isCompleted) loaded.complete(a);
+              if (!loaded.isCompleted) {
+                loaded.complete(a);
+              } else {
+                // Arrived after the timeout: keep it for the next unlock
+                // instead of throwing away a filled impression.
+                _warmRewarded ??= a;
+              }
             },
-            onAdFailedToLoad: (_) {
+            onAdFailedToLoad: (err) {
+              failCode = err.code;
+              failMsg = err.message;
               if (!loaded.isCompleted) loaded.complete(null);
             },
           ),
@@ -223,7 +235,14 @@ class AdsService {
     }
 
     if (ad == null) {
-      await Analytics.capture('ad_rewarded_failed_open');
+      // Step + AdMob reason (3 = no fill, 2 = network, 0 = internal,
+      // null = timed out before AdMob answered).
+      await Analytics.capture('ad_rewarded_failed_open', {
+        'step': failCode == null ? 'load_timeout' : 'load_failed',
+        'error_code': failCode,
+        'error_message': failMsg,
+        'wait_ms': DateTime.now().difference(loadStart).inMilliseconds,
+      });
       return true; // fail open
     }
 
@@ -236,7 +255,13 @@ class AdsService {
         markAdShown();
         if (!done.isCompleted) done.complete(earned);
       },
-      onAdFailedToShowFullScreenContent: (a, _) {
+      onAdFailedToShowFullScreenContent: (a, err) {
+        Analytics.capture('ad_rewarded_failed_open', {
+          'step': 'show_failed',
+          'error_code': err.code,
+          'error_message': err.message,
+          'was_warm': hadWarm,
+        });
         a.dispose();
         if (!done.isCompleted) done.complete(true); // fail open
       },

@@ -266,6 +266,14 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
     );
   }
 
+  /// Trial on/off comes from the RevenueCat offering — no app update needed.
+  bool get _trial {
+    final yearly = _packages[PlanId.yearly];
+    return yearly != null
+        ? RevenueCatService.packageHasFreeTrial(yearly)
+        : RevenueCatService.trialOffered;
+  }
+
   String _zeroTodayLabel() {
     // Currency-neutral copy also avoids stale OTA strings containing "$0".
     return t('premium.cta.zeroTodayFallback');
@@ -492,7 +500,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
                         const SizedBox(height: 12),
                         _cta(compact),
                         const SizedBox(height: 8),
-                        Text('${_selected == PlanId.yearly ? '${_zeroTodayLabel()} · ' : ''}${t(_selected == PlanId.weekly ? 'premium.reminder.weekly' : 'premium.reminder.yearly')}',
+                        Text('${_selected == PlanId.yearly && _trial ? '${_zeroTodayLabel()} · ' : ''}${t(_selected == PlanId.weekly || !_trial ? 'premium.reminder.weekly' : 'premium.reminder.yearly')}',
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 10, height: 1.5, color: _mutedForeground)),
                         const SizedBox(height: 6),
@@ -701,7 +709,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                  Text(plan.label, style: TextStyle(fontSize: 14, height: 1.15, fontWeight: FontWeight.w600, color: _foreground)),
                  const SizedBox(height: 4),
-                Text(plan.id == PlanId.yearly ? t('premium.plan.trialBadge') : plan.subtitle,
+                Text(plan.id == PlanId.yearly ? t(_trial ? 'premium.plan.trialBadge' : 'premium.plan.yearly.subtitleNoTrial') : plan.subtitle,
                     style: TextStyle(fontSize: 10, height: 1.25, fontWeight: FontWeight.w500, color: _mutedForeground)),
               ])),
                const SizedBox(width: 12),
@@ -785,7 +793,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
         minimumSize: const Size(double.infinity, 48),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), shape: const StadiumBorder()),
       child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
-        Flexible(child: Text(t(_purchasing ? 'premium.cta.processing' : 'premium.cta.${_selected.name}.title'),
+        Flexible(child: Text(t(_purchasing ? 'premium.cta.processing' : _selected == PlanId.yearly && !_trial ? 'premium.cta.yearly.titleNoTrial' : 'premium.cta.${_selected.name}.title'),
           textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
         const SizedBox(width: 12), const Icon(Icons.arrow_forward_rounded, size: 16),
       ]),
@@ -820,7 +828,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
         );
       }
     }
-    final reminderKey = _selected == PlanId.weekly
+    final reminderKey = _selected == PlanId.weekly || !_trial
         ? 'premium.reminder.weekly'
         : 'premium.reminder.yearly';
     out.add(

@@ -151,11 +151,11 @@
 
 ## Purchase / trial tracking cleanup
 - [x] Recheck the historical saved-token release path against successful releases on October 14–15: both used GITHUB_PUSH_TOKEN and flutter-play-store.yml; no alternate GitHub backend dispatcher or CLI credential is available in this sandbox. All 32 tracking regression tests pass.
-- [ ] Ship the approved Flutter tracking-fix build to Play Internal Testing using the existing saved-token release path, then restore repository private (securely updated access verified: GitHub repository HTTP 200 with admin/push permission; sync and workflow dispatch in progress).
+- [x] Ship the approved Flutter tracking-fix build to Play Internal Testing using the existing saved-token release path, then restore repository private: 1.0.1210 (30100175), run 39035962023 succeeded and Play upload passed; repository private verified. Fixed the host's missing Meta core compile dependency to match the installed plugin's SDK range; 32 tracking regression tests pass.
 - [x] Retire custom webhook forwarding and block client conversion sends, including old-client requests at the live server; disable automatic SDK IAP logging in native configs and preserve explicit activation.
 - [x] Separate trial checkout success from paid checkout/revenue in PostHog on web and Flutter; trial has zero price and catalog price is not revenue.
 - [ ] Verify RevenueCat built-in Meta enabled state and event mappings (blocked: dashboard-only configuration is not readable through available integration API).
-- [ ] Verify install/open, real trial, paid conversion and renewal receipt on device (blocked: requires explicitly approved new native build and real store/test receipt).
+- [ ] Verify install/open, real trial, paid conversion and renewal receipt on device (blocked: requires the user's device on internal build 1.0.1210 and real store/test receipts; compilation and upload alone do not prove Meta receipt).
 
 ## Live Photo wallpapers on iOS
 - [ ] Live Photo wallpapers on iOS (deferred until explicitly requested).

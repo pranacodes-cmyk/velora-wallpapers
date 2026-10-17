@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/prefs.dart';
+import '../../core/services/revenuecat_service.dart';
 import '../../state/app_providers.dart';
 import '../../widgets/premium_sheet.dart';
 import '../../widgets/trial_ready_transition.dart';
@@ -58,6 +59,12 @@ class _PostOnboardingPremiumState extends ConsumerState<PostOnboardingPremium> {
     final alreadyShown = Prefs.getBool(_shownKey);
     if (isPremium || alreadyShown) {
       _handoff();
+      return;
+    }
+    // Trial off (RevenueCat offering has no free phase): skip the
+    // "3 days free" slide and open the paid paywall directly.
+    if (!RevenueCatService.trialOffered) {
+      setState(() => _showSheet = true);
       return;
     }
     setState(() => _showTransition = true);

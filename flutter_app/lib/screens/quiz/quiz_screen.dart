@@ -38,10 +38,17 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
   _Hype? _hype;
   Timer? _hypeTimer;
 
+  late final StateController<bool> _navHidden;
+  late final StateController<bool Function()?> _backHandler;
+
   @override
   void initState() {
     super.initState();
     _quiz = QuizController();
+    // Cache notifiers now: `ref` is unusable once this widget is disposed,
+    // and the reset below runs after disposal.
+    _navHidden = ref.read(quizNavHiddenProvider.notifier);
+    _backHandler = ref.read(quizBackHandlerProvider.notifier);
     _quiz.addListener(_onQuizChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -85,8 +92,10 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
     _quiz.dispose();
     _hypeTimer?.cancel();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(quizNavHiddenProvider.notifier).state = false;
-      ref.read(quizBackHandlerProvider.notifier).state = null;
+      try { _navHidden.state = false; } catch (_) {}
+      try {
+        if (_backHandler.state == _handleHardwareBack) _backHandler.state = null;
+      } catch (_) {}
     });
     // Fire the armed rating prompt when the user LEAVES the Quiz screen, not
     // the moment a quiz ends — same 600ms settle delay as `Quiz.tsx`.

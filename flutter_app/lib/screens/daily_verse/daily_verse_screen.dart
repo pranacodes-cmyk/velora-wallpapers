@@ -187,6 +187,7 @@ class _DailyVerseScreenState extends ConsumerState<DailyVerseScreen>
   }
 
   void _pitchAutoUpdateIfFree() {
+    if (!mounted) return;
     final isPremium = ref.read(premiumProvider);
     if (isPremium) return;
     final count = Prefs.getInt(_kManualAppliesKey) + 1;

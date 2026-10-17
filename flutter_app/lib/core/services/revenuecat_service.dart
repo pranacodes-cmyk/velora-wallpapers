@@ -9,6 +9,7 @@ import '../env.dart';
 import 'meta_capi.dart';
 import 'meta_events.dart';
 import 'parallax_wallpaper.dart';
+import 'analytics.dart';
 import 'prefs.dart';
 import 'wallpaper_bridge.dart';
 import 'app_log.dart';
@@ -85,6 +86,44 @@ class RevenueCatService {
     await _syncAdIdentifiers();
   }
 
+  // ── Remote trial mode (RevenueCat Offerings / Experiments) ─────────────
+  // Whether the yearly plan carries a free trial is decided by the offering
+  // RevenueCat serves, so trial on/off can be switched without an update.
+  // Cached so onboarding can decide before offerings arrive; defaults to on.
+  static const _trialKey = 'rc_trial_offered_v1';
+
+  static bool get trialOffered => Prefs.getBool(_trialKey, fallback: true);
+
+  /// True when the store will actually grant a free phase for this package
+  /// (Play only returns the trial option to eligible users).
+  static bool packageHasFreeTrial(Package p) {
+    final product = p.storeProduct;
+    final option = product.defaultOption;
+    if (option != null) return option.freePhase != null;
+    final intro = product.introductoryPrice;
+    return intro != null && intro.price == 0;
+  }
+
+  static void _rememberTrialMode(Offering? current) {
+    final yearly = current?.annual ??
+        current?.availablePackages
+            .where((p) => p.identifier == '\$rc_annual')
+            .firstOrNull;
+    if (yearly == null) return;
+    final on = packageHasFreeTrial(yearly);
+    Prefs.setBool(_trialKey, on);
+    Analytics.capture('paywall_trial_mode', {
+      'trial': on,
+      'offering': current?.identifier,
+    });
+  }
+
+  static Future<void> _refreshTrialMode() async {
+    try {
+      _rememberTrialMode((await Purchases.getOfferings()).current);
+    } catch (_) {}
+  }
+
   static Future<void> init() async {
     if (_configured || kIsWeb) return;
     final key = Platform.isIOS
@@ -103,6 +142,7 @@ class RevenueCatService {
       // Keep existing attribution identifiers available to RevenueCat’s native
       // Meta integration; no additional matching identifiers are collected.
       _syncAdIdentifiers();
+      _refreshTrialMode();
     } catch (e) {
       // A failed configure() leaves premium on the cached snapshot — loud in
       // debug so a broken store setup is never invisible during QA.
@@ -194,6 +234,7 @@ class RevenueCatService {
       } catch (_) {}
       final current = (await Purchases.getOfferings()).current;
       if (current == null) return const {};
+      _rememberTrialMode(current);
       final map = <String, Package>{};
       if (current.weekly != null) map['weekly'] = current.weekly!;
       if (current.monthly != null) map['monthly'] = current.monthly!;
