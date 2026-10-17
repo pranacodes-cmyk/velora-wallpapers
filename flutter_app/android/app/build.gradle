@@ -82,6 +82,9 @@ flutter {
 dependencies {
     implementation "androidx.appcompat:appcompat:1.7.0"
     implementation "androidx.core:core:1.13.1"
+    // MainActivity explicitly activates install/open events. The Flutter plugin
+    // keeps its SDK dependency internal, so the host needs compile access too.
+    implementation "com.facebook.android:facebook-core:[16.0,17.0)"
 
     // AdMob is supplied by google_mobile_ads; no third-party mediation SDKs.
 }
