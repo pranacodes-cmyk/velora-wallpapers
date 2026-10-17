@@ -54,13 +54,15 @@ class _PostOnboardingPremiumState extends ConsumerState<PostOnboardingPremium> {
     widget.onFinished();
   }
 
-  void _start() {
+  Future<void> _start() async {
     final isPremium = ref.read(premiumProvider);
     final alreadyShown = Prefs.getBool(_shownKey);
     if (isPremium || alreadyShown) {
       _handoff();
       return;
     }
+    await RevenueCatService.refreshTrialMode().timeout(const Duration(seconds: 4), onTimeout: () {});
+    if (!mounted || _handedOff) return;
     // Trial off (RevenueCat offering has no free phase): skip the
     // "3 days free" slide and open the paid paywall directly.
     if (!RevenueCatService.trialOffered) {

@@ -63,7 +63,7 @@ export function TrialReadyTransition({ visible }: TrialReadyTransitionProps) {
           transition={instant ?? { delay: 1.12, duration: 0.42, ease: "easeOut" }}
         >
 
-          {t("premium.trialTransition.title")}
+          {t("premium.trialTransition.generic")}
         </motion.h2>
       </div>
     </motion.div>

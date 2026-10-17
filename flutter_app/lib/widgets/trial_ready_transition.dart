@@ -158,7 +158,7 @@ class _TrialReadyTransitionState extends State<TrialReadyTransition>
                           child: Transform.translate(
                             offset: Offset(0, 8 * (1 - title.value)),
                             child: Text(
-                              t('premium.trialTransition.title'),
+                              t('premium.trialTransition.generic'),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 24,

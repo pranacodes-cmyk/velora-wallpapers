@@ -159,3 +159,12 @@
 
 ## Live Photo wallpapers on iOS
 - [ ] Live Photo wallpapers on iOS (deferred until explicitly requested).
+
+- [x] Remote trial on/off (RevenueCat offering "no_trial" + Play base plan yearly-direct), Quiz/Daily Verse fixes, ad-failure reasons — shipped to Play internal (run 39051517241); repo private.
+- [ ] Start RevenueCat Experiment default vs no_trial (dashboard only; API cannot create experiments).
+
+## Flexible offering testing
+- [ ] Assign existing no_trial to the user's test customer (blocked: requires their RevenueCat App User ID; global current offering remains unchanged to protect live users).
+- [x] Show offering-driven Weekly, Monthly, Yearly and Lifetime plans in Flutter first, then web; use selected-plan store trial eligibility and duration, excluding Lifetime trials.
+- [x] Verify dynamic-plan/trial rules and purchase tracking: 43 tests passed; web four-plan selection, Weekly/Monthly trials, trial-off Annual and Lifetime verified without page errors.
+- [ ] Compile/run new Flutter rule tests and verify native plans/eligibility on device (blocked: no new CI release requested, Flutter SDK unavailable here).

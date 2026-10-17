@@ -3,9 +3,10 @@ import { Purchases, LOG_LEVEL, PRODUCT_CATEGORY, type PurchasesPackage, type Cus
 import { fetchGooglePlaySubscriptionPrices, type NativeStorePrice } from "@/lib/googlePlayPrices";
 import { isFreeTestMode } from "@/services/free-test-mode";
 import { checkoutTracking } from "@/lib/purchaseTracking";
+import { freeTrialPeriod, type OfferingPlanId } from "@/lib/offeringRules";
 
-type PlanKey = "weekly" | "monthly" | "yearly";
-type SubPlanKey = PlanKey;
+type PlanKey = OfferingPlanId;
+type SubPlanKey = Exclude<PlanKey, "lifetime">;
 
 /**
  * RevenueCat configuration.
@@ -20,6 +21,7 @@ export const PREMIUM_ENTITLEMENT = "Jesus Wallpaper & Bible Prayer Pro";
 export type PremiumPackage = PurchasesPackage & {
   storeProduct?: PurchasesStoreProduct;
   googlePlayPrice?: NativeStorePrice;
+  introEligible?: boolean;
 };
 
 const PLAN_PERIOD: Record<SubPlanKey, string> = {
@@ -88,11 +90,7 @@ export async function initRevenueCat(): Promise<void> {
  * Invalidates RC caches first so the Premium sheet always shows the
  * latest Play Store prices (within Google Play Billing's own SKU cache TTL).
  */
-export async function fetchOfferingPackages(): Promise<{
-  weekly?: PremiumPackage;
-  monthly?: PremiumPackage;
-  yearly?: PremiumPackage;
-}> {
+export async function fetchOfferingPackages(): Promise<Partial<Record<PlanKey, PremiumPackage>>> {
   if (!isRevenueCatAvailable()) return {};
   await initRevenueCat();
   try {
@@ -102,20 +100,22 @@ export async function fetchOfferingPackages(): Promise<{
 
     const { current } = await Purchases.getOfferings();
     if (!current) return {};
-    const map: { weekly?: PremiumPackage; monthly?: PremiumPackage; yearly?: PremiumPackage } = {
+    const map: Partial<Record<PlanKey, PremiumPackage>> = {
       weekly: current.weekly ?? undefined,
       monthly: current.monthly ?? undefined,
       yearly: current.annual ?? undefined,
+      lifetime: current.lifetime ?? undefined,
     };
     for (const pkg of current.availablePackages) {
       // RevenueCat package identifiers: $rc_weekly, $rc_monthly, $rc_annual
-      if (pkg.identifier === "$rc_weekly") map.weekly = pkg;
-      else if (pkg.identifier === "$rc_monthly") map.monthly = pkg;
-      else if (pkg.identifier === "$rc_annual") map.yearly = pkg;
+      if (pkg.identifier === "$rc_weekly" || String(pkg.packageType) === "WEEKLY") map.weekly = pkg;
+      else if (pkg.identifier === "$rc_monthly" || String(pkg.packageType) === "MONTHLY") map.monthly = pkg;
+      else if (pkg.identifier === "$rc_annual" || String(pkg.packageType) === "ANNUAL") map.yearly = pkg;
+      else if (pkg.identifier === "$rc_lifetime" || String(pkg.packageType) === "LIFETIME") map.lifetime = pkg;
     }
     console.info("[PaywallPrices] offering packages", summarizePackages(map));
     try {
-      const productIds = Array.from(new Set(Object.values(map).flatMap((pkg) => {
+      const productIds = Array.from(new Set(Object.entries(map).filter(([id]) => id !== "lifetime").flatMap(([, pkg]) => {
         if (!pkg?.product) return [];
         const option = pkg.product.defaultOption as any;
         return [
@@ -148,7 +148,7 @@ export async function fetchOfferingPackages(): Promise<{
     }
     try {
       // Native BillingClient price refresh — every plan is a subscription now.
-      const subEntries = Object.entries(map) as Array<[SubPlanKey, PremiumPackage | undefined]>;
+      const subEntries = Object.entries(map).filter(([id]) => id !== "lifetime") as Array<[SubPlanKey, PremiumPackage | undefined]>;
       const requests = subEntries.flatMap(([key, pkg]) => {
         if (!pkg?.product) return [];
         const option = pkg.product.defaultOption as any;
@@ -172,11 +172,44 @@ export async function fetchOfferingPackages(): Promise<{
     } catch {
       // Keep RevenueCat prices if direct BillingClient labels are unavailable.
     }
+    if (Capacitor.getPlatform() === "ios") {
+      try {
+        const eligibility = await Purchases.checkTrialOrIntroductoryPriceEligibility({
+          productIdentifiers: Object.values(map).flatMap(pkg => pkg ? [pkg.product.identifier] : []),
+        });
+        for (const pkg of Object.values(map)) {
+          if (pkg) pkg.introEligible = eligibility[pkg.product.identifier]?.status === 2;
+        }
+      } catch { /* Unknown eligibility must not promise free access. */ }
+    }
+    rememberOfferingTrial(map);
     return map;
   } catch (e) {
     /* RC offerings failed */;
     return {};
   }
+}
+
+const TRIAL_KEY = "rc_trial_offered_v1";
+export function trialOffered() {
+  try { return localStorage.getItem(TRIAL_KEY) !== "false"; } catch { return true; }
+}
+export function packageTrial(pkg: PremiumPackage | undefined, plan: string) {
+  if (!pkg || plan === "lifetime") return null;
+  const product = pkg.product;
+  const option = product.defaultOption;
+  if (option) {
+    const phase = option.freePhase;
+    return phase ? freeTrialPeriod(plan, phase.billingPeriod?.iso8601, phase.billingCycleCount ?? 1) : null;
+  }
+  const intro = product.introPrice;
+  return intro && intro.price === 0 && pkg.introEligible === true
+    ? freeTrialPeriod(plan, intro.period, intro.cycles) : null;
+}
+function rememberOfferingTrial(map: Partial<Record<PlanKey, PremiumPackage>>) {
+  try {
+    localStorage.setItem(TRIAL_KEY, String(Object.entries(map).some(([id, pkg]) => packageTrial(pkg, id) !== null)));
+  } catch { /* ignore */ }
 }
 
 function normalizeStoreProductId(value?: string | null) {

@@ -9,7 +9,8 @@ const post = src("lib/screens/onboarding/post_onboarding_premium.dart");
 // Source-contract guards: trial on/off is driven remotely by the RevenueCat offering.
 describe("remote trial mode", () => {
   it("detects the trial from the store's free phase and defaults to on", () => {
-    expect(rc).toContain("option.freePhase != null");
+    expect(rc).toContain("final phase = option.freePhase");
+    expect(rc).toContain("if (phase == null) return null");
     expect(rc).toContain("Prefs.getBool(_trialKey, fallback: true)");
   });
 
@@ -18,8 +19,8 @@ describe("remote trial mode", () => {
   });
 
   it("uses no-trial yearly copy when the trial is off", () => {
-    expect(sheet).toContain("'premium.cta.yearly.titleNoTrial'");
-    expect(sheet).toContain("'premium.plan.yearly.subtitleNoTrial'");
+    expect(sheet).toContain("'premium.cta.${_selected.name}.titleNoTrial'");
+    expect(sheet).toContain("'premium.plan.$name.subtitleNoTrial'");
   });
 
   it("ships the no-trial copy in all eight languages", () => {

@@ -1,3 +1,4 @@
+import { freeTrialPeriod, visibleOfferingPlans, selectedOfferingPlan, type OfferingPlanId } from "@/lib/offeringRules";
 import { Button } from "@/components/ui/button";
 import { PaywallWelcomeFilm } from "@/components/PaywallWelcomeFilm";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
@@ -12,6 +13,7 @@ import { useAndroidBack } from "@/hooks/useAndroidBack";
 import { isAndroidPerfMode } from "@/lib/androidPerf";
 import {
   fetchOfferingPackages,
+  packageTrial,
   purchasePackage,
   restorePurchases,
   isRevenueCatAvailable,
@@ -40,7 +42,7 @@ interface PremiumSheetProps {
 }
 
 
-type PlanId = "weekly" | "monthly" | "yearly";
+type PlanId = OfferingPlanId;
 
 type Plan = {
   id: PlanId;
@@ -53,13 +55,11 @@ type Plan = {
   badge?: string;
 };
 
-function buildPlans(t: (key: string, vars?: Record<string, string | number>) => string): Plan[] {
-  return [
-    // Yearly FIRST — the anchor & default. Trial is the hero.
-    { id: "yearly",   label: t("premium.plan.yearly.label"),   price: "—", period: t("premium.period.year"),    subtitle: t("premium.plan.yearly.subtitle"), badge: t("premium.plan.yearly.badge") },
-    // Monthly hidden from UI only; store product stays live for existing subscribers.
-    { id: "weekly",   label: t("premium.plan.weekly.label"),   price: "—", period: t("premium.period.week"),    subtitle: t("premium.plan.weekly.subtitle") },
-  ];
+function buildPlans(t: (key: string, vars?: Record<string, string | number>) => string, ids: PlanId[]): Plan[] {
+  const periods = { yearly: "year", monthly: "month", weekly: "week", lifetime: "oneTime" };
+  return ids.map(id => ({ id, label: t(`premium.plan.${id}.label`), price: "—",
+    period: t(`premium.period.${periods[id]}`),
+    subtitle: t(id === "lifetime" ? "premium.plan.lifetime.subtitle" : `premium.plan.${id}.subtitleNoTrial`) }));
 }
 
 /** 6 concrete Pro features that actually ship today — Shield leads. The removed
@@ -259,13 +259,35 @@ function ScriptureAnchor() {
 export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", context }: PremiumSheetProps) {
   const { t } = useT();
   const forceMidnightTheme = trigger === "post_onboarding";
-  const plans = useMemo(() => buildPlans(t), [t]);
+
   const benefits = useMemo(() => buildBenefits(t), [t]);
   const [selectedPlan, setSelectedPlan] = useState<PlanId>("yearly");
   const { unlock, isPremium } = usePremium();
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
-  const [packages, setPackages] = useState<{ weekly?: PremiumPackage; monthly?: PremiumPackage; yearly?: PremiumPackage }>({});
+  const [packages, setPackages] = useState<Partial<Record<PlanId, PremiumPackage>>>({});
+  // Browser preview uses explicit local QA metadata, never a real purchase.
+  const previewIds = (() => {
+    try { return visibleOfferingPlans(JSON.parse(localStorage.getItem("prayly_preview_plans") ?? '["yearly","weekly"]')); }
+    catch { return ["yearly", "weekly"] as PlanId[]; }
+  })();
+  const ids = isRevenueCatAvailable() ? visibleOfferingPlans(Object.keys(packages)) : previewIds;
+  const plans = buildPlans(t, ids);
+  const effectivePlan = selectedOfferingPlan(ids, selectedPlan);
+  const trialFor = (id: PlanId) => {
+    if (isRevenueCatAvailable()) return packageTrial(packages[id], id);
+    try {
+      const trials = JSON.parse(localStorage.getItem("prayly_preview_trials") ?? '{}');
+      const iso = trials[id];
+      return freeTrialPeriod(id, typeof iso === "string" ? iso : null);
+    } catch { return null; }
+  };
+  const trialLabel = (id: PlanId, cta = false) => {
+    const trial = trialFor(id);
+    if (!trial) return "";
+    const duration = t(`premium.duration.${trial.unit}${trial.count === 1 ? '.one' : ''}`, { count: trial.count });
+    return t(cta ? "premium.cta.trialDynamic" : "premium.plan.trialDynamic", { duration });
+  };
   const y = useMotionValue(0);
   const backdropOpacity = useTransform(y, [0, 300], [1, 0]);
 
@@ -307,7 +329,11 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
     if (!isRevenueCatAvailable()) return;
     let cancelled = false;
     fetchOfferingPackages().then((pkgs) => {
-      if (!cancelled) setPackages(pkgs);
+      if (!cancelled) {
+        setPackages(pkgs);
+        const next = selectedOfferingPlan(Object.keys(pkgs), selectedPlan);
+        if (next) setSelectedPlan(next);
+      }
     }).catch(() => {});
     return () => { cancelled = true; };
   }, [isOpen, trigger]);
@@ -354,8 +380,8 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
     return { ...p, price: priceString, period, anchor, badge };
   });
 
-  const selected = livePlans.find((p) => p.id === selectedPlan);
-  const selectedPackage = packages[selectedPlan];
+  const selected = livePlans.find((p) => p.id === effectivePlan);
+  const selectedTrial = effectivePlan ? trialFor(effectivePlan) : null;
   const zeroTodayLabel = t("premium.cta.zeroTodayFallback");
 
   // Pull the honest yearly-vs-weekly savings % from the computed badge.
@@ -423,7 +449,7 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
       }
       return;
     }
-    const pkg = packages[selectedPlan];
+    const pkg = effectivePlan ? packages[effectivePlan] : undefined;
     if (!pkg) {
       toast.error(t("premium.toast.notAvailable"));
       return;
@@ -560,21 +586,21 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
               </div>
             </div>
             <footer className="paywall-purchase shrink-0 bg-background px-5 pt-2">
-                <div role="radiogroup" aria-label="Plans" className="mb-2 space-y-2">
+                <div role="radiogroup" aria-label="Plans" className="mb-2 max-h-[36dvh] space-y-2 overflow-y-auto overscroll-contain">
                   {livePlans.map((plan) => {
-                    const active = selectedPlan === plan.id;
+                    const active = effectivePlan === plan.id;
                     return <Button key={plan.id} variant="ghost" role="radio" aria-checked={active}
-                      onClick={() => { setSelectedPlan(plan.id); haptic("soft"); }}
+                      disabled={purchasing} onClick={() => { setSelectedPlan(plan.id); haptic("soft"); }}
                       className={`paywall-plan-option h-auto min-h-[54px] w-full justify-start gap-0 whitespace-normal rounded-xl border px-3 py-2.5 text-left transition-[border-color,background-color,box-shadow] hover:border-primary/55 hover:bg-primary/5 ${active ? "paywall-plan-active border-primary" : "border-border bg-card"}`}>
                       <span className={`mr-3 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border transition-colors ${active ? "border-primary bg-primary text-paywall-cta" : "border-muted-foreground/55 bg-background"}`}>
                         {active && <Check className="h-3 w-3" strokeWidth={3} />}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-[14px] font-semibold leading-tight text-foreground">{plan.label}</span>
-                        <span className="mt-1 block text-[10px] font-medium leading-snug text-muted-foreground">{plan.id === "yearly" ? t("premium.plan.trialBadge") : plan.subtitle}</span>
+                        <span className="mt-1 block text-[10px] font-medium leading-snug text-muted-foreground">{trialFor(plan.id) ? trialLabel(plan.id) : plan.subtitle}</span>
                       </span>
                       <span className="ml-3 max-w-[46%] break-words text-right">
-                        <span className="block text-[15px] font-semibold leading-tight text-foreground">{plan.price}<span className="ml-1 text-[10px] font-medium text-muted-foreground">/ {plan.period}</span></span>
+                        <span className="block text-[15px] font-semibold leading-tight text-foreground">{plan.price}<span className="ml-1 text-[10px] font-medium text-muted-foreground">{plan.id === "lifetime" ? "·" : "/"} {plan.period}</span></span>
                         {plan.anchor && <span className="mt-1 block text-[9px] font-medium leading-snug text-muted-foreground">{plan.anchor}</span>}
                       </span>
                     </Button>;
@@ -585,11 +611,11 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
                   <LockOpen className="h-3 w-3 shrink-0" />
                   <span className="text-center font-semibold">{t("premium.offer.today")}</span>
                 </div>
-              <Button onClick={handleContinue} disabled={purchasing} className="paywall-cta h-auto min-h-12 w-full gap-3 whitespace-normal rounded-full bg-primary px-5 py-3 hover:bg-primary/90">
-                <span className="text-[14px] font-semibold leading-tight">{purchasing ? t("premium.cta.processing") : t(`premium.cta.${selectedPlan}.title`)}</span>
+              <Button onClick={handleContinue} disabled={purchasing || !effectivePlan} className="paywall-cta h-auto min-h-12 w-full gap-3 whitespace-normal rounded-full bg-primary px-5 py-3 hover:bg-primary/90">
+                <span className="text-[14px] font-semibold leading-tight">{purchasing ? t("premium.cta.processing") : selectedTrial && effectivePlan ? trialLabel(effectivePlan, true) : t(effectivePlan === "lifetime" ? "premium.cta.lifetime.title" : `premium.cta.${effectivePlan ?? "yearly"}.titleNoTrial`)}</span>
                 <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" strokeWidth={1.8} />
               </Button>
-              <p className="mt-2 text-center text-[10px] leading-snug text-muted-foreground">{selectedPlan === "yearly" ? `${zeroTodayLabel} · ` : ""}{t(selectedPlan === "weekly" ? "premium.reminder.weekly" : "premium.reminder.yearly")}</p>
+              <p className="mt-2 text-center text-[10px] leading-snug text-muted-foreground">{selectedTrial ? `${zeroTodayLabel} · ` : ""}{t(effectivePlan === "lifetime" ? "premium.reminder.lifetime" : "premium.reminder.weekly")}</p>
               <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3">
                 <Button variant="link" onClick={handleRestore} disabled={restoring} className="h-8 px-0 text-[10px] font-normal text-muted-foreground">{t(restoring ? "premium.footer.restoring" : "premium.footer.restore")}</Button>
                 <span className="text-[10px] text-muted-foreground">{t("premium.footer.terms")}</span>

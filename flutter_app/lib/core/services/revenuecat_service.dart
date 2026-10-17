@@ -14,6 +14,7 @@ import 'prefs.dart';
 import 'wallpaper_bridge.dart';
 import 'app_log.dart';
 import 'purchase_tracking.dart';
+import 'offering_rules.dart';
 
 /// Port of `src/services/revenuecat.ts` + `src/services/premium-sync.ts`.
 /// Same entitlement string, same products, same silent-restore recovery so a
@@ -96,31 +97,49 @@ class RevenueCatService {
 
   /// True when the store will actually grant a free phase for this package
   /// (Play only returns the trial option to eligible users).
-  static bool packageHasFreeTrial(Package p) {
+  static final Map<String, bool> _introEligibility = {};
+
+  static ({int count, String unit})? packageTrial(Package p) {
+    if (p.packageType == PackageType.lifetime) return null;
     final product = p.storeProduct;
     final option = product.defaultOption;
-    if (option != null) return option.freePhase != null;
+    if (option != null) {
+      final phase = option.freePhase;
+      if (phase == null) return null;
+      return freeTrialPeriod('subscription', phase.billingPeriod?.iso8601,
+          phase.billingCycleCount ?? 1);
+    }
+    // App Store metadata alone does not prove customer eligibility.
+    if (_introEligibility[product.identifier] != true) return null;
     final intro = product.introductoryPrice;
-    return intro != null && intro.price == 0;
+    if (intro == null || intro.price != 0) return null;
+    return freeTrialPeriod('subscription', intro.period, intro.cycles);
   }
 
-  static void _rememberTrialMode(Offering? current) {
-    final yearly = current?.annual ??
-        current?.availablePackages
-            .where((p) => p.identifier == '\$rc_annual')
-            .firstOrNull;
-    if (yearly == null) return;
-    final on = packageHasFreeTrial(yearly);
-    Prefs.setBool(_trialKey, on);
+  static bool packageHasFreeTrial(Package p) => packageTrial(p) != null;
+
+  static Future<void> _rememberTrialMode(Offering? current) async {
+    if (current == null) return;
+    if (Platform.isIOS) {
+      try {
+        final result = await Purchases.checkTrialOrIntroductoryPriceEligibility(
+          current.availablePackages.map((p) => p.storeProduct.identifier).toList());
+        for (final entry in result.entries) {
+          _introEligibility[entry.key] = entry.value.status == IntroEligibilityStatus.introEligibilityStatusEligible;
+        }
+      } catch (_) { _introEligibility.clear(); }
+    }
+    final on = current.availablePackages.any(packageHasFreeTrial);
+    await Prefs.setBool(_trialKey, on);
     Analytics.capture('paywall_trial_mode', {
       'trial': on,
-      'offering': current?.identifier,
+      'offering': current.identifier,
     });
   }
 
-  static Future<void> _refreshTrialMode() async {
+  static Future<void> refreshTrialMode() async {
     try {
-      _rememberTrialMode((await Purchases.getOfferings()).current);
+      await _rememberTrialMode((await Purchases.getOfferings()).current);
     } catch (_) {}
   }
 
@@ -139,10 +158,15 @@ class RevenueCatService {
       _configured = true;
       // Identify the RC App User ID to Meta for advanced matching (web parity).
       MetaCapi.captureAppUserId();
+      // Lets support match a test phone to its RevenueCat customer (for
+      // per-customer offering overrides) without asking the user for an ID.
+      Purchases.appUserID.then((id) {
+        if (id.isNotEmpty) Analytics.register({'rc_app_user_id': id});
+      }).catchError((_) {});
       // Keep existing attribution identifiers available to RevenueCat’s native
       // Meta integration; no additional matching identifiers are collected.
       _syncAdIdentifiers();
-      _refreshTrialMode();
+      refreshTrialMode();
     } catch (e) {
       // A failed configure() leaves premium on the cached snapshot — loud in
       // debug so a broken store setup is never invisible during QA.
@@ -234,16 +258,17 @@ class RevenueCatService {
       } catch (_) {}
       final current = (await Purchases.getOfferings()).current;
       if (current == null) return const {};
-      _rememberTrialMode(current);
+      await _rememberTrialMode(current);
       final map = <String, Package>{};
-      if (current.weekly != null) map['weekly'] = current.weekly!;
-      if (current.monthly != null) map['monthly'] = current.monthly!;
-      if (current.annual != null) map['yearly'] = current.annual!;
       for (final pkg in current.availablePackages) {
-        // RevenueCat package identifiers: $rc_weekly, $rc_monthly, $rc_annual
-        if (pkg.identifier == '\$rc_weekly') map['weekly'] = pkg;
-        if (pkg.identifier == '\$rc_monthly') map['monthly'] = pkg;
-        if (pkg.identifier == '\$rc_annual') map['yearly'] = pkg;
+        final key = switch (pkg.packageType) {
+          PackageType.weekly => 'weekly',
+          PackageType.monthly => 'monthly',
+          PackageType.annual => 'yearly',
+          PackageType.lifetime => 'lifetime',
+          _ => null,
+        };
+        if (key != null) map[key] = pkg;
       }
       return map;
     } catch (e) {

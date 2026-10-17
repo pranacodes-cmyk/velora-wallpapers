@@ -14,6 +14,7 @@ import '../core/services/meta_events.dart';
 import '../core/services/rating_service.dart';
 import 'lucide_cross.dart';
 import '../core/services/revenuecat_service.dart';
+import '../core/services/offering_rules.dart';
 import '../core/theme/app_colors.dart';
 import 'lucide.dart';
 import 'price_shimmer.dart';
@@ -27,7 +28,7 @@ import 'package:url_launcher/url_launcher.dart';
 /// 1:1 port of `src/components/PremiumSheet.tsx`.
 /// Same order of blocks, same paddings/radii/typography, same compact/tiny
 /// breakpoints (<740px / <620px), same analytics event names and properties.
-enum PlanId { yearly, monthly, weekly }
+enum PlanId { yearly, monthly, weekly, lifetime }
 
 /// Solid royal gold fill — identical in both themes, so the CTA and badges
 /// never read washed out. Black type always sits on top of it.
@@ -50,25 +51,16 @@ class _PlanSpec {
   final String? badge;
 }
 
-List<_PlanSpec> _buildPlans() => [
-  // Yearly FIRST — the anchor & default. Trial is the hero.
-  _PlanSpec(
-    PlanId.yearly,
-    t('premium.plan.yearly.label'),
-    t('premium.period.year'),
-    t('premium.plan.yearly.subtitle'),
-    t('premium.plan.yearly.badge'),
-  ),
-  // Monthly is hidden from the UI only — the store product stays live so
-  // existing monthly subscribers keep renewing normally.
-  _PlanSpec(
-    PlanId.weekly,
-    t('premium.plan.weekly.label'),
-    t('premium.period.week'),
-    t('premium.plan.weekly.subtitle'),
-    null,
-  ),
-];
+List<_PlanSpec> _buildPlans(Iterable<PlanId> available) =>
+    visibleOfferingPlans(available.map((id) => id.name)).map((name) {
+      final id = PlanId.values.firstWhere((id) => id.name == name);
+      final period = switch (id) {
+        PlanId.yearly => 'year', PlanId.monthly => 'month',
+        PlanId.weekly => 'week', PlanId.lifetime => 'oneTime',
+      };
+      return _PlanSpec(id, t('premium.plan.$name.label'), t('premium.period.$period'),
+        t(id == PlanId.lifetime ? 'premium.plan.lifetime.subtitle' : 'premium.plan.$name.subtitleNoTrial'), null);
+    }).toList();
 
 class _Benefit {
   const _Benefit(this.icon, this.title, this.sub);
@@ -238,11 +230,11 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
     }
     final pkgs = await RevenueCatService.planPackages();
     if (!mounted) return;
-    final mapped = <PlanId, Package>{
-      if (pkgs['weekly'] != null) PlanId.weekly: pkgs['weekly']!,
-      if (pkgs['monthly'] != null) PlanId.monthly: pkgs['monthly']!,
-      if (pkgs['yearly'] != null) PlanId.yearly: pkgs['yearly']!,
-    };
+    final mapped = <PlanId, Package>{};
+    for (final id in PlanId.values) {
+      final pkg = pkgs[id.name];
+      if (pkg != null) mapped[id] = pkg;
+    }
     // Empty result = offline, store hiccup or offerings not cached yet.
     // Retry a few times with growing delays before admitting failure.
     if (mapped.isEmpty && attempt < 3) {
@@ -252,6 +244,8 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
     }
     setState(() {
       _packages = mapped;
+      final next = selectedOfferingPlan(mapped.keys.map((id) => id.name), _selected.name);
+      if (next != null) _selected = PlanId.values.firstWhere((id) => id.name == next);
       _pricesLoading = false;
       _priceFailed = mapped.isEmpty;
     });
@@ -268,10 +262,15 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
 
   /// Trial on/off comes from the RevenueCat offering — no app update needed.
   bool get _trial {
-    final yearly = _packages[PlanId.yearly];
-    return yearly != null
-        ? RevenueCatService.packageHasFreeTrial(yearly)
-        : RevenueCatService.trialOffered;
+    final pkg = _packages[_selected];
+    return pkg != null && RevenueCatService.packageHasFreeTrial(pkg);
+  }
+
+  String _trialLabel(Package pkg, {bool cta = false}) {
+    final trial = RevenueCatService.packageTrial(pkg);
+    if (trial == null) return '';
+    final duration = t('premium.duration.${trial.unit}${trial.count == 1 ? '.one' : ''}', {'count': '${trial.count}'});
+    return t(cta ? 'premium.cta.trialDynamic' : 'premium.plan.trialDynamic', {'duration': duration});
   }
 
   String _zeroTodayLabel() {
@@ -450,7 +449,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
       top: max(mqInsets.top, view.viewPadding.top / dpr),
       bottom: max(mqInsets.bottom, view.viewPadding.bottom / dpr),
     );
-    final plans = _buildPlans();
+    final plans = _buildPlans(_packages.keys);
     final benefits = _buildBenefits();
 
     return Material(
@@ -490,7 +489,10 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
                     decoration: BoxDecoration(color: _background),
                     child: Column(
                       children: [
-                        ..._planCards(plans, compact),
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxHeight: size.height * 0.36),
+                          child: SingleChildScrollView(child: Column(children: _planCards(plans, compact))),
+                        ),
                         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                           Icon(Icons.lock_open, size: 12, color: _gold),
                           const SizedBox(width: 8),
@@ -500,7 +502,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
                         const SizedBox(height: 12),
                         _cta(compact),
                         const SizedBox(height: 8),
-                        Text('${_selected == PlanId.yearly && _trial ? '${_zeroTodayLabel()} · ' : ''}${t(_selected == PlanId.weekly || !_trial ? 'premium.reminder.weekly' : 'premium.reminder.yearly')}',
+                        Text('${_trial ? '${_zeroTodayLabel()} · ' : ''}${t(_selected == PlanId.lifetime ? 'premium.reminder.lifetime' : 'premium.reminder.weekly')}',
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 10, height: 1.5, color: _mutedForeground)),
                         const SizedBox(height: 6),
@@ -689,7 +691,7 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
         child: Semantics(
           selected: isSel,
           child: OutlinedButton(
-            onPressed: () { setState(() => _selected = plan.id); haptic(HapticStyle.soft); },
+            onPressed: _purchasing ? null : () { setState(() => _selected = plan.id); haptic(HapticStyle.soft); },
             style: OutlinedButton.styleFrom(
                minimumSize: Size(double.infinity, 54),
                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -709,14 +711,14 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                  Text(plan.label, style: TextStyle(fontSize: 14, height: 1.15, fontWeight: FontWeight.w600, color: _foreground)),
                  const SizedBox(height: 4),
-                Text(plan.id == PlanId.yearly ? t(_trial ? 'premium.plan.trialBadge' : 'premium.plan.yearly.subtitleNoTrial') : plan.subtitle,
+                Text(pkg != null && RevenueCatService.packageHasFreeTrial(pkg) ? _trialLabel(pkg) : plan.subtitle,
                     style: TextStyle(fontSize: 10, height: 1.25, fontWeight: FontWeight.w500, color: _mutedForeground)),
               ])),
                const SizedBox(width: 12),
               Flexible(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 if (pkg == null && _pricesLoading)
                   PriceShimmer(width: 52, height: 15, base: _mutedForeground)
-                else Text('$priceLabel / $periodLabel', textAlign: TextAlign.right,
+                else Text(plan.id == PlanId.lifetime ? '$priceLabel · $periodLabel' : '$priceLabel / $periodLabel', textAlign: TextAlign.right,
                    style: TextStyle(fontSize: 14, height: 1.1, fontWeight: FontWeight.w600, color: _foreground)),
                 if (anchor != null) ...[
                   const SizedBox(height: 4),
@@ -787,13 +789,13 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
       boxShadow: AppColors.paywallButtonShadow,
     ),
     child: SizedBox(width: double.infinity, child: FilledButton(
-      onPressed: _purchasing ? null : _handleContinue,
+      onPressed: _purchasing || _pricesLoading || _packages.isEmpty ? null : _handleContinue,
       style: FilledButton.styleFrom(backgroundColor: Colors.transparent,
         disabledBackgroundColor: Colors.transparent, foregroundColor: AppColors.darkBackground,
         minimumSize: const Size(double.infinity, 48),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), shape: const StadiumBorder()),
       child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
-        Flexible(child: Text(t(_purchasing ? 'premium.cta.processing' : _selected == PlanId.yearly && !_trial ? 'premium.cta.yearly.titleNoTrial' : 'premium.cta.${_selected.name}.title'),
+        Flexible(child: Text(_purchasing ? t('premium.cta.processing') : _trial && _packages[_selected] != null ? _trialLabel(_packages[_selected] as Package, cta: true) : t(_selected == PlanId.lifetime ? 'premium.cta.lifetime.title' : 'premium.cta.${_selected.name}.titleNoTrial'),
           textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
         const SizedBox(width: 12), const Icon(Icons.arrow_forward_rounded, size: 16),
       ]),
@@ -828,9 +830,9 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
         );
       }
     }
-    final reminderKey = _selected == PlanId.weekly || !_trial
-        ? 'premium.reminder.weekly'
-        : 'premium.reminder.yearly';
+    final reminderKey = _selected == PlanId.lifetime
+        ? 'premium.reminder.lifetime'
+        : 'premium.reminder.weekly';
     out.add(
       Padding(
         padding: const EdgeInsets.only(top: 6),

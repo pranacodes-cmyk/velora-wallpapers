@@ -1,3 +1,4 @@
+import { freeTrialPeriod } from "@/lib/offeringRules";
 import { useEffect, useRef, useState } from "react";
 import { PremiumSheet } from "@/components/PremiumSheet";
 import { usePremium } from "@/hooks/usePremium";
@@ -8,6 +9,7 @@ import {
   ONBOARDING_REPLAY_KEY,
   POST_ONBOARDING_FLOW_COMPLETE_EVENT,
 } from "@/components/onboarding/OnboardingFlow";
+import { fetchOfferingPackages, isRevenueCatAvailable, trialOffered } from "@/services/revenuecat";
 import { markShown } from "@/lib/paywallScheduler";
 
 const SHOWN_KEY = "cw_post_onboarding_premium_shown";
@@ -86,6 +88,14 @@ export function PostOnboardingPremium() {
           return;
         }
       } catch {}
+      if (isRevenueCatAvailable()) await fetchOfferingPackages();
+      let hasTrial = trialOffered();
+      if (!isRevenueCatAvailable()) {
+        try {
+          const trials = JSON.parse(localStorage.getItem("prayly_preview_trials") ?? '{}');
+          hasTrial = Object.entries(trials).some(([id, period]) => freeTrialPeriod(id, typeof period === "string" ? period : null) !== null);
+        } catch { hasTrial = false; }
+      }
       const release = await acquireOverlay("post_onboarding_premium");
       if (cancelled || (isPremium && !allowPremiumReplay)) {
         release();
@@ -109,7 +119,7 @@ export function PostOnboardingPremium() {
         if (cancelled || (isPremium && !allowPremiumReplay)) {
           release(); releaseRef.current = null; return;
         }
-        if (!showIntro) {
+        if (!showIntro || !hasTrial) {
           setOpen(true);
           return;
         }
