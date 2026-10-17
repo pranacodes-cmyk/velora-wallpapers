@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/services/ios_platform.dart';
 import '../../core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -132,13 +133,16 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               child: Row(
                 children: [
-                  GiftButton(
-                    onTap: () {
-                      haptic(HapticStyle.soft);
-                      showLifeCalendarPreview(context, ref.read(languageProvider));
-                    },
-                  ),
-                  const SizedBox(width: 10),
+                  // Life Calendar is a Google Play app — no gift on iPhone.
+                  if (!IosPlatform.isIOS) ...[
+                    GiftButton(
+                      onTap: () {
+                        haptic(HapticStyle.soft);
+                        showLifeCalendarPreview(context, ref.read(languageProvider));
+                      },
+                    ),
+                    const SizedBox(width: 10),
+                  ],
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,6 +285,8 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                 ),
                 const app_keep_alive.KeepAlive(child: PrayerAlarmToggles()),
 
+                // 3D parallax wallpapers need Android's live wallpaper engine.
+                if (!IosPlatform.isIOS)
                 app_keep_alive.KeepAlive(
                   child: ParallaxRail(
                     onOpenScene: (id, personalize) =>
@@ -297,6 +303,8 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
 
                 const app_keep_alive.KeepAlive(child: ChallengeHomeCard()),
 
+                // Shield relies on Android usage access — hidden on iPhone.
+                if (!IosPlatform.isIOS)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
                   child: GestureDetector(

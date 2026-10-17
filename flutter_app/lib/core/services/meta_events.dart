@@ -1,14 +1,15 @@
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:flutter/foundation.dart';
+import 'purchase_tracking.dart';
 
 /// Meta (Facebook) App Events — 1:1 port of the web build's
 /// `src/services/meta-events.ts`.
 ///
 /// Fires the standard events Meta Ads campaigns rely on:
-///   - App install / open (auto-logged by the native SDK)
+///   - App install / open (explicit native lifecycle activation)
 ///   - CompleteRegistration (onboarding finished)
 ///   - InitiatedCheckout (paywall opened)
-///   - Purchase / Subscribe (RevenueCat success) → powers Value Optimization
+///   - RevenueCat native integration owns subscription conversions
 ///
 /// Every call is a no-op on web and never throws.
 class MetaEvents {
@@ -20,12 +21,13 @@ class MetaEvents {
   static bool get _available => !kIsWeb;
 
   /// Call once at app start. The native SDK auto-logs app open/install.
-  static Future<void> init() async {
+  static Future<void> init({bool trackingAllowed = true}) async {
     if (!_available || _ready) return;
     try {
-      // Android: allows advertiser-id collection (no-op where ATT governs).
-      await _fb.setAdvertiserTracking(enabled: true);
-      await _fb.setAutoLogAppEventsEnabled(true);
+      // Android: allows advertiser-id collection. iOS: follows the user's App
+      // Tracking Transparency answer.
+      await _fb.setAdvertiserTracking(enabled: trackingAllowed);
+      await _fb.setAutoLogAppEventsEnabled(false);
       _ready = true;
     } catch (_) {
       /* non-fatal */
@@ -37,7 +39,7 @@ class MetaEvents {
     Map<String, dynamic>? params,
     double? valueToSum,
   }) async {
-    if (!_available) return;
+    if (!_available || isMetaConversion(name)) return;
     try {
       await _fb.logEvent(
         name: name,

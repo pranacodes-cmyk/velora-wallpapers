@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/localization/app_localizations.dart';
 import '../core/services/daily_reminder_service.dart';
+import '../core/services/ios_platform.dart';
 import '../core/services/pray_screen_service.dart';
 import '../core/services/prayer_pause_store.dart';
 import '../core/services/prefs.dart';
@@ -20,6 +21,7 @@ class LanguageController extends StateNotifier<String> {
     final lang = saved ?? resolveLang(device);
     await L10n.load(lang);
     state = lang;
+    IosPlatform.syncState(lang: lang, premium: Prefs.getBool(StorageKeys.premiumUnlocked));
     // Sacred Pause prayers are published from the backend; warm them up (and
     // refresh the on-device cache) without holding the first frame.
     PrayerPauseStore.load(lang);
@@ -29,6 +31,7 @@ class LanguageController extends StateNotifier<String> {
     await L10n.load(lang);
     await Prefs.setString(StorageKeys.lang, lang);
     state = lang;
+    IosPlatform.syncState(lang: lang);
     // Native re-arm + prayer refresh run after the new language has painted,
     // so rapid switching never stalls the UI on platform-channel work.
     Future<void>.delayed(const Duration(milliseconds: 400), () {
@@ -51,6 +54,14 @@ class PremiumController extends StateNotifier<bool> {
   }
 
   void _onPremiumChanged(bool active) => state = active;
+
+  /// Every Pro change also reaches the iOS widgets / wallpaper renderer
+  /// (no-op on Android and web).
+  @override
+  set state(bool value) {
+    super.state = value;
+    IosPlatform.syncState(premium: value);
+  }
 
   @override
   void dispose() {

@@ -1,0 +1,4 @@
+/* Permission prompts (generated from scripts/native_strings.py) */
+"CFBundleDisplayName" = "Prayly";
+"NSUserTrackingUsageDescription" = "Erlaube Tracking, damit wir sehen, welche unserer Anzeigen Menschen zu Prayly führen. So kann die App weiter wachsen. Wir verkaufen deine Daten niemals.";
+"NSPhotoLibraryAddUsageDescription" = "Prayly speichert dein Tagesvers-Hintergrundbild in Fotos, damit du es als Hintergrundbild verwenden kannst.";

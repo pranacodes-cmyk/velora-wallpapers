@@ -78,16 +78,20 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    if (!META_CAPI_ACCESS_TOKEN) {
-      return new Response(JSON.stringify({ error: "META_CAPI_ACCESS_TOKEN not configured" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const body = (await req.json()) as TrackPayload;
     if (!body?.event_name) {
       return new Response(JSON.stringify({ error: "event_name required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (["purchase", "fb_mobile_purchase", "subscribe", "starttrial"].includes(body.event_name.toLowerCase())) {
+      return new Response(JSON.stringify({ ok: true, skipped: "revenuecat-native-meta-owns-conversions" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!META_CAPI_ACCESS_TOKEN) {
+      return new Response(JSON.stringify({ error: "Meta credentials not configured" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 

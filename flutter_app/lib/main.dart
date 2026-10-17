@@ -14,10 +14,12 @@ import 'core/services/ads_service.dart';
 import 'core/services/analytics.dart';
 import 'core/services/backend_service.dart';
 import 'core/services/content_push_service.dart';
+import 'core/services/ios_platform.dart';
 import 'core/services/meta_events.dart';
 import 'core/services/ota_service.dart';
 import 'core/services/prefs.dart';
 import 'core/services/rating_service.dart';
+import 'core/services/revenuecat_service.dart';
 import 'core/services/telemetry.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
@@ -108,7 +110,16 @@ Future<void> main() async {
     // another SDK: install + app_open must fire on the first session no matter
     // how slow AdMob, PostHog or the backend are. Only the ordering moved off
     // the startup path — nothing about the tracking itself changed.
-    if (!kIsWeb) {
+    if (IosPlatform.isIOS) {
+      // iOS: App Tracking Transparency is asked first; Meta and RevenueCat
+      // only use the advertising identifier if the user allows it.
+      IosPlatform.requestTracking().then((status) async {
+        await MetaEvents.init(trackingAllowed: status == 'authorized')
+            .catchError((_) {});
+        await RevenueCatService.refreshAdIdentifiers().catchError((_) {});
+        Analytics.capture('att_answered', {'status': status});
+      });
+    } else if (!kIsWeb) {
       MetaEvents.init().catchError((_) {}).whenComplete(() {
         // Install + app open are auto-logged by the native Meta SDK with
         // full attribution; no duplicate server copies.

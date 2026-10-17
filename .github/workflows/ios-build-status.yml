@@ -1,0 +1,44 @@
+name: iOS build status
+
+# Waits for Apple to finish processing an uploaded build, then adds
+# "What to Test" notes and puts it in the internal TestFlight groups.
+on:
+  workflow_dispatch:
+    inputs:
+      build_number:
+        description: "CFBundleVersion to check (blank = newest)"
+        required: false
+        default: ""
+  workflow_call:
+    inputs:
+      build_number:
+        type: string
+        required: false
+        default: ""
+    secrets:
+      APPSTORE_ISSUER_ID:
+        required: true
+      APPSTORE_KEY_ID:
+        required: true
+      APPSTORE_PRIVATE_KEY:
+        required: true
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Wait for Apple processing + enable TestFlight
+        env:
+          ISS: ${{ secrets.APPSTORE_ISSUER_ID }}
+          KID: ${{ secrets.APPSTORE_KEY_ID }}
+          PK: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+          BUILD: ${{ inputs.build_number }}
+          MAX_WAIT_MIN: ${{ inputs.build_number != '' && '35' || '3' }}
+        run: node .github/scripts/asc_build_status.mjs

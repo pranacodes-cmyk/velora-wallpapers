@@ -12,6 +12,7 @@ import 'parallax_wallpaper.dart';
 import 'prefs.dart';
 import 'wallpaper_bridge.dart';
 import 'app_log.dart';
+import 'purchase_tracking.dart';
 
 /// Port of `src/services/revenuecat.ts` + `src/services/premium-sync.ts`.
 /// Same entitlement string, same products, same silent-restore recovery so a
@@ -78,6 +79,12 @@ class RevenueCatService {
     _premiumListeners.remove(listener);
   }
 
+  /// Re-sends device identifiers (e.g. right after the iOS tracking answer).
+  static Future<void> refreshAdIdentifiers() async {
+    if (!_configured) return;
+    await _syncAdIdentifiers();
+  }
+
   static Future<void> init() async {
     if (_configured || kIsWeb) return;
     final key = Platform.isIOS
@@ -93,8 +100,8 @@ class RevenueCatService {
       _configured = true;
       // Identify the RC App User ID to Meta for advanced matching (web parity).
       MetaCapi.captureAppUserId();
-      // Attach ad identifiers to the RevenueCat customer so the server can
-      // send StartTrial / Purchase to Meta with ad attribution.
+      // Keep existing attribution identifiers available to RevenueCat’s native
+      // Meta integration; no additional matching identifiers are collected.
       _syncAdIdentifiers();
     } catch (e) {
       // A failed configure() leaves premium on the cached snapshot — loud in
@@ -222,7 +229,7 @@ class RevenueCatService {
     }
   }
 
-  static Future<bool> purchase(Package package) async {
+  static Future<CheckoutOutcome> purchase(Package package) async {
     if (!_configured) await init();
     if (!_configured) {
       throw StateError('Purchases are unavailable on this device.');
@@ -233,14 +240,17 @@ class RevenueCatService {
     final active = _hasPremium(info);
     await _applyCustomerInfo(info);
 
-    if (active) {
-      // StartTrial and Purchase are sent to Meta ONLY by the RevenueCat
-      // webhook (server), so they are never double-counted and still arrive
-      // when the app is closed or payment confirms late. Make sure the ad
-      // identifiers are on the customer before RevenueCat fires the webhook.
-      _syncAdIdentifiers();
-    }
-    return active;
+    // RevenueCat's native Meta integration owns store-confirmed conversions.
+    if (active) _syncAdIdentifiers();
+    final entitlement = info.entitlements.active[Env.entitlementId];
+    final period = entitlement?.periodType;
+    return CheckoutOutcome(
+      active: active,
+      periodType: period == PeriodType.trial ? 'TRIAL'
+          : period == PeriodType.normal ? 'NORMAL'
+          : period == PeriodType.intro ? 'INTRO' : 'UNKNOWN',
+      isSandbox: entitlement?.isSandbox ?? false,
+    );
   }
 
   static Future<bool> restore() async {

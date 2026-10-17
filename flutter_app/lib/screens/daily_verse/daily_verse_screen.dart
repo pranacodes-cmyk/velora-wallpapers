@@ -17,6 +17,9 @@ import '../../state/app_providers.dart';
 import '../../widgets/app_toast.dart';
 import '../../widgets/premium_sheet.dart';
 import '../today/today_shared.dart';
+import '../../core/services/ios_platform.dart';
+import '../ios/ios_copy.dart';
+import '../ios/ios_wallpaper.dart';
 import 'daily_verse_wallpaper_preview.dart';
 import 'verse_pack_picker.dart';
 
@@ -40,6 +43,9 @@ class _DailyVerseScreenState extends ConsumerState<DailyVerseScreen>
   bool _autoActive = false;
   bool _preparingAuto = false;
   String _premiumTrigger = 'daily_verse';
+
+  /// Bumped after anything that changes the iOS render (unlock, pack, Pro).
+  int _iosPreviewRevision = 0;
 
   @override
   void initState() {
@@ -122,6 +128,15 @@ class _DailyVerseScreenState extends ConsumerState<DailyVerseScreen>
       return;
     }
     haptic(HapticStyle.heavy);
+    if (IosPlatform.isIOS) {
+      // iOS: wallpapers can only change through Apple Shortcuts — open the
+      // one-time setup guide instead of Android's live wallpaper picker.
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const IosWallpaperGuideScreen()),
+      );
+      _refreshAutoState();
+      return;
+    }
     if (_preparingAuto) return;
     setState(() => _preparingAuto = true);
     try {
@@ -200,7 +215,14 @@ class _DailyVerseScreenState extends ConsumerState<DailyVerseScreen>
           if (mounted) AppToast.error(context, t('dv.toast.adError'));
           return;
         }
+      }
 
+      if (IosPlatform.isIOS) {
+        await _applyIos(isPremium);
+        return;
+      }
+
+      if (!isPremium) {
         // Free users need TODAY'S exact background cached locally, otherwise
         // the wallpaper service repaints from yesterday's cached image.
         final prepared = await _guard<Map<Object?, Object?>?>(
@@ -244,6 +266,36 @@ class _DailyVerseScreenState extends ConsumerState<DailyVerseScreen>
       );
     } finally {
       if (mounted) setState(() => _applying = false);
+    }
+  }
+
+  /// iPhone: unlock today, then either run the user's automation shortcut
+  /// (instant) or save the exact wallpaper to Photos and offer the setup.
+  Future<void> _applyIos(bool isPremium) async {
+    await WallpaperBridge.dailyVerseMarkUnlocked();
+    if (mounted) setState(() => _iosPreviewRevision++);
+    final status = await IosPlatform.automationStatus();
+    if (status.active) {
+      final ran = await IosPlatform.runShortcut();
+      if (ran) {
+        Analytics.capture('daily_verse_ios_shortcut_run', {'is_premium': isPremium});
+        if (mounted) AppToast.success(context, IosCopy.t('shortcut.ran'));
+        Future.delayed(const Duration(milliseconds: 5000), RatingService.maybeRequestRating);
+        return;
+      }
+    }
+    final result = await IosPlatform.saveTodayToPhotos();
+    if (!mounted) return;
+    if (result == 'saved') {
+      haptic(HapticStyle.heavy);
+      Analytics.capture('daily_verse_ios_saved_photos', {'is_premium': isPremium});
+      await showIosSavedSheet(context, onMakeAutomatic: _handleEnableAutoUpdate);
+      Future.delayed(const Duration(milliseconds: 3000), RatingService.maybeRequestRating);
+    } else if (result == 'denied') {
+      AppToast.error(context, IosCopy.t('photos.denied'));
+      Analytics.capture('daily_verse_ios_photos_denied');
+    } else {
+      AppToast.error(context, IosCopy.t('photos.failed'));
     }
   }
 
@@ -423,10 +475,19 @@ class _DailyVerseScreenState extends ConsumerState<DailyVerseScreen>
                                     ),
                                   ],
                                 ),
-                                child: DailyVerseWallpaperPreview(
-                                  verse: verse,
-                                  backgroundUrl: bg?.url,
-                                ),
+                                child: IosPlatform.isIOS
+                                    // Exact native render = what the Shortcut sets.
+                                    ? IosWallpaperPreview(
+                                        key: ValueKey('ios-dv-$_iosPreviewRevision-$isPremium'),
+                                        fallback: DailyVerseWallpaperPreview(
+                                          verse: verse,
+                                          backgroundUrl: bg?.url,
+                                        ),
+                                      )
+                                    : DailyVerseWallpaperPreview(
+                                        verse: verse,
+                                        backgroundUrl: bg?.url,
+                                      ),
                               ),
                             ),
                           ),
@@ -571,7 +632,7 @@ class _DailyVerseScreenState extends ConsumerState<DailyVerseScreen>
                                     const SizedBox(width: 8),
                                     Text(
                                       _autoActive
-                                          ? t('dv.auto.title')
+                                          ? (IosPlatform.isIOS ? IosCopy.t('dv.autoOn') : t('dv.auto.title'))
                                           : _preparingAuto
                                           ? t('dv.cta.preparing')
                                           : t('dv.cta.auto'),
@@ -623,6 +684,7 @@ class _DailyVerseScreenState extends ConsumerState<DailyVerseScreen>
                           Analytics.capture('verse_pack_apply_auto_launched', {
                             'mood': mood,
                           });
+                          if (IosPlatform.isIOS) setState(() => _iosPreviewRevision++);
                           Future.delayed(
                             const Duration(milliseconds: 250),
                             _handleApplyWallpaper,

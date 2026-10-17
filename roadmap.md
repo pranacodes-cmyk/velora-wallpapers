@@ -76,7 +76,7 @@
 - [x] Gift tap opens Life Calendar wallpaper preview, app name and Install action in matching web/Flutter; web preview and exact Play listing verified, native store launch awaits approved device build.
 - [x] Cancel requested Play build before store upload and restore repository private; do not restart without approval.
 - [x] Release Prayly 1.0.1201 (30100166) to Play Internal Testing; run 38260726966 and store upload succeeded, GitHub repository restored private.
-- [ ] iOS release blocked: native iOS project, Apple signing and App Store Connect credentials missing.
+- [x] iOS release unblocked: Flutter iOS project + TestFlight workflow in the old iOS repo (working Apple key) — see iOS section below.
 
 ## 75 Days of Light challenge (replaces Journeys)
 - [x] Replace Live it with the approved 75 practical missions and why-it-matters copy; all eight language packs independently edited, exact Flutter parity and placeholders tested, web layouts and completion/reload verified.
@@ -131,6 +131,31 @@
 ## Alarm ringing-screen fix
 - [x] Fix alarm: notification Dismiss/Open now silences + closes the ringing screen, volume keys mute instantly, back/power stop it, auto-stop at 60s (web parity n/a; Flutter/native Android only).
 - [x] Pushed to GitHub main (commit cd26e67); repo back to private.
-- [ ] Play internal-track build for the alarm fix (blocked: GitHub Actions refuses to start jobs — "recent account payments have failed or your spending limit needs to be increased"; needs the user to fix GitHub Billing & plans, then re-run).
-- [ ] Device-check the alarm on a phone after that build (blocked: needs the build).
+- [x] Play build for the alarm fix shipped (v1.0.1208, now in production).
+- [ ] Device-check the alarm on a phone (needs the user's phone with v1.0.1208).
 
+
+## iOS Flutter app (replaces old Capacitor App Store build)
+- [x] Flutter iOS project (same bundle ID, iPhone + iPad, app iOS 15+, widgets iOS 16+), Android project untouched
+- [x] Native iOS bridge: wallpaper channel (save to Photos, daily verse state), reminders/alarms via local notifications, Shield/live/3D/Life Calendar hidden on iOS
+- [x] On-device daily wallpaper renderer (same 20 photos + verse selection, content below lock-screen clock); in-app preview uses the same render
+- [x] Shortcuts action "Get Today's Prayly Wallpaper" + in-app one-time automation guide (8 languages)
+- [x] Home Screen widget (photo + verse, 3 sizes) and Lock Screen widgets (verse, streak) sharing the old App Group
+- [x] RevenueCat App Store key, ATT prompt at start, Meta/RevenueCat ad-ID after ATT, Apple-native rating only on iOS
+- [x] App Store compliance: privacy manifests, paywall Terms(EULA)/Privacy links + renewal disclosure, Apple wording in legal pages on iOS
+- [x] First TestFlight upload: 1.0.23 (29868253) processed VALID, in internal testing (fixed Apple ITMS-90626 intent wording + ITMS-90683 microphone APIs)
+- [ ] Real-device check of Shortcut automation, widgets, purchase/restore and ATT on TestFlight (needs the user's iPhone)
+- [ ] App Store submission of the new version (screenshots/review notes in App Store Connect; after TestFlight approval by the user)
+- [ ] AdMob on iOS (blocked: needs iOS app + ad unit IDs created in the AdMob account)
+- [ ] AlarmKit real alarms on iOS 26 (next step after first TestFlight)
+
+## Purchase / trial tracking cleanup
+- [x] Recheck the historical saved-token release path against successful releases on October 14–15: both used GITHUB_PUSH_TOKEN and flutter-play-store.yml; no alternate GitHub backend dispatcher or CLI credential is available in this sandbox. All 32 tracking regression tests pass.
+- [ ] Ship the approved Flutter tracking-fix build to Play Internal Testing using the existing saved-token release path, then restore repository private (securely updated access verified: GitHub repository HTTP 200 with admin/push permission; sync and workflow dispatch in progress).
+- [x] Retire custom webhook forwarding and block client conversion sends, including old-client requests at the live server; disable automatic SDK IAP logging in native configs and preserve explicit activation.
+- [x] Separate trial checkout success from paid checkout/revenue in PostHog on web and Flutter; trial has zero price and catalog price is not revenue.
+- [ ] Verify RevenueCat built-in Meta enabled state and event mappings (blocked: dashboard-only configuration is not readable through available integration API).
+- [ ] Verify install/open, real trial, paid conversion and renewal receipt on device (blocked: requires explicitly approved new native build and real store/test receipt).
+
+## Live Photo wallpapers on iOS
+- [ ] Live Photo wallpapers on iOS (deferred until explicitly requested).

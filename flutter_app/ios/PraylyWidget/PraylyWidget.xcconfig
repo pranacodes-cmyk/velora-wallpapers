@@ -1,0 +1,3 @@
+// Widget extension shares the Flutter build name/number with the app so the
+// versions always match (App Store requirement for embedded extensions).
+#include? "../Flutter/Generated.xcconfig"

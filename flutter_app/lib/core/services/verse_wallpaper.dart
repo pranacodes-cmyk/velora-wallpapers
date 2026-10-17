@@ -360,6 +360,7 @@ class VerseWallpaper {
           files: [XFile(file.path, mimeType: 'image/png')],
           text: caption,
           subject: 'Daily Bible Verse',
+          sharePositionOrigin: kShareOrigin,
         ),
       );
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/services/ios_platform.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/ads_service.dart';
 import '../../core/services/challenge_store.dart';
@@ -34,8 +35,10 @@ import '../pray_screen/pray_screen_screen.dart';
 const _lifeCalendarUrl =
     'https://play.google.com/store/apps/details?id=com.mylifecalendar.app';
 const _supportEmail = 'pranacodes@gmail.com';
-const _playStoreUrl =
-    'https://play.google.com/store/apps/details?id=com.jesuswallpaperbible.app';
+/// Rate row: Play listing on Android, App Store "Write a Review" on iOS.
+String get _playStoreUrl => IosPlatform.isIOS
+    ? '${IosPlatform.appStoreUrl}?action=write-review'
+    : 'https://play.google.com/store/apps/details?id=com.jesuswallpaperbible.app';
 const _appVersionFallback = '1.0';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -808,6 +811,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
 
             const PrayerAlarmToggles(),
+            // Shield needs Android usage access; iOS has no equivalent API.
+            if (!IosPlatform.isIOS)
             _Section(
               title: t('nav.prayscreen'),
               child: _Row(
@@ -837,6 +842,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
 
             // ---------------- More from us ----------------
+            // Life Calendar ships on Google Play only.
+            if (!IosPlatform.isIOS)
             _Section(
               title: t('settings.section.more'),
               child: TapScale(
@@ -958,7 +965,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     onTap: () => ShareService.share(
                       title: t('share.title'),
                       text: t('share.text'),
-                      url: _playStoreUrl,
+                      url: kAppPlayStoreUrl,
                       dialogTitle: t('share.dialogTitle'),
                     ),
                   ),

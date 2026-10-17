@@ -9,9 +9,15 @@ class Env {
 
   /// RevenueCat — Google Play public SDK key (same as `src/services/revenuecat.ts`).
   static const revenueCatAndroidKey = 'goog_XgbEkcJHOfiAMIUudVojRoiMWCs';
-  static const revenueCatIosKey = '';
+  static const revenueCatIosKey = 'appl_waMoLfyPfiADOxbkRaKRBIUIoOp';
 
   /// Server-side entitlement identifier — must never change.
+  /// AdMob iOS ad units. Empty = ads stay off on iOS (rewarded unlocks are
+  /// granted directly) until the iOS AdMob app exists; then also set
+  /// `GADApplicationIdentifier` in ios/Runner/Info.plist.
+  static const admobIosRewardedUnit = '';
+  static const admobIosInterstitialUnit = '';
+
   static const entitlementId = 'Jesus Wallpaper & Bible Prayer Pro';
 
   static const productWeekly = 'prayly_weekly';

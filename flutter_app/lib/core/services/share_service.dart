@@ -1,14 +1,34 @@
+import 'dart:ui' show PlatformDispatcher, Rect;
+
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'analytics.dart';
+import 'ios_platform.dart';
 
 /// 1:1 port of `src/utils/nativeShare.ts`.
 ///
 /// Every share ends with the Play Store link so each share is also an organic
 /// install opportunity, and the same `share_invoked` analytics event fires.
-const kAppPlayStoreUrl =
+const _kPlayStoreUrl =
     'https://play.google.com/store/apps/details?id=com.jesuswallpaperbible.app';
+
+/// Store link for the platform the user is on (Play on Android/web, App Store
+/// on iPhone/iPad) so every share invites friends to the right store.
+String get kAppPlayStoreUrl =>
+    IosPlatform.isIOS ? IosPlatform.appStoreUrl : _kPlayStoreUrl;
+
+/// iPad presents the share sheet as a popover and needs an anchor; phones and
+/// Android ignore it.
+Rect? get kShareOrigin {
+  if (!IosPlatform.isIOS) return null;
+  final views = PlatformDispatcher.instance.views;
+  if (views.isEmpty) return null;
+  final v = views.first;
+  final w = v.physicalSize.width / v.devicePixelRatio;
+  final h = v.physicalSize.height / v.devicePixelRatio;
+  return Rect.fromLTWH(w / 2 - 1, h * 0.45, 2, 2);
+}
 
 class ShareService {
   const ShareService._();
@@ -61,7 +81,7 @@ class ShareService {
 
     try {
       final result = await SharePlus.instance.share(
-        ShareParams(text: payload, subject: title),
+        ShareParams(text: payload, subject: title, sharePositionOrigin: kShareOrigin),
       );
 
       _report(

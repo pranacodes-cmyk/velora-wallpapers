@@ -2,6 +2,8 @@ package com.jesuswallpaperbible.app;
 
 import android.content.Intent;
 import android.os.Bundle;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -75,6 +77,9 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            if (FacebookSdk.isInitialized()) AppEventsLogger.activateApp(getApplication());
+        } catch (Throwable ignored) { /* non-fatal attribution */ }
         stashRoute(getIntent());
     }
 

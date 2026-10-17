@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/services/haptics.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/lucide.dart';
+import 'legal_platform.dart';
 
 /// One section of a legal document — heading + body blocks.
 class LegalSection {
@@ -180,7 +181,7 @@ class LegalScreen extends StatelessWidget {
       color: AppColors.mutedForeground,
     );
     return RichText(
-      text: TextSpan(style: base, children: _spans(raw, base)),
+      text: TextSpan(style: base, children: _spans(legalForPlatform(raw), base)),
     );
   }
 

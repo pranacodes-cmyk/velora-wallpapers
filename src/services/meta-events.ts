@@ -1,12 +1,13 @@
 import { Capacitor } from "@capacitor/core";
 import { FacebookAnalytics } from "@capgo/capacitor-facebook-analytics";
+import { isMetaConversion } from "@/lib/purchaseTracking";
 
 /**
  * Meta (Facebook) App Events wrapper.
  * Fires standard events used by Meta Ads campaigns:
- *   - App install / open (auto-logged by native SDK)
+ *   - App install / open (explicit native activation)
  *   - CompleteRegistration (onboarding done)
- *   - Subscribe / Purchase (RevenueCat success) → enables VO campaigns
+ *   - RevenueCat native integration owns subscription conversions
  * All calls are no-ops on web.
  */
 
@@ -36,13 +37,13 @@ export async function logMetaEvent(
   params?: Record<string, string | number>,
   value?: { amount: number; currency: string }
 ): Promise<void> {
-  if (!isAvailable()) return;
+  if (!isAvailable() || isMetaConversion(name)) return;
   try {
     await FacebookAnalytics.logEvent({
-      eventName: name,
+      event: name,
       params,
-      ...(value ? { value: value.amount, currency: value.currency } : {}),
-    } as any);
+      ...(value ? { valueToSum: value.amount, currency: value.currency } : {}),
+    });
   } catch {
     /* swallow */
   }
@@ -68,14 +69,3 @@ export function logContentView(wallpaperId?: string): void {
   void logMetaEvent("fb_mobile_content_view", wallpaperId ? { fb_content_id: wallpaperId } : undefined);
 }
 
-/**
- * Standard Meta StartTrial event (value 0). Purchase is never sent from the
- * app — the RevenueCat webhook is the single Purchase sender to Meta.
- */
-export function logStartTrial(currency: string, productId?: string): void {
-  void logMetaEvent(
-    "StartTrial",
-    { fb_currency: currency, ...(productId ? { fb_content_id: productId } : {}) },
-    { amount: 0, currency },
-  );
-}

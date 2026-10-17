@@ -1,0 +1,4 @@
+/* Permission prompts (generated from scripts/native_strings.py) */
+"CFBundleDisplayName" = "Prayly";
+"NSUserTrackingUsageDescription" = "ट्रैकिंग की अनुमति दें ताकि हम जान सकें कि हमारे कौन-से विज्ञापन लोगों को Prayly तक पहुँचाते हैं। इससे ऐप बढ़ता रहता है। हम आपका डेटा कभी नहीं बेचते।";
+"NSPhotoLibraryAddUsageDescription" = "Prayly आपका रोज़ का वचन वॉलपेपर Photos में सेव करता है, ताकि आप उसे वॉलपेपर बना सकें।";

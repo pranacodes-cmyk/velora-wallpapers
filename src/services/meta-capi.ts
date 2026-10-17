@@ -6,6 +6,7 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
+import { isMetaConversion } from "@/lib/purchaseTracking";
 
 const DEVICE_KEY = "cw_device_id";
 const INSTALL_FIRED_KEY = "cw_meta_install_fired";
@@ -99,6 +100,7 @@ export async function trackMetaCapi(
   event_name: string,
   opts: { value?: number; currency?: string; custom_data?: Record<string, unknown>; event_id?: string } = {}
 ): Promise<void> {
+  if (isMetaConversion(event_name)) return;
   try {
     await supabase.functions.invoke("meta-capi", {
       body: {
@@ -151,17 +153,4 @@ export function metaTrackInitiateCheckout(value: number, currency: string, produ
   });
 }
 
-// Purchase is intentionally NOT sent from the app — the RevenueCat webhook
-// is the single Purchase sender to Meta (avoids duplicate/trial Purchases).
-
-
-export function metaTrackSubscribe(value: number, currency: string, productId?: string): string {
-  const event_id = uuid();
-  void trackMetaCapi("Subscribe", {
-    value,
-    currency,
-    event_id,
-    custom_data: productId ? { content_ids: [productId] } : undefined,
-  });
-  return event_id;
-}
+// RevenueCat native integration exclusively owns subscription conversions.

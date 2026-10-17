@@ -9,6 +9,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import '../core/localization/app_localizations.dart';
 import '../core/services/analytics.dart';
 import '../core/services/haptics.dart';
+import '../core/services/ios_platform.dart';
 import '../core/services/meta_events.dart';
 import '../core/services/rating_service.dart';
 import 'lucide_cross.dart';
@@ -19,6 +20,9 @@ import 'price_shimmer.dart';
 import 'paywall_welcome_film.dart';
 import '../core/theme/app_theme.dart';
 import '../state/app_providers.dart';
+import '../screens/ios/ios_copy.dart';
+import '../screens/legal/privacy_policy_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// 1:1 port of `src/components/PremiumSheet.tsx`.
 /// Same order of blocks, same paddings/radii/typography, same compact/tiny
@@ -321,17 +325,18 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
         product.price,
         product.currencyCode,
       );
-      final ok = await RevenueCatService.purchase(pkg);
+      final outcome = await RevenueCatService.purchase(pkg);
       if (!mounted) return;
-      if (ok) {
+      if (outcome.active) {
         ref.read(premiumProvider.notifier).setUnlocked();
         haptic(HapticStyle.heavy);
         _toast(t('premium.toast.unlocked'));
-        Analytics.capture('purchase_completed', {
+        Analytics.capture(outcome.event, {
           ..._planProps,
           'product_id': product.identifier,
-          'price': product.price,
+          'catalog_price': product.price,
           'currency': product.currencyCode,
+          ...outcome.properties,
         });
         widget.onUnlock?.call();
         _close();
@@ -864,9 +869,42 @@ class _PremiumSheetState extends ConsumerState<PremiumSheet> {
           ),
         ),
         sep,
-        Text(t('premium.footer.terms'), style: style),
+        if (IosPlatform.isIOS)
+          GestureDetector(
+            onTap: () => launchUrl(
+              Uri.parse(IosPlatform.appleEulaUrl),
+              mode: LaunchMode.externalApplication,
+            ),
+            child: Text(
+              t('premium.footer.terms'),
+              style: style.copyWith(decoration: TextDecoration.underline, decorationColor: _mutedForeground),
+            ),
+          )
+        else
+          Text(t('premium.footer.terms'), style: style),
         sep,
-        Text(t('premium.footer.privacy'), style: style),
+        if (IosPlatform.isIOS)
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const PrivacyPolicyScreen()),
+            ),
+            child: Text(
+              t('premium.footer.privacy'),
+              style: style.copyWith(decoration: TextDecoration.underline, decorationColor: _mutedForeground),
+            ),
+          )
+        else
+          Text(t('premium.footer.privacy'), style: style),
+        // App Store auto-renewal disclosure (Guideline 3.1.2).
+        if (IosPlatform.isIOS)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              IosCopy.t('pay.disclosure'),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 9.5, height: 1.4, color: _mutedForeground.withValues(alpha: 0.85)),
+            ),
+          ),
       ],
     );
   }

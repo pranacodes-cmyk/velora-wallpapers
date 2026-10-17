@@ -86,7 +86,7 @@ function verifyNativeCrashHardening() {
     'android:theme="@style/AppTheme.Launcher"',
   ]);
   requireManifestMetaValue('android/app/src/main/AndroidManifest.xml', 'com.facebook.sdk.AutoInitEnabled', 'true');
-  requireManifestMetaValue('android/app/src/main/AndroidManifest.xml', 'com.facebook.sdk.AutoLogAppEventsEnabled', 'true');
+  requireManifestMetaValue('android/app/src/main/AndroidManifest.xml', 'com.facebook.sdk.AutoLogAppEventsEnabled', 'false');
   requireManifestMetaValue('android/app/src/main/AndroidManifest.xml', 'com.facebook.sdk.AdvertiserIDCollectionEnabled', 'true');
   requireFileContains('android/app/src/main/java/com/jesuswallpaperbible/app/MainActivity.java', [
     'setImportantForAutofill',

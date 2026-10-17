@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'backend_service.dart';
 import 'prefs.dart';
+import 'purchase_tracking.dart';
 
 /// Client → server Meta Conversions API helper.
 /// 1:1 port of `src/services/meta-capi.ts`: fire-and-forget POST to the
@@ -146,6 +147,7 @@ class MetaCapi {
     Map<String, Object?>? customData,
     String? eventId,
   }) async {
+    if (isMetaConversion(eventName)) return;
     try {
       await BackendService.ensure();
       ensureFbp();
@@ -210,19 +212,4 @@ class MetaCapi {
     );
   }
 
-  /// Subscribe signal only. Purchase is sent to Meta exclusively by the
-  /// RevenueCat webhook (server) — the app must never send Purchase.
-  static void subscribe(double value, String currency, {String? productId}) {
-    track(
-      'Subscribe',
-      value: value,
-      currency: currency,
-      eventId: _uuid(),
-      customData: productId == null
-          ? null
-          : {
-              'content_ids': [productId],
-            },
-    );
-  }
 }

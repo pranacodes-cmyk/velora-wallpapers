@@ -115,8 +115,7 @@ class _DevotionalSlideState extends State<DevotionalSlide>
 
   Future<void> _handleShare() async {
     await haptic(HapticStyle.soft);
-    const appLink =
-        'https://play.google.com/store/apps/details?id=com.jesuswallpaperbible.app';
+    final appLink = kAppPlayStoreUrl;
     final messages = [
       t('dev.slide.share.text1', {'prayer': widget.prayer, 'link': appLink}),
       t('dev.slide.share.text2', {'prayer': widget.prayer, 'link': appLink}),

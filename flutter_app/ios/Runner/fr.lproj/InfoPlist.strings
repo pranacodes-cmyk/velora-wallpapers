@@ -1,0 +1,4 @@
+/* Permission prompts (generated from scripts/native_strings.py) */
+"CFBundleDisplayName" = "Prayly";
+"NSUserTrackingUsageDescription" = "Autorisez le suivi pour que nous sachions quelles publicités aident d'autres personnes à découvrir Prayly. Cela fait grandir l'app. Nous ne vendons jamais vos données.";
+"NSPhotoLibraryAddUsageDescription" = "Prayly enregistre votre fond d'écran du verset du jour dans Photos pour que vous puissiez l'utiliser.";

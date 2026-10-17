@@ -1,0 +1,4 @@
+/* Permission prompts (generated from scripts/native_strings.py) */
+"CFBundleDisplayName" = "Prayly";
+"NSUserTrackingUsageDescription" = "Izinkan pelacakan agar kami tahu iklan mana yang membantu orang menemukan Prayly. Ini membuat aplikasi terus berkembang. Kami tidak pernah menjual datamu.";
+"NSPhotoLibraryAddUsageDescription" = "Prayly menyimpan wallpaper ayat harianmu ke Foto agar bisa kamu jadikan wallpaper.";

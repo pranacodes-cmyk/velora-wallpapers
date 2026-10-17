@@ -446,16 +446,17 @@ export function PremiumSheet({ isOpen, onClose, onUnlock, trigger = "unknown", c
     })).catch(() => {});
     setPurchasing(true);
     try {
-      const ok = await purchasePackage(pkg);
-      if (ok) {
+      const outcome = await purchasePackage(pkg);
+      if (outcome.active) {
         unlock();
         haptic("heavy");
         toast.success(t("premium.toast.unlocked"));
-        import("@/services/analytics").then((a) => a.track("purchase_completed", {
+        import("@/services/analytics").then((a) => a.track(outcome.event, {
           trigger, plan: selectedPlan,
           product_id: (pkg as any).product?.identifier,
-          price: Number((pkg as any).product?.price ?? 0),
+          catalog_price: Number((pkg as any).product?.price ?? 0),
           currency: String((pkg as any).product?.currencyCode ?? "USD"),
+        ...outcome.properties,
         })).catch(() => {});
         if (onUnlock) onUnlock();
         onClose();

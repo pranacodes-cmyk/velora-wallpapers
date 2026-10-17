@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../widgets/rating_prompt_dialog.dart';
 import 'analytics.dart';
+import 'ios_platform.dart';
 import 'prefs.dart';
 
 /// 1:1 port of `src/services/rating.ts` — daily-aggressive, 2-step,
@@ -155,6 +156,13 @@ class RatingService {
   }
 
   static void _showPrompt() {
+    if (IosPlatform.isIOS) {
+      // App Store rules: no custom "do you like us?" gate — ask Apple's sheet
+      // directly at the happy moment (Apple throttles it to 3x a year).
+      Analytics.capture('rating_prompt_shown', {'platform': 'ios_native'});
+      IosPlatform.requestReview();
+      return;
+    }
     final ctx = navigatorKey.currentState?.overlay?.context;
     if (ctx == null) return;
     Analytics.capture('rating_prompt_shown');
@@ -166,6 +174,16 @@ class RatingService {
   /// the sheet almost certainly never appeared, and we fall back to opening
   /// the Play Store listing directly.
   static Future<void> openNativeRating() async {
+    if (IosPlatform.isIOS) {
+      try {
+        await launchUrl(
+          Uri.parse('${IosPlatform.appStoreUrl}?action=write-review'),
+          mode: LaunchMode.externalApplication,
+        );
+      } catch (_) {}
+      markRated();
+      return;
+    }
     if (kIsWeb) {
       try {
         await launchUrl(

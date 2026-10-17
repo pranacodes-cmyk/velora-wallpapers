@@ -1,0 +1,211 @@
+name: Flutter iOS TestFlight
+
+# Builds the Flutter iOS app (flutter_app/ios), signs it with Apple cloud
+# signing through the App Store Connect API key and uploads it to TestFlight.
+# The Android project is never built or touched here.
+#
+# Secrets: APPSTORE_ISSUER_ID, APPSTORE_KEY_ID, APPSTORE_PRIVATE_KEY (.p8 text).
+# The build shows up in App Store Connect → TestFlight ~10–20 min after upload.
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_name:
+        description: "Version shown in the App Store (blank = pubspec version)"
+        required: false
+        default: ""
+  push:
+    branches: [flutter-ios]
+    paths:
+      - ".github/workflows/flutter-ios-testflight.yml"
+      - "flutter_app/**"
+      - "flutter_app.tar.gz"
+
+concurrency:
+  group: flutter-ios-testflight
+  cancel-in-progress: false
+
+jobs:
+  testflight:
+    runs-on: macos-26
+    timeout-minutes: 80
+    outputs:
+      build_number: ${{ steps.ver.outputs.number }}
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+      TEAM_ID: NN9Q2FQYGP
+    defaults:
+      run:
+        working-directory: flutter_app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # The iOS release repo carries the app as one archive (keeps API pushes
+      # small); the main repo has the plain folder. Either layout works.
+      - name: Unpack app source (if archived)
+        working-directory: .
+        run: |
+          if [ -f flutter_app.tar.gz ]; then
+            tar -xzf flutter_app.tar.gz
+            echo "Unpacked $(find flutter_app -type f | wc -l) files"
+          fi
+          test -f flutter_app/pubspec.yaml
+
+      - name: Select Xcode 26
+        run: |
+          XCODE_PATH="$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -n 1)"
+          if [ -z "$XCODE_PATH" ]; then
+            echo "No Xcode 26 found:"; ls -d /Applications/Xcode*.app || true; exit 1
+          fi
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          xcodebuild -version
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Version + build number
+        id: ver
+        run: |
+          NAME="${{ github.event.inputs.build_name }}"
+          if [ -z "$NAME" ]; then
+            NAME="$(grep -E '^version:' pubspec.yaml | head -n1 | sed -E 's/version:[[:space:]]*//; s/\+.*//')"
+          fi
+          # Monotonic, always unique: minutes since epoch.
+          NUMBER="$(( $(date -u +%s) / 60 ))"
+          echo "BUILD_NAME=$NAME" >> "$GITHUB_ENV"
+          echo "BUILD_NUMBER=$NUMBER" >> "$GITHUB_ENV"
+          echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+          echo "Version $NAME ($NUMBER)"
+
+      - name: Flutter dependencies + iOS config
+        run: |
+          flutter --version
+          # google_mobile_ads still ships CocoaPods only; mixing it with
+          # Swift Package Manager plugins is rejected, so use CocoaPods for all.
+          flutter config --no-enable-swift-package-manager
+          flutter pub get
+          flutter build ios --release --no-codesign --config-only \
+            --build-name="$BUILD_NAME" --build-number="$BUILD_NUMBER"
+
+      - name: Install App Store Connect API key
+        env:
+          APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          APPSTORE_PRIVATE_KEY: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          KEY_PATH=~/.appstoreconnect/private_keys/AuthKey_${APPSTORE_KEY_ID}.p8
+          printf '%s\n' "$APPSTORE_PRIVATE_KEY" > "$KEY_PATH"
+          chmod 600 "$KEY_PATH"
+          echo "ASC_KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
+
+      - name: Archive
+        env:
+          APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$APPSTORE_KEY_ID" \
+            -authenticationKeyIssuerID "$APPSTORE_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_STYLE=Automatic \
+            CODE_SIGN_IDENTITY=- \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            archive 2>&1 | tee "$RUNNER_TEMP/archive.log" | xcpretty || {
+              echo "================ ARCHIVE FAILED ================"
+              grep -nE "error:|fatal error|Undefined symbol|Command .* failed" "$RUNNER_TEMP/archive.log" | head -n 80 || true
+              echo "--------------- last 150 lines ----------------"
+              tail -n 150 "$RUNNER_TEMP/archive.log"
+              exit 1
+            }
+
+      - name: Verify archive contents
+        run: |
+          APP="$RUNNER_TEMP/Runner.xcarchive/Products/Applications/Runner.app"
+          test -d "$APP" || { echo "Runner.app missing from archive"; exit 1; }
+          test -d "$APP/PlugIns/PraylyWidget.appex" || { echo "Widget not embedded"; exit 1; }
+          test -d "$APP/DailyWallpaper/backgrounds" || { echo "Wallpaper photos missing"; exit 1; }
+          echo "Backgrounds: $(ls "$APP/DailyWallpaper/backgrounds" | wc -l)"
+          echo "Widget photos: $(ls "$APP/PlugIns/PraylyWidget.appex/WidgetContent/backgrounds" | wc -l)"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$APP/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$APP/PlugIns/PraylyWidget.appex/Info.plist"
+          test -d "$APP/Metadata.appintents" && echo "App Intents metadata present" || echo "WARNING: no App Intents metadata"
+
+      - name: Export signed IPA (Apple cloud signing)
+        env:
+          APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+        run: |
+          set -o pipefail
+          cat > "$RUNNER_TEMP/exportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store-connect</string>
+              <key>teamID</key>
+              <string>${TEAM_ID}</string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+              <key>destination</key>
+              <string>export</string>
+              <key>uploadSymbols</key>
+              <true/>
+              <key>manageAppVersionAndBuildNumber</key>
+              <false/>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild \
+            -exportArchive \
+            -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist "$RUNNER_TEMP/exportOptions.plist" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$APPSTORE_KEY_ID" \
+            -authenticationKeyIssuerID "$APPSTORE_ISSUER_ID" 2>&1 | tee "$RUNNER_TEMP/export.log" | xcpretty || {
+              echo "================ EXPORT FAILED ================"
+              tail -n 120 "$RUNNER_TEMP/export.log"
+              exit 1
+            }
+          ls -la "$RUNNER_TEMP/export/"
+
+      - name: Upload to TestFlight
+        env:
+          APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+        run: |
+          IPA_PATH="$(ls "$RUNNER_TEMP"/export/*.ipa | head -n 1)"
+          echo "Uploading $IPA_PATH ($BUILD_NAME / $BUILD_NUMBER)"
+          xcrun altool --upload-app \
+            -f "$IPA_PATH" \
+            -t ios \
+            --apiKey "$APPSTORE_KEY_ID" \
+            --apiIssuer "$APPSTORE_ISSUER_ID" \
+            --output-format normal
+          echo "Uploaded $BUILD_NAME ($BUILD_NUMBER) — appears in TestFlight after Apple processing."
+
+  # Apple processing → "What to Test" + internal TestFlight groups.
+  testflight-ready:
+    needs: testflight
+    uses: ./.github/workflows/ios-build-status.yml
+    with:
+      build_number: ${{ needs.testflight.outputs.build_number }}
+    secrets: inherit

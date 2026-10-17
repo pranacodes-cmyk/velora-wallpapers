@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,8 +10,10 @@ import '../../core/services/ads_service.dart';
 import '../../core/services/analytics.dart';
 import '../../core/services/haptics.dart';
 import '../../core/services/share_service.dart';
+import '../../core/services/ios_platform.dart';
 import '../../core/services/rating_service.dart';
 import '../../core/services/wallpaper_bridge.dart';
+import '../ios/ios_copy.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/lucide.dart';
 import '../../core/widgets/color_boost.dart';
@@ -101,7 +104,50 @@ class _WallpaperDetailState extends ConsumerState<WallpaperDetail> {
       setState(() => _showPremium = true);
       return;
     }
+    if (IosPlatform.isIOS) {
+      // iOS has no wallpaper API for apps: save to Photos, then the user picks
+      // "Use as Wallpaper" from the share sheet in Photos.
+      _saveToPhotosIos();
+      return;
+    }
     setState(() => _showApplySheet = true);
+  }
+
+  Future<void> _saveToPhotosIos() async {
+    if (_applying) return;
+    setState(() => _applying = true);
+    try {
+      final res = await http.get(Uri.parse(widget.wallpaper.src)).timeout(const Duration(seconds: 30));
+      if (res.statusCode != 200 || res.bodyBytes.length < 1024) throw Exception('download ${res.statusCode}');
+      final result = await IosPlatform.saveImageToPhotos(res.bodyBytes);
+      if (!mounted) return;
+      if (result == 'saved') {
+        haptic(HapticStyle.heavy);
+        AppToast.success(context, IosCopy.t('photos.saved'), description: IosCopy.t('photos.savedHint'));
+        Analytics.capture('wallpaper_applied', {
+          'wallpaper_id': widget.wallpaper.id,
+          'type': 'static',
+          'target': 'ios_photos',
+          'is_premium_wallpaper': widget.wallpaper.isPremium,
+        });
+        Timer(const Duration(milliseconds: 3500), RatingService.maybeRequestRating);
+      } else if (result == 'denied') {
+        AppToast.error(context, IosCopy.t('photos.denied'));
+      } else {
+        AppToast.error(context, IosCopy.t('photos.failed'));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      AppToast.error(context, IosCopy.t('photos.failed'));
+      Analytics.capture('wallpaper_apply_failed', {
+        'wallpaper_id': widget.wallpaper.id,
+        'type': 'static',
+        'target': 'ios_photos',
+        'reason': '$e',
+      });
+    } finally {
+      if (mounted) setState(() => _applying = false);
+    }
   }
 
   Future<void> _handleShare() async {

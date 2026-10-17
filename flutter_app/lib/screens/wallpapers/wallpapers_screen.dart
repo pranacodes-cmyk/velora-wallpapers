@@ -30,6 +30,7 @@ import 'feed_banners.dart';
 import 'live_preview_overlay.dart';
 import 'mode_pill.dart';
 import 'wallpaper_search_overlay.dart';
+import '../../core/services/ios_platform.dart';
 import 'wallpapers_mode.dart';
 
 class _CategoryPill {
@@ -82,7 +83,10 @@ class WallpapersScreen extends ConsumerStatefulWidget {
 }
 
 class _WallpapersScreenState extends ConsumerState<WallpapersScreen> {
-  late WpMode _mode = wpModeFromString(Prefs.getString(kWallpapersModeKey));
+  // iOS cannot apply live (video) wallpapers — photos only there.
+  late WpMode _mode = IosPlatform.isIOS
+      ? WpMode.photos
+      : wpModeFromString(Prefs.getString(kWallpapersModeKey));
   String _activeCategory = 'all';
 
   final _scrollController = ScrollController();
@@ -530,8 +534,10 @@ class _WallpapersScreenState extends ConsumerState<WallpapersScreen> {
                   ),
                   Row(
                     children: [
-                      ModePill(mode: _mode, onChange: _setMode),
-                      const SizedBox(width: 8),
+                      if (!IosPlatform.isIOS) ...[
+                        ModePill(mode: _mode, onChange: _setMode),
+                        const SizedBox(width: 8),
+                      ],
                       GestureDetector(
                         onTap: () {
                           haptic(HapticStyle.soft);

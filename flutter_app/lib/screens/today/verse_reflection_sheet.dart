@@ -9,6 +9,7 @@ import '../../core/services/content_data.dart';
 import '../../core/services/haptics.dart';
 import '../../core/services/streak_store.dart';
 import '../../core/services/today_tasks_store.dart';
+import '../../core/services/share_service.dart';
 import '../../core/services/verse_wallpaper.dart';
 import 'today_shared.dart';
 
@@ -113,7 +114,10 @@ class _VerseReflectionSheetState extends State<VerseReflectionSheet> {
       final ok = await VerseWallpaper.share();
       if (!ok) {
         await SharePlus.instance.share(
-          ShareParams(text: '"${verse.text}"\n— ${verse.reference}'),
+          ShareParams(
+            text: '"${verse.text}"\n— ${verse.reference}',
+            sharePositionOrigin: kShareOrigin,
+          ),
         );
       }
       Analytics.capture('reflection_share_completed', {

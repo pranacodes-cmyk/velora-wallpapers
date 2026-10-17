@@ -202,7 +202,7 @@ class _PersonalPrayerSheetState extends ConsumerState<PersonalPrayerSheet> {
       title: t('pr.personal.shareTitle'),
       text:
           '$p\n\n━━━━━━━\n✝️ Made with Prayly: Bible Prayer & Verse\n'
-          'https://play.google.com/store/apps/details?id=com.jesuswallpaperbible.app',
+          '$kAppPlayStoreUrl',
       dialogTitle: t('pr.personal.shareDialogTitle'),
     );
   }

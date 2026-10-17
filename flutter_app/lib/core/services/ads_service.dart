@@ -1,8 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show debugPrint, kDebugMode, kIsWeb;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, debugPrint, defaultTargetPlatform, kDebugMode, kIsWeb;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../env.dart';
 import 'analytics.dart';
 import 'prefs.dart';
 
@@ -26,10 +28,16 @@ class AdsService {
   static const _rewardedUnitTest = 'ca-app-pub-3940256099942544/5224354917';
   static const _interstitialUnitTest = 'ca-app-pub-3940256099942544/1033173712';
 
-  static String get _rewardedUnit =>
-      kDebugMode ? _rewardedUnitTest : _rewardedUnitLive;
-  static String get _interstitialUnit =>
-      kDebugMode ? _interstitialUnitTest : _interstitialUnitLive;
+  static String get _rewardedUnit => kDebugMode
+      ? _rewardedUnitTest
+      : defaultTargetPlatform == TargetPlatform.iOS
+          ? Env.admobIosRewardedUnit
+          : _rewardedUnitLive;
+  static String get _interstitialUnit => kDebugMode
+      ? _interstitialUnitTest
+      : defaultTargetPlatform == TargetPlatform.iOS
+          ? Env.admobIosInterstitialUnit
+          : _interstitialUnitLive;
 
   static const _cooldown = Duration(milliseconds: 45000);
 
@@ -51,8 +59,15 @@ class AdsService {
     return until > DateTime.now().millisecondsSinceEpoch;
   }
 
+  /// Ads run only where real AdMob units exist. iOS has no AdMob app yet, so
+  /// it behaves like web: no ad requests, rewarded unlocks granted directly.
+  static bool get _adsUnavailable =>
+      kIsWeb ||
+      (defaultTargetPlatform == TargetPlatform.iOS &&
+          (Env.admobIosRewardedUnit.isEmpty || Env.admobIosInterstitialUnit.isEmpty));
+
   static Future<void> init() {
-    if (_initialized || kIsWeb) return Future.value();
+    if (_initialized || _adsUnavailable) return Future.value();
     return _initFuture ??= _gatherConsent()
         .then((_) => MobileAds.instance.initialize())
         .then((_) {
@@ -130,7 +145,7 @@ class AdsService {
   /// user, at least one guarded app) — never on every launch, so no AdMob
   /// requests are wasted on users who will never see a rewarded ad.
   static void primeRewarded() {
-    if (_isAdFree || kIsWeb) return;
+    if (_isAdFree || _adsUnavailable) return;
     init().then((_) => _preloadRewarded());
   }
 
@@ -177,7 +192,7 @@ class AdsService {
       await Analytics.capture('ad_rewarded_skipped_pro');
       return true;
     }
-    if (kIsWeb) return true;
+    if (_adsUnavailable) return true;
 
     await init();
 
@@ -246,7 +261,7 @@ class AdsService {
   /// Warms the next interstitial in the background so showing is instant.
   /// Safe to call at any time; no-op for ad-free users.
   static void primeInterstitial() {
-    if (_isAdFree || kIsWeb) return;
+    if (_isAdFree || _adsUnavailable) return;
     init().then((_) => _preloadInterstitial());
   }
 
@@ -284,7 +299,7 @@ class AdsService {
     bool force = false,
     bool onlyIfWarm = false,
   }) async {
-    if (_isAdFree || kIsWeb) return false;
+    if (_isAdFree || _adsUnavailable) return false;
     if (!force && isCooldownActive) return false;
 
     _inFlight = true;
@@ -306,7 +321,7 @@ class AdsService {
 
   static Future<void> _showInterstitial(String? label,
       {bool onlyIfWarm = false}) async {
-    if (_isAdFree || kIsWeb) return;
+    if (_isAdFree || _adsUnavailable) return;
     await init();
 
     var ad = _warmInterstitial;
@@ -385,7 +400,7 @@ class AdsService {
   /// Re-opens the AdMob consent (UMP) form so the user can change their
   /// personalized-ads preference. Required by Google for GDPR revocation.
   static Future<bool> showPrivacyOptionsForm() async {
-    if (kIsWeb) return false;
+    if (_adsUnavailable) return false;
     await init();
     final done = Completer<bool>();
     try {
@@ -404,7 +419,7 @@ class AdsService {
   /// Whether the privacy options form is available right now — used to hide
   /// the Settings row in regions where it does not apply.
   static Future<bool> isPrivacyOptionsRequired() async {
-    if (kIsWeb) return false;
+    if (_adsUnavailable) return false;
     try {
       await init();
       final status = await ConsentInformation.instance

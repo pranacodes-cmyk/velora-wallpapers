@@ -2,6 +2,7 @@ import { Capacitor } from "@capacitor/core";
 import { Purchases, LOG_LEVEL, PRODUCT_CATEGORY, type PurchasesPackage, type CustomerInfo, type PurchasesStoreProduct } from "@revenuecat/purchases-capacitor";
 import { fetchGooglePlaySubscriptionPrices, type NativeStorePrice } from "@/lib/googlePlayPrices";
 import { isFreeTestMode } from "@/services/free-test-mode";
+import { checkoutTracking } from "@/lib/purchaseTracking";
 
 type PlanKey = "weekly" | "monthly" | "yearly";
 type SubPlanKey = PlanKey;
@@ -207,29 +208,16 @@ export function hasPremiumEntitlement(info: CustomerInfo | null | undefined): bo
   return !!ent;
 }
 
-/** Purchase a package. Returns true on success (entitlement granted). */
-export async function purchasePackage(pkg: PurchasesPackage): Promise<boolean> {
+/** Purchase a package. Returns access and checkout classification, not verified revenue. */
+export async function purchasePackage(pkg: PurchasesPackage) {
   if (!isRevenueCatAvailable()) {
     throw new Error("Purchases are only available in the mobile app.");
   }
   await initRevenueCat();
   const result = await Purchases.purchasePackage({ aPackage: pkg });
   const success = hasPremiumEntitlement(result.customerInfo);
-  if (success) {
-    // Purchase is sent to Meta ONLY by the RevenueCat webhook (server).
-    // On trial start the app fires the standard StartTrial event (value 0).
-    try {
-      const ent: any = result.customerInfo?.entitlements?.active?.[PREMIUM_ENTITLEMENT];
-      const isTrial = String(ent?.periodType ?? "").toUpperCase() === "TRIAL";
-      if (isTrial) {
-        const currency = (pkg as any).product?.currencyCode ?? "USD";
-        const productId = (pkg as any).product?.identifier;
-        const meta = await import("@/services/meta-events");
-        meta.logStartTrial(String(currency), productId);
-      }
-    } catch { /* swallow */ }
-  }
-  return success;
+  const ent = result.customerInfo.entitlements.active[PREMIUM_ENTITLEMENT];
+  return { active: success, ...checkoutTracking(ent?.periodType, ent?.isSandbox ?? false) };
 }
 
 /** Restore previous purchases. Returns true if premium is now active. */
